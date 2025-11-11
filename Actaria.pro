@@ -8,24 +8,25 @@ CONFIG += c++17
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+INCLUDEPATH += include/GUI
 SOURCES += \
-    entity.cpp \
-    gamecontext.cpp \
-    main.cpp \
-    mainwindow.cpp \
-    playerinfo.cpp \
-    scene.cpp \
-    scenecontext.cpp \
-    trigger.cpp
+    src/GUI/entity.cpp \
+    src/GUI/gamecontext.cpp \
+    src/GUI/main.cpp \
+    src/GUI/mainwindow.cpp \
+    src/GUI/playerinfo.cpp \
+    src/GUI/scene.cpp \
+    src/GUI/scenecontext.cpp \
+    src/GUI/trigger.cpp
 
 HEADERS += \
-    entity.h \
-    gamecontext.h \
-    mainwindow.h \
-    playerinfo.h \
-    scene.h \
-    scenecontext.h \
-    trigger.h
+    include/GUI/entity.h \
+    include/GUI/gamecontext.h \
+    include/GUI/mainwindow.h \
+    include/GUI/playerinfo.h \
+    include/GUI/scene.h \
+    include/GUI/scenecontext.h \
+    include/GUI/trigger.h
 
 FORMS += \
     mainwindow.ui
