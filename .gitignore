@@ -1,4 +1,6 @@
-/build
+# Qt build dir
+build/
+*.user
 
 # C++ objects and libs
 *.slo
