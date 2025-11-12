@@ -1,0 +1,16 @@
+Actaria should allow the user to play a visual novel game that they assemble themselves using written dialogues, storylines, backgrounds, and sounds.
+The coherence of the story is ensured by a system of triggers and game context.
+
+A visual novel is defined as a story-based game represented by a directed graph.
+A node of the graph is a scene — a unit of the storyline.
+A scene represents a dialogue (or monologue) with a character from the story.
+The dialogue offers the player multiple response choices (including the absence of a choice).
+Depending on the chosen response, the current dialogue context or even the global game context may change.
+Contexts are stored as sets of variables (logical variables are called triggers) and triggers themselves.
+
+The workflow in Actaria consists of creating and editing game scenes and planning the connections between them.
+In some scenes, it may be necessary to activate a trigger, while in others it may be required to switch the narrative branch to one isolated from an alternative ending.
+
+These scenes form a directed graph of the story, which is serialized into a primitive binary format.
+The binary file is passed to a virtual machine that runs the user’s game (with subsequent saving of progress).
+A human-readable game format is also intended to be supported.
