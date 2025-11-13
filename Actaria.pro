@@ -10,20 +10,18 @@ CONFIG += c++20
 
 INCLUDEPATH += include
 SOURCES += \
-    src/Entities/contextcounter.cpp \
     src/Entities/contextvar.cpp \
-    src/Entities/context.cpp \
     src/Entities/entity.cpp \
     src/main.cpp \
-    src/GUI/mainwindow.cpp
+    src/GUI/mainwindow.cpp \
+    src/Entities/trigger.cpp
 
 HEADERS += \
-    include/Entities/contextcounter.h \
     include/Entities/contextvar.h \
-    include/Entities/context.h \
     include/Entities/entity.h \
     include/GUI/mainwindow.h \
-    include/utils.h
+    include/utils.h \
+    include/Entities/trigger.h
 
 FORMS += \
     mainwindow.ui
