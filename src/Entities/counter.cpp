@@ -125,7 +125,7 @@ QByteArray Counter::serialize(bool isPrefix) const
 void Counter::deserialize(const QByteArray& data)
 {
     if(data.size() < this->Counter::minimumSize()){
-        qWarning("Trigger::deserialize: data too small");
+        qWarning("Counter::deserialize: data too small");
         return;
     }
 
@@ -162,14 +162,14 @@ QString Counter::represent() const
 void Counter::fromString(const QStringList &data)
 {
     if(data.size() < 5){
-        qWarning("Trigger::fromString: data too small");
+        qWarning("Counter::fromString: data too small");
         return;
     }
 
     bool ok;
     this->value = static_cast<value_type>(data[1].toInt(&ok));
     if(!ok){
-        qWarning("Trigger::Failed to parse entity id");
+        qWarning("Counter::Failed to parse entity id");
     }
 
     this->ContextVar::fromString(data.mid(2));

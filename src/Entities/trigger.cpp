@@ -10,6 +10,7 @@ namespace {
 
 /**
  * @brief Trigger::minimumSize
+ *
  * @return
  */
 quint32 Trigger::minimumSize() const
@@ -19,7 +20,9 @@ quint32 Trigger::minimumSize() const
 
 /**
  * @brief Trigger::Trigger
+ *
  * @param value
+ *
  * @param name
  */
 Trigger::Trigger(value_type value, const QString &name)
@@ -27,6 +30,7 @@ Trigger::Trigger(value_type value, const QString &name)
 
 /**
  * @brief Trigger::Trigger
+ *
  * @param represent
  */
 Trigger::Trigger(const QStringList &represent)
@@ -37,6 +41,7 @@ Trigger::Trigger(const QStringList &represent)
 
 /**
  * @brief Trigger::Trigger
+ *
  * @param represent
  */
 Trigger::Trigger(const QByteArray &represent)
@@ -47,6 +52,7 @@ Trigger::Trigger(const QByteArray &represent)
 
 /**
  * @brief Trigger::getValue
+ *
  * @return
  */
 Trigger::value_type Trigger::getValue() const
@@ -56,6 +62,7 @@ Trigger::value_type Trigger::getValue() const
 
 /**
  * @brief Trigger::setValue
+ *
  * @param value
  */
 void Trigger::setValue(value_type value) noexcept
@@ -73,6 +80,7 @@ Trigger::operator bool() const noexcept
 
 /**
  * @brief Trigger::hash
+ *
  * @return
  */
 Entity::hash_type Trigger::hash() const
@@ -82,6 +90,7 @@ Entity::hash_type Trigger::hash() const
 
 /**
  * @brief Trigger::size
+ *
  * @return
  */
 size_t Trigger::size() const
@@ -92,7 +101,9 @@ size_t Trigger::size() const
 
 /**
  * @brief Trigger::serialize
+ *
  * @param isPrefix
+ *
  * @return
  */
 QByteArray Trigger::serialize(bool isPrefix) const
@@ -113,6 +124,7 @@ QByteArray Trigger::serialize(bool isPrefix) const
 
 /**
  * @brief Trigger::deserialize
+ *
  * @param data
  */
 void Trigger::deserialize(const QByteArray& data)
@@ -137,6 +149,7 @@ void Trigger::deserialize(const QByteArray& data)
 
 /**
  * @brief Trigger::represent
+ *
  * @return
  */
 QString Trigger::represent() const
@@ -150,6 +163,7 @@ QString Trigger::represent() const
 
 /**
  * @brief Trigger::fromString
+ *
  * @param data
  */
 void Trigger::fromString(const QStringList &data)
