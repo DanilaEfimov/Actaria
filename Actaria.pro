@@ -10,6 +10,7 @@ CONFIG += c++20
 
 INCLUDEPATH += include
 SOURCES += \
+    src/GUI/codeeditor.cpp \
     src/Entities/counter.cpp \
     src/Entities/contextvar.cpp \
     src/Entities/entity.cpp \
@@ -18,6 +19,7 @@ SOURCES += \
     src/Entities/trigger.cpp
 
 HEADERS += \
+    include/GUI/codeeditor.h \
     include/Entities/counter.h \
     include/Entities/contextvar.h \
     include/Entities/entity.h \
@@ -26,7 +28,8 @@ HEADERS += \
     include/Entities/trigger.h
 
 FORMS += \
-    mainwindow.ui
+    ui/codeeditor.ui \
+    ui/mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
