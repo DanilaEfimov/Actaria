@@ -13,10 +13,17 @@ protected:
     QString name;
 
     ContextVar();
+    ContextVar(const QString& name);
     ContextVar(const QStringList& represent);
     ContextVar(const QByteArray& represent);
 
     size_t size() const override;
+    quint32 minimumSize() const override;
+
+    QByteArray serialize() const override;
+    void deserialize(const QByteArray& data) override;
+    QString represent() const override;
+    void fromString(const QStringList& data) override;
 
 public:
     virtual ~ContextVar() = default;

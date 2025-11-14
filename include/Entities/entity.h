@@ -25,9 +25,14 @@ public:
 protected:
     id_type id;
 
+    struct NonIncrementFlag {};
+
     Entity();
+    Entity(NonIncrementFlag&&);
     Entity(const QStringList& represent);
     Entity(const QByteArray& represent);
+
+    virtual quint32 minimumSize() const;
 
 public:
     virtual ~Entity() = default;
@@ -40,7 +45,7 @@ public:
     virtual void deserialize(const QByteArray&);
 
     virtual QString represent() const;
-    virtual void fromString(const QStringList& data);
+    virtual void fromString(const QStringList&);
 
     id_type getId() const;
 
