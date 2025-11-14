@@ -4,7 +4,6 @@
  * Derived classes: Scene, Dialog, Trigger, and other game objects.
  */
 
-
 #ifndef ENTITY_H
 #define ENTITY_H
 
@@ -41,7 +40,7 @@ public:
 
     // returns serialized object size in bytes
     virtual size_t size() const;
-    virtual QByteArray serialize() const;
+    virtual QByteArray serialize(bool isPostfix = false) const;
     virtual void deserialize(const QByteArray&);
 
     virtual QString represent() const;

@@ -11,11 +11,11 @@ namespace {
 
 quint32 Trigger::minimumSize() const
 {
-    return sizeof(hash_type) + sizeof(value_type) + this->ContextVar::minimumSize();
+    return sizeof(value_type) + this->ContextVar::minimumSize();
 }
 
 Trigger::Trigger()
-: ContextVar(), value(false) {}
+    : ContextVar(), value(false) {}
 
 Trigger::Trigger(value_type value, const QString &name)
     : ContextVar(name), value(value) {}
@@ -24,6 +24,12 @@ Trigger::Trigger(const QStringList &represent)
     : ContextVar()
 {
     this->fromString(represent);
+}
+
+Trigger::Trigger(const QByteArray &represent)
+    : ContextVar()
+{
+    this->deserialize(represent);
 }
 
 Trigger::value_type Trigger::getValue() const
@@ -48,27 +54,22 @@ Entity::hash_type Trigger::hash() const
 
 size_t Trigger::size() const
 {
-    // >= 25 bytes (without QChars)
-    // [hash code][value][name][entity hash code][id]
     return sizeof(utils::hash_type)
            + sizeof(value_type)
            + this->ContextVar::size();
 }
 
-QByteArray Trigger::serialize() const
+QByteArray Trigger::serialize(bool isPrefix) const
 {
-    /**
-     * [hash code][value][ContextVar]
-     * returns byte representation of Trigger.
-     */
     QByteArray ret;
     QDataStream out(&ret, QDataStream::WriteOnly);
     out.setVersion(QDataStream::Qt_6_5);
 
-    out << static_cast<hash_type>(this->hash())
-        << static_cast<value_type>(this->value);
+    if(!isPrefix)
+        out << static_cast<hash_type>(this->hash());
+    out << static_cast<value_type>(this->value);
 
-    QByteArray arr = this->ContextVar::serialize();
+    QByteArray arr = this->ContextVar::serialize(true);
     out.writeRawData(arr.constData(), arr.size());
 
     return ret;
@@ -88,8 +89,6 @@ void Trigger::deserialize(const QByteArray& data)
     QDataStream in(&buffer);
     in.setVersion(QDataStream::Qt_6_5);
 
-    in.skipRawData(sizeof(hash_type));
-
     in >> this->value;
 
     quint64 pos = buffer.pos();
@@ -98,7 +97,6 @@ void Trigger::deserialize(const QByteArray& data)
 
 QString Trigger::represent() const
 {
-    // Example: "Trigger::1::checkpoint::Entity::23"
     return QStringList{
         typeName,
         QString::number(this->value),

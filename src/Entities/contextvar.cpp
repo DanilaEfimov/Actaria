@@ -29,7 +29,7 @@ size_t ContextVar::size() const
 {
     return sizeof(quint32)  // length of name in QChars
            + this->name.size() * sizeof(QChar)
-           +this->Entity::size();
+           + this->Entity::size();
 }
 
 quint32 ContextVar::minimumSize() const
@@ -37,7 +37,7 @@ quint32 ContextVar::minimumSize() const
     return sizeof(QChar) + this->Entity::minimumSize();
 }
 
-QByteArray ContextVar::serialize() const
+QByteArray ContextVar::serialize(bool isPrefix) const
 {
     QByteArray ret;
     QDataStream out(&ret, QDataStream::WriteOnly);
@@ -45,7 +45,7 @@ QByteArray ContextVar::serialize() const
 
     out << static_cast<QString>(this->name);
 
-    QByteArray arr = this->Entity::serialize();
+    QByteArray arr = this->Entity::serialize(true);
     out.writeRawData(arr.constData(), arr.size());
 
     return ret;

@@ -56,7 +56,7 @@ Entity::Entity(const QByteArray &represent)
  */
 quint32 Entity::minimumSize() const
 {
-    return sizeof(utils::hash_type) + sizeof(Entity::id_type);
+    return sizeof(Entity::id_type);
 }
 
 /**
@@ -86,14 +86,15 @@ size_t Entity::size() const
  *
  * @return binary serialized onject
  */
-QByteArray Entity::serialize() const
+QByteArray Entity::serialize(bool isPostfix) const
 {
     QByteArray ret;
     QDataStream out(&ret, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_5);
 
-    out << static_cast<hash_type>(this->hash())
-        << static_cast<id_type>(this->id);
+    if(!isPostfix)
+        out << static_cast<hash_type>(this->hash());
+    out << static_cast<id_type>(this->id);
 
     return ret;
 }
@@ -119,7 +120,6 @@ void Entity::deserialize(const QByteArray& data)
     QDataStream in(&buffer);
     in.setVersion(QDataStream::Qt_6_5);
 
-    in.skipRawData(sizeof(hash_type));
     in >> this->id;
 }
 

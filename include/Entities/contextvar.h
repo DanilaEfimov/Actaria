@@ -20,7 +20,7 @@ protected:
     size_t size() const override;
     quint32 minimumSize() const override;
 
-    QByteArray serialize() const override;
+    QByteArray serialize(bool isPrefix = false) const override;
     void deserialize(const QByteArray& data) override;
     QString represent() const override;
     void fromString(const QStringList& data) override;
