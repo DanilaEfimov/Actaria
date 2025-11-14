@@ -13,7 +13,7 @@ protected:
     quint32 minimumSize() const override;
 
 public:
-    Trigger();
+    Trigger() = delete;
     Trigger(value_type value, const QString& name);
     Trigger(const QStringList& represent);
     Trigger(const QByteArray& represent);

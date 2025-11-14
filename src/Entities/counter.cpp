@@ -1,101 +1,109 @@
-#include "Entities/trigger.h"
-#include <QByteArray>
-#include <QDataStream>
+#include "Entities/counter.h"
 #include <QBuffer>
-#include <QVariant>
+#include <QDataStream>
 
 namespace {
-    constexpr const char* typeName = "Trigger";
-};
-
-/**
- * @brief Trigger::minimumSize
- * @return
- */
-quint32 Trigger::minimumSize() const
-{
-    return sizeof(value_type) + this->ContextVar::minimumSize();
+    constexpr const char* typeName = "Counter";
 }
 
 /**
- * @brief Trigger::Trigger
+ * @brief Counter::Counter
+ *
  * @param value
+ *
  * @param name
  */
-Trigger::Trigger(value_type value, const QString &name)
+Counter::Counter(value_type value, const QString &name)
     : ContextVar(name), value(value) {}
 
 /**
- * @brief Trigger::Trigger
+ * @brief Counter::Counter
+ *
  * @param represent
  */
-Trigger::Trigger(const QStringList &represent)
+Counter::Counter(const QStringList &represent)
     : ContextVar()
 {
     this->fromString(represent);
 }
 
 /**
- * @brief Trigger::Trigger
+ * @brief Counter::Counter
+ *
  * @param represent
  */
-Trigger::Trigger(const QByteArray &represent)
+Counter::Counter(const QByteArray &represent)
     : ContextVar()
 {
     this->deserialize(represent);
 }
 
 /**
- * @brief Trigger::getValue
+ * @brief Counter::getValue
+ *
  * @return
  */
-Trigger::value_type Trigger::getValue() const
+Counter::value_type Counter::getValue() const
 {
     return this->value;
 }
 
 /**
- * @brief Trigger::setValue
+ * @brief Counter::setValue
+ *
  * @param value
  */
-void Trigger::setValue(value_type value) noexcept
+void Counter::setValue(value_type value) noexcept
 {
     this->value = value;
 }
 
 /**
- * @brief Trigger::operator bool
+ * @brief Counter::operator int
  */
-Trigger::operator bool() const noexcept
+Counter::operator int() const noexcept
 {
     return this->value;
 }
 
 /**
- * @brief Trigger::hash
+ * @brief Counter::minimumSize
+ *
  * @return
  */
-Entity::hash_type Trigger::hash() const
+quint32 Counter::minimumSize() const
+{
+    return sizeof(value_type) + this->ContextVar::minimumSize();
+}
+
+/**
+ * @brief Counter::hash
+ *
+ * @return
+ */
+Entity::hash_type Counter::hash() const
 {
     return utils::fnv1a_64(typeName);
 }
 
 /**
- * @brief Trigger::size
+ * @brief Counter::size
+ *
  * @return
  */
-size_t Trigger::size() const
+size_t Counter::size() const
 {
-    return sizeof(value_type)
-           + this->ContextVar::size();
+    return sizeof(value_type) + this->ContextVar::size();
 }
 
 /**
- * @brief Trigger::serialize
- * @param isPrefix
+ * @brief Counter::serialize
+ *
+ * @param isPostfix
+ *
  * @return
  */
-QByteArray Trigger::serialize(bool isPrefix) const
+QByteArray Counter::serialize(bool isPrefix) const
 {
     QByteArray ret;
     QDataStream out(&ret, QDataStream::WriteOnly);
@@ -112,12 +120,11 @@ QByteArray Trigger::serialize(bool isPrefix) const
 }
 
 /**
- * @brief Trigger::deserialize
- * @param data
+ * @brief Counter::deserialize
  */
-void Trigger::deserialize(const QByteArray& data)
+void Counter::deserialize(const QByteArray& data)
 {
-    if(data.size() < this->Trigger::minimumSize()){
+    if(data.size() < this->Counter::minimumSize()){
         qWarning("Trigger::deserialize: data too small");
         return;
     }
@@ -136,10 +143,11 @@ void Trigger::deserialize(const QByteArray& data)
 }
 
 /**
- * @brief Trigger::represent
+ * @brief Counter::represent
+ *
  * @return
  */
-QString Trigger::represent() const
+QString Counter::represent() const
 {
     return QStringList{
         typeName,
@@ -149,10 +157,9 @@ QString Trigger::represent() const
 }
 
 /**
- * @brief Trigger::fromString
- * @param data
+ * @brief Counter::fromString
  */
-void Trigger::fromString(const QStringList &data)
+void Counter::fromString(const QStringList &data)
 {
     if(data.size() < 5){
         qWarning("Trigger::fromString: data too small");

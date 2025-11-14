@@ -10,6 +10,7 @@ CONFIG += c++20
 
 INCLUDEPATH += include
 SOURCES += \
+    src/Entities/counter.cpp \
     src/Entities/contextvar.cpp \
     src/Entities/entity.cpp \
     src/main.cpp \
@@ -17,6 +18,7 @@ SOURCES += \
     src/Entities/trigger.cpp
 
 HEADERS += \
+    include/Entities/counter.h \
     include/Entities/contextvar.h \
     include/Entities/entity.h \
     include/GUI/mainwindow.h \

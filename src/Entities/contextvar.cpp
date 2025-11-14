@@ -11,11 +11,6 @@ ContextVar::ContextVar(const QString &name)
 ContextVar::ContextVar(const QStringList& represent)
     : Entity(NonIncrementFlag{})
 {
-    /**
-     * It is assumed here that the id will be read from
-     * the provided object representation,
-     * so a dummy parent constructor is used.
-    */
     this->fromString(represent);
 }
 
