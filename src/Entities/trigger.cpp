@@ -6,12 +6,13 @@
 
 namespace {
     constexpr const char* typeName = "Trigger";
+    constexpr const int fieldCount = 2;
 };
 
 /**
  * @brief Trigger::minimumSize
  *
- * @return
+ * @return minimum required size for hex-dump
  */
 quint32 Trigger::minimumSize() const
 {
@@ -19,7 +20,19 @@ quint32 Trigger::minimumSize() const
 }
 
 /**
+ * @brief Trigger::minimumStrings
+ *
+ * @return count of required strings in representation
+ */
+quint32 Trigger::minimumStrings() const
+{
+    return fieldCount + this->ContextVar::minimumStrings();
+}
+
+/**
  * @brief Trigger::Trigger
+ *
+ * Normal constructor for context counter.
  *
  * @param value
  *
@@ -30,6 +43,9 @@ Trigger::Trigger(value_type value, const QString &name)
 
 /**
  * @brief Trigger::Trigger
+ *
+ * Non global entity counter increment.
+ * Hex parse-based constructor.
  *
  * @param represent
  */
@@ -42,6 +58,9 @@ Trigger::Trigger(const QStringList &represent)
 /**
  * @brief Trigger::Trigger
  *
+ * Non global entity counter increment.
+ * QString parse-based constructor.
+ *
  * @param represent
  */
 Trigger::Trigger(const QByteArray &represent)
@@ -53,7 +72,7 @@ Trigger::Trigger(const QByteArray &represent)
 /**
  * @brief Trigger::getValue
  *
- * @return
+ * @return trigger-value
  */
 Trigger::value_type Trigger::getValue() const
 {
@@ -81,7 +100,7 @@ Trigger::operator bool() const noexcept
 /**
  * @brief Trigger::hash
  *
- * @return
+ * @return fnv-1a hash of typeName string
  */
 Entity::hash_type Trigger::hash() const
 {
@@ -91,7 +110,7 @@ Entity::hash_type Trigger::hash() const
 /**
  * @brief Trigger::size
  *
- * @return
+ * @return actual size of object in bytes
  */
 size_t Trigger::size() const
 {
@@ -102,21 +121,19 @@ size_t Trigger::size() const
 /**
  * @brief Trigger::serialize
  *
- * @param isPrefix
+ * @param isPostfix - true if called by deriver
  *
- * @return
+ * @return hex-dump of object
  */
-QByteArray Trigger::serialize(bool isPrefix) const
+QByteArray Trigger::serialize() const
 {
     QByteArray ret;
     QDataStream out(&ret, QDataStream::WriteOnly);
     out.setVersion(QDataStream::Qt_6_5);
 
-    if(!isPrefix)
-        out << static_cast<hash_type>(this->hash());
     out << static_cast<value_type>(this->value);
 
-    QByteArray arr = this->ContextVar::serialize(true);
+    QByteArray arr = this->ContextVar::serialize();
     out.writeRawData(arr.constData(), arr.size());
 
     return ret;
@@ -124,6 +141,8 @@ QByteArray Trigger::serialize(bool isPrefix) const
 
 /**
  * @brief Trigger::deserialize
+ *
+ * Parse raw bytes in lineral order.
  *
  * @param data
  */
@@ -150,7 +169,7 @@ void Trigger::deserialize(const QByteArray& data)
 /**
  * @brief Trigger::represent
  *
- * @return
+ * @return Readable QString presentation
  */
 QString Trigger::represent() const
 {
@@ -164,11 +183,13 @@ QString Trigger::represent() const
 /**
  * @brief Trigger::fromString
  *
+ * Parse QString in lineral order with typeName skipping.
+ *
  * @param data
  */
 void Trigger::fromString(const QStringList &data)
 {
-    if(data.size() < 5){
+    if(data.size() < this->Trigger::minimumSize()){
         qWarning("Trigger::fromString: data too small");
         return;
     }
@@ -179,5 +200,5 @@ void Trigger::fromString(const QStringList &data)
         qWarning("Trigger::Failed to parse entity id");
     }
 
-    this->ContextVar::fromString(data.mid(2));
+    this->ContextVar::fromString(data.mid(fieldCount));
 }

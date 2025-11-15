@@ -60,6 +60,16 @@ quint32 Entity::minimumSize() const
 }
 
 /**
+ * @brief Entity::minimumStrings
+ *
+ * @return count of required strings in representation
+ */
+quint32 Entity::minimumStrings() const
+{
+    return 2;
+}
+
+/**
  * @brief Entity::hash
  *
  * @return fnv-1A 64 bits hash by class name
@@ -86,14 +96,12 @@ size_t Entity::size() const
  *
  * @return binary serialized onject
  */
-QByteArray Entity::serialize(bool isPostfix) const
+QByteArray Entity::serialize() const
 {
     QByteArray ret;
     QDataStream out(&ret, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_5);
 
-    if(!isPostfix)
-        out << static_cast<hash_type>(this->hash());
     out << static_cast<id_type>(this->id);
 
     return ret;

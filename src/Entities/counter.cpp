@@ -4,10 +4,13 @@
 
 namespace {
     constexpr const char* typeName = "Counter";
+    constexpr const int fieldCount = 2;
 }
 
 /**
  * @brief Counter::Counter
+ *
+ * Normal constructor for context counter.
  *
  * @param value
  *
@@ -18,6 +21,9 @@ Counter::Counter(value_type value, const QString &name)
 
 /**
  * @brief Counter::Counter
+ *
+ * Non global entity counter increment.
+ * Hex parse-based constructor.
  *
  * @param represent
  */
@@ -30,6 +36,9 @@ Counter::Counter(const QStringList &represent)
 /**
  * @brief Counter::Counter
  *
+ * Non global entity counter increment.
+ * QString parse-based constructor.
+ *
  * @param represent
  */
 Counter::Counter(const QByteArray &represent)
@@ -41,7 +50,7 @@ Counter::Counter(const QByteArray &represent)
 /**
  * @brief Counter::getValue
  *
- * @return
+ * @return trigger-counter
  */
 Counter::value_type Counter::getValue() const
 {
@@ -69,7 +78,7 @@ Counter::operator int() const noexcept
 /**
  * @brief Counter::minimumSize
  *
- * @return
+ * @return minimum required size for hex-dump
  */
 quint32 Counter::minimumSize() const
 {
@@ -77,9 +86,19 @@ quint32 Counter::minimumSize() const
 }
 
 /**
+ * @brief Counter::minimumStrings
+ *
+ * @return count of required strings in representation
+ */
+quint32 Counter::minimumStrings() const
+{
+    return fieldCount + this->ContextVar::minimumStrings();
+}
+
+/**
  * @brief Counter::hash
  *
- * @return
+ * @return fnv-1a hash of typeName string
  */
 Entity::hash_type Counter::hash() const
 {
@@ -89,7 +108,7 @@ Entity::hash_type Counter::hash() const
 /**
  * @brief Counter::size
  *
- * @return
+ * @return actual size of object in bytes
  */
 size_t Counter::size() const
 {
@@ -99,21 +118,19 @@ size_t Counter::size() const
 /**
  * @brief Counter::serialize
  *
- * @param isPostfix
+ * @param isPostfix - true if called by deriver
  *
- * @return
+ * @return hex-dump of object
  */
-QByteArray Counter::serialize(bool isPrefix) const
+QByteArray Counter::serialize() const
 {
     QByteArray ret;
     QDataStream out(&ret, QDataStream::WriteOnly);
     out.setVersion(QDataStream::Qt_6_5);
 
-    if(!isPrefix)
-        out << static_cast<hash_type>(this->hash());
     out << static_cast<value_type>(this->value);
 
-    QByteArray arr = this->ContextVar::serialize(true);
+    QByteArray arr = this->ContextVar::serialize();
     out.writeRawData(arr.constData(), arr.size());
 
     return ret;
@@ -121,6 +138,10 @@ QByteArray Counter::serialize(bool isPrefix) const
 
 /**
  * @brief Counter::deserialize
+ *
+ * Parse raw bytes in lineral order.
+ *
+ * @param data
  */
 void Counter::deserialize(const QByteArray& data)
 {
@@ -145,7 +166,7 @@ void Counter::deserialize(const QByteArray& data)
 /**
  * @brief Counter::represent
  *
- * @return
+ * @return Readable QString presentation
  */
 QString Counter::represent() const
 {
@@ -158,10 +179,14 @@ QString Counter::represent() const
 
 /**
  * @brief Counter::fromString
+ *
+ * Parse QString in lineral order with typeNmae skipping.
+ *
+ * @param data
  */
 void Counter::fromString(const QStringList &data)
 {
-    if(data.size() < 5){
+    if(data.size() < this->Counter::minimumStrings()){
         qWarning("Counter::fromString: data too small");
         return;
     }
@@ -172,5 +197,5 @@ void Counter::fromString(const QStringList &data)
         qWarning("Counter::Failed to parse entity id");
     }
 
-    this->ContextVar::fromString(data.mid(2));
+    this->ContextVar::fromString(data.mid(fieldCount));
 }

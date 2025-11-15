@@ -13,6 +13,7 @@ SOURCES += \
     src/Entities/counter.cpp \
     src/Entities/contextvar.cpp \
     src/Entities/entity.cpp \
+    src/Entities/namevar.cpp \
     src/main.cpp \
     src/GUI/mainwindow.cpp \
     src/Entities/trigger.cpp
@@ -21,6 +22,7 @@ HEADERS += \
     include/Entities/counter.h \
     include/Entities/contextvar.h \
     include/Entities/entity.h \
+    include/Entities/namevar.h \
     include/GUI/mainwindow.h \
     include/utils.h \
     include/Entities/trigger.h

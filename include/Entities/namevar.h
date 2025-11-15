@@ -1,12 +1,12 @@
-#ifndef TRIGGER_H
-#define TRIGGER_H
+#ifndef NAMEVAR_H
+#define NAMEVAR_H
 
 #include "Entities/contextvar.h"
 
-class Trigger : public ContextVar
+class NameVar : public ContextVar
 {
 protected:
-    using value_type = bool;
+    using value_type = QString;
 
     value_type value;
 
@@ -14,15 +14,15 @@ protected:
     quint32 minimumStrings() const override;
 
 public:
-    Trigger() = delete;
-    Trigger(value_type value, const QString& name);
-    Trigger(const QStringList& represent);
-    Trigger(const QByteArray& represent);
+    NameVar() = delete;
+    NameVar(value_type value, const QString& name);
+    NameVar(const QStringList& represent);
+    NameVar(const QByteArray& represent);
 
     value_type getValue() const;
     void setValue(value_type value) noexcept;
 
-    operator bool() const noexcept;
+    operator QString() const noexcept;
 
     // Entity interface
     hash_type hash() const override;
@@ -30,7 +30,7 @@ public:
     QByteArray serialize() const override;
     void deserialize(const QByteArray &) override;
     QString represent() const override;
-    void fromString(const QStringList &data) override;
+    void fromString(const QStringList &) override;
 };
 
-#endif // TRIGGER_H
+#endif // NAMEVAR_H

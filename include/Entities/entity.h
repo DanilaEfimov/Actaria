@@ -32,6 +32,7 @@ protected:
     Entity(const QByteArray& represent);
 
     virtual quint32 minimumSize() const;
+    virtual quint32 minimumStrings() const;
 
 public:
     virtual ~Entity() = default;
@@ -40,7 +41,7 @@ public:
 
     // returns serialized object size in bytes
     virtual size_t size() const;
-    virtual QByteArray serialize(bool isPostfix = false) const;
+    virtual QByteArray serialize() const;
     virtual void deserialize(const QByteArray&);
 
     virtual QString represent() const;

@@ -1,6 +1,10 @@
 #include "Entities/contextvar.h"
 #include <QBuffer>
 
+namespace {
+    constexpr const int fieldCount = 1;
+}
+
 
 ContextVar::ContextVar()
     : Entity(NonIncrementFlag{}), name() {}
@@ -32,7 +36,12 @@ quint32 ContextVar::minimumSize() const
     return sizeof(QChar) + this->Entity::minimumSize();
 }
 
-QByteArray ContextVar::serialize(bool isPrefix) const
+quint32 ContextVar::minimumStrings() const
+{
+    return fieldCount;
+}
+
+QByteArray ContextVar::serialize() const
 {
     QByteArray ret;
     QDataStream out(&ret, QDataStream::WriteOnly);
@@ -40,7 +49,7 @@ QByteArray ContextVar::serialize(bool isPrefix) const
 
     out << static_cast<QString>(this->name);
 
-    QByteArray arr = this->Entity::serialize(true);
+    QByteArray arr = this->Entity::serialize();
     out.writeRawData(arr.constData(), arr.size());
 
     return ret;
@@ -73,13 +82,13 @@ QString ContextVar::represent() const
 
 void ContextVar::fromString(const QStringList &data)
 {
-    if(data.size() < 3){
+    if(data.size() < this->ContextVar::minimumStrings()){
         qWarning("ContextVar::fromString: data too small");
         return;
     }
 
     this->name = data[0];
-    this->Entity::fromString(data.mid(1));
+    this->Entity::fromString(data.mid(fieldCount));
 }
 
 QString ContextVar::getName() const

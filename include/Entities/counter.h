@@ -11,6 +11,7 @@ protected:
     value_type value;
 
     quint32 minimumSize() const override;
+    quint32 minimumStrings() const override;
 
 public:
     Counter() = delete;
@@ -26,7 +27,7 @@ public:
     // Entity interface
     hash_type hash() const override;
     size_t size() const override;
-    QByteArray serialize(bool isPostfix = false) const override;
+    QByteArray serialize() const override;
     void deserialize(const QByteArray &) override;
     QString represent() const override;
     void fromString(const QStringList &) override;
