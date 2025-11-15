@@ -31,6 +31,8 @@ public:
 
     QString getName() const;
     void setName(const QString& name) noexcept;
+
+    bool operator<(const ContextVar& other) const noexcept;
 };
 
 #endif // CONTEXTVAR_H

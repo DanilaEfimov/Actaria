@@ -38,7 +38,7 @@ quint32 ContextVar::minimumSize() const
 
 quint32 ContextVar::minimumStrings() const
 {
-    return fieldCount;
+    return fieldCount + this->Entity::minimumStrings();
 }
 
 QByteArray ContextVar::serialize() const
@@ -99,4 +99,9 @@ QString ContextVar::getName() const
 void ContextVar::setName(const QString &name) noexcept
 {
     this->name = name;
+}
+
+bool ContextVar::operator<(const ContextVar &other) const noexcept
+{
+    return this->name < other.name;
 }

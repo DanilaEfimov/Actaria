@@ -10,6 +10,7 @@ CONFIG += c++20
 
 INCLUDEPATH += include
 SOURCES += \
+    src/Entities/character.cpp \
     src/Entities/counter.cpp \
     src/Entities/contextvar.cpp \
     src/Entities/entity.cpp \
@@ -19,6 +20,7 @@ SOURCES += \
     src/Entities/trigger.cpp
 
 HEADERS += \
+    include/Entities/character.h \
     include/Entities/counter.h \
     include/Entities/contextvar.h \
     include/Entities/entity.h \
@@ -37,4 +39,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 DISTFILES += \
     abi \
+    examples/Hogwarts.scene \
+    examples/Hogwarts.scene.i \
+    examples/romance.scene \
     target

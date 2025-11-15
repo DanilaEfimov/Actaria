@@ -1,0 +1,93 @@
+import Aika;  // Import Aika's character
+
+bool loveTrigger = false;  // Trigger for romantic ending
+bool game_end = false;  // Flag to indicate the end of the game
+
+character Aika {
+    description = "Aika is the player's long-time friend who has feelings for them.";
+}
+
+scene ParkWalk {
+    string description = "A peaceful walk through the park at sunset, the perfect time for a heart-to-heart conversation.";
+    string background = "C:/users/me/images/park_sunset.png"; // Background image of a sunset in the park
+    int player_mood = 1;  // Local variable to track the player's mood in this scene
+
+    mark start:
+        Aika.speak("It's such a beautiful evening, isn't it?");
+    options {
+        "Yes, it's perfect. I love spending time with you.";  // Player's response
+        "Yeah, it really is. The sunset is amazing.";  // Player's response
+    }
+
+    mark after_start_good: start.1:
+        Aika.speak("I'm glad you think so. I always enjoy our time together, but lately, I've been thinking... maybe there's more to it.");
+    options {
+        "More to it? What do you mean?";  // Player's response
+        "Are you saying you want to be more than just friends?";  // Player's response
+    }
+
+    mark after_start_confession: start.2:
+        Aika.speak("I've been feeling this way for a while... I think I might like you... more than just a friend.");
+    options {
+        "Aika, I... I think I feel the same way.";  // Player's response
+        "Wow, this is unexpected. I need some time to think.";  // Player's response
+    }
+
+    mark after_confession_accept: after_start_confession.1:
+        Aika.speak("Really? You do? That makes me so happy...");
+        Player.speak("Yes, I've been holding these feelings for a while too. I'm glad you feel the same.");
+    options {
+        "Let's take this slow, but I'm glad we're on the same page.";  // Player's response
+        "I can't believe this is happening, I'm so happy right now.";  // Player's response
+    }
+
+    mark after_confession_reject: after_start_confession.2:
+        Aika.speak("I... I understand. I just needed to tell you how I feel.");
+        Player.speak("Aika, I care about you too. Let's not let this change our friendship.");
+    options {
+        "You're an amazing friend, and I want to stay close.";  // Player's response
+        "Maybe in time, I'll feel the same way. Let's take it slow.";  // Player's response
+    }
+
+    mark after_sunset_end: after_confession_accept.1:
+        Aika.speak("I’m so happy we talked about this. The sunset seems even more beautiful now.");
+        Player.speak("Yeah, it does. I’m glad we’re here together.");
+    options {
+        "Let’s walk a bit more and enjoy the moment.";  // Player's response
+        "It’s a perfect ending to a perfect evening.";  // Player's response
+    }
+
+    mark romantic_end: after_sunset_end.1:
+        Aika.speak("No matter what happens, I’m glad we have each other.");
+        Player.speak("Me too, Aika. Me too.");
+}
+
+// Event handlers for transitions
+setEvent(trigger_love) {
+    loveTrigger = true;  // Set the flag that the romantic scene has ended
+    jmp romantic_end;   // Jump to the romantic ending scene
+}
+
+setEvent(open_door) {
+    if (loveTrigger) {
+        // If love was triggered, lead to the romantic ending
+        jmp romantic_end;
+    } else {
+        jmp unknown_character;  // Lead to another character's appearance if the romantic path isn't chosen
+    }
+}
+
+// Event handler for unknown character's appearance
+setEvent(unknown_character) {
+    unknown.speak("Hey, I don’t recognize you. Who are you?");
+    options {
+        "I’m just here to enjoy the evening, nothing special.";  // Player's response
+        "I’m just looking for someone... maybe you can help me.";  // Player's response
+    }
+}
+
+// Final event handler to set the game end flag
+setEvent(game_end_trigger) {
+    game_end = true;  // Set the flag to true when the game ends
+    // Additional logic can go here, like ending the game or transitioning to credits
+}

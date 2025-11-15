@@ -1,0 +1,108 @@
+// Imports for characters and other necessary entities
+import Harry;   // Import Harry Potter character
+import Hermione; // Import Hermione Granger character
+import Ron;      // Import Ron Weasley character
+
+// Global variable to track if the player has met Draco Malfoy
+bool DracoMeeted = false;    // Global variable
+
+// Declare the character that only appears in this scene
+character unknown;
+
+// Scene in Hogwarts: a walk through the school
+scene Hogwarts {
+    string description = "You, Harry, Hermione, and Ron are walking through the halls of Hogwarts, enjoying a break from classes.";
+    string background = "C:/users/me/images/hogwarts_hallway.png";  // Background image for the scene
+    int player_mood = 1;  // Local variable to track the player's mood in the scene
+
+    // Beginning of the scene
+    mark start:
+        Harry.speak("What a day, huh? The classes are so tiring.");
+    options {
+        "Yeah, I’m exhausted... Let's grab a snack.";  // Player's response
+        "I don't mind. I just want to relax for a bit.";  // Player's response
+    }
+
+    // Branch if the player says they are tired
+    mark after_start_tired: start.1:
+        Hermione.speak("I know, I feel the same. Maybe we should visit the kitchen?");
+    options {
+        "Good idea, I could really use some pumpkin pasties.";  // Player's response
+        "I’m fine for now, but later I could go for something sweet.";  // Player's response
+    }
+
+    // Branch if the player prefers to relax
+    mark after_start_relax: start.2:
+        Ron.speak("We could sit by the fireplace in the common room. That sounds nice.");
+    options {
+        "That sounds perfect. Let’s go there.";  // Player's response
+        "Maybe some time outside would be better, like by the lake.";  // Player's response
+    }
+
+    // Branch if the player mentions Draco
+    mark after_start_mention_draco: after_start_tired.2:
+        Harry.speak("I just heard Draco Malfoy talking about the Slytherin Quidditch team... Do you think we should join the match next week?");
+    options {
+        "Draco? I hope we beat him at the match.";  // Player's response
+        "I’m not sure. He’s always so smug, I don't think I want to play with him.";  // Player's response
+    }
+
+    // Branch if the player decides to meet Draco
+    mark after_draco_appears: after_start_mention_draco.1:
+        Ron.speak("Oh no, here he comes... Draco!");
+    options {
+        "Draco, what do you want this time?";  // Player's response
+        "What’s going on, Malfoy?";  // Player's response
+    }
+
+    // Draco appears if selected
+    mark after_meeting_draco: after_draco_appears.1:
+        Draco.speak("Well, well... Looks like you three are up to no good again. Just wanted to remind you that Slytherin is going to win the Cup this year.");
+    options {
+        "We’ll see about that, Draco. We’re going to beat you this time.";  // Player's response
+        "You’re full of yourself as always, Malfoy.";  // Player's response
+    }
+
+    // Branch if the player decides not to meet Draco
+    mark after_skip_draco: after_start_mention_draco.2:
+        Ron.speak("Let's just ignore him, he’s not worth our time.");
+    options {
+        "Good idea. Let’s just go to the common room.";  // Player's response
+        "Right. He’s always so annoying.";  // Player's response
+    }
+
+    // Branch for meeting Hermione
+    mark after_meeting_hermione: after_start_relax.1:
+        Hermione.speak("Hey, I’ve been thinking... maybe we could study for the Potions test together later?");
+    options {
+        "Sure, I could use some help with that.";  // Player's response
+        "I think I need a break from studying, but maybe later.";  // Player's response
+    }
+}
+
+// Event handlers for transitions
+setEvent(after_meeting_draco) {
+    DracoMeeted = true;  // Set the flag that Draco was met
+    jmp after_meeting_draco;   // Jump to the scene where Draco is met
+}
+
+// Handler for the "open_door" event
+setEvent(open_door) {
+    if (DracoMeeted) {
+        // If Draco was met, we see him when the door opens
+        jmp after_meeting_draco;  // Jump to the scene where Draco is met
+    } else {
+        // If Draco was not met, the player will encounter another character
+        jmp unknown_character;  // Jump to the unknown character scene
+    }
+}
+
+// Event handler for an unknown character's appearance
+setEvent(unknown_character) {
+    // Appearance of an unknown character
+    unknown.speak("Hey, I don’t recognize you. Who are you?");
+    options {
+        "I’m just here to see what’s behind the door...";  // Player's response
+        "I think I’m lost, can you help me?";  // Player's response
+    }
+}
