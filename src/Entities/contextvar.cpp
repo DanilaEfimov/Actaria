@@ -5,7 +5,6 @@ namespace {
     constexpr const int fieldCount = 1;
 }
 
-
 ContextVar::ContextVar()
     : Entity(NonIncrementFlag{}), name() {}
 
@@ -26,14 +25,12 @@ ContextVar::ContextVar(const QByteArray& represent)
 
 size_t ContextVar::size() const
 {
-    return sizeof(quint32)  // length of name in QChars
-           + this->name.size() * sizeof(QChar)
-           + this->Entity::size();
+    return QStringHexSize(this->name) + this->Entity::size();
 }
 
 quint32 ContextVar::minimumSize() const
 {
-    return sizeof(QChar) + this->Entity::minimumSize();
+    return minimumQStringSize + this->Entity::minimumSize();
 }
 
 quint32 ContextVar::minimumStrings() const

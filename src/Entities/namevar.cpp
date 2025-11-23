@@ -5,38 +5,75 @@
 namespace {
     constexpr const char* typeName = "NameVar";
     constexpr const int fieldCount = 2;
-}
+};
 
+/**
+ * @brief NameVar::NameVar
+ *
+ * @param value
+ *
+ * @param name
+ */
 NameVar::NameVar(value_type value, const QString &name)
     : ContextVar(name), value(value) {}
 
+/**
+ * @brief NameVar::NameVar
+ *
+ * @param represent
+ */
 NameVar::NameVar(const QStringList &represent)
     : ContextVar()
 {
     this->fromString(represent);
 }
 
+/**
+ * @brief NameVar::NameVar
+ *
+ * @param represent
+ */
 NameVar::NameVar(const QByteArray &represent)
     : ContextVar()
 {
     this->deserialize(represent);
 }
 
+/**
+ * @brief NameVar::minimumSize
+ *
+ * @return
+ */
 quint32 NameVar::minimumSize() const
 {
-    return sizeof(quint32) + this->value.size() * sizeof(QChar) + this->ContextVar::minimumSize();
+    return QStringHexSize(this->value) + this->ContextVar::minimumSize();
 }
 
+/**
+ * @brief NameVar::minimumStrings
+ *
+ * @return
+ */
 quint32 NameVar::minimumStrings() const
 {
     return fieldCount + this->ContextVar::minimumStrings();
 }
 
+/**
+ * @brief NameVar::hash
+ *
+ * @return
+ */
 Entity::hash_type NameVar::hash() const
 {
     return utils::fnv1a_64(typeName);
 }
 
+/**
+ * @brief NameVar::size
+ *
+ * @return
+ */
 size_t NameVar::size() const
 {
     return sizeof(quint32) + this->value.size() * sizeof(QChar) + this->ContextVar::size();
@@ -118,11 +155,6 @@ void NameVar::fromString(const QStringList &data)
         return;
     }
 
-    bool ok;
     this->value = static_cast<value_type>(data[1]);
-    if(!ok){
-        qWarning("NameVar::Failed to parse entity id");
-    }
-
     this->ContextVar::fromString(data.mid(fieldCount));
 }

@@ -7,6 +7,7 @@
 #include <QDebug>
 
 class Entity;
+class ContextVar;
 
 namespace {
     using hash_type = uint64_t;
@@ -18,12 +19,22 @@ namespace {
     }
 };
 
+// quint32 contains length of string
+inline constexpr const int minimumQStringSize = sizeof(quint32);
+
+inline size_t QStringHexSize(const QString& str) noexcept {
+    return minimumQStringSize + str.size() * sizeof(QChar);
+}
+
 namespace utils {
 
 using hash_type = uint64_t;
 
 template<typename T>
 concept GameEntity = std::derived_from<T, Entity>;
+
+template<typename T>
+concept ContextVariable = std::derived_from<T, ContextVar> && GameEntity<T>;
 
 inline constexpr size_t strlen_ct(const char* str) noexcept {
     if (!str) return 0;

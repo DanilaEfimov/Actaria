@@ -7,6 +7,12 @@
 
 #include "Entities/entity.h"
 
+enum class VarType {
+    Counter,
+    Trigger,
+    Named
+};
+
 class ContextVar : public Entity
 {
 protected:

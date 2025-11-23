@@ -194,7 +194,7 @@ void Counter::fromString(const QStringList &data)
     bool ok;
     this->value = static_cast<value_type>(data[1].toInt(&ok));
     if(!ok){
-        qWarning("Counter::Failed to parse entity id");
+        qWarning("Counter::Failed to parse the value");
     }
 
     this->ContextVar::fromString(data.mid(fieldCount));

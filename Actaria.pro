@@ -10,19 +10,27 @@ CONFIG += c++20
 
 INCLUDEPATH += include
 SOURCES += \
+    src/Entities/contextvarfabric.cpp \
     src/Entities/counter.cpp \
     src/Entities/contextvar.cpp \
     src/Entities/entity.cpp \
     src/Entities/namevar.cpp \
+    src/Entities/character.cpp \
+    src/Entities/nonplayercharacter.cpp \
+    src/Entities/player.cpp \
     src/main.cpp \
     src/GUI/mainwindow.cpp \
     src/Entities/trigger.cpp
 
 HEADERS += \
+    include/Entities/contextvarfabric.h \
     include/Entities/counter.h \
     include/Entities/contextvar.h \
     include/Entities/entity.h \
     include/Entities/namevar.h \
+    include/Entities/character.h \
+    include/Entities/nonplayercharacter.h \
+    include/Entities/player.h \
     include/GUI/mainwindow.h \
     include/utils.h \
     include/Entities/trigger.h
