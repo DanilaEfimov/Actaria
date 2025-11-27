@@ -28,6 +28,7 @@ protected:
 
     Entity();
     Entity(NonIncrementFlag&&);
+    Entity(const Entity&) = delete;
     Entity(const QStringList& represent);
     Entity(const QByteArray& represent);
 
@@ -48,6 +49,7 @@ public:
     virtual void fromString(const QStringList&);
 
     id_type getId() const;
+    static id_type count();
 
 };
 

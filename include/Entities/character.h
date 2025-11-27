@@ -28,7 +28,6 @@ protected:
     quint32 minimumStrings() const override;
 
 public:
-
     QString getName() const noexcept;
 
     // Entity interface

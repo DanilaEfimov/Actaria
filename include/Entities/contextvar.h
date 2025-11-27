@@ -10,7 +10,8 @@
 enum class VarType {
     Counter,
     Trigger,
-    Named
+    Named,
+    Unknown = -1
 };
 
 class ContextVar : public Entity
