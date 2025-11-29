@@ -5,9 +5,10 @@
 
 class Trigger : public ContextVar
 {
-protected:
+public:
     using value_type = bool;
 
+protected:
     value_type value;
 
     quint32 minimumSize() const override;

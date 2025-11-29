@@ -93,8 +93,9 @@ QByteArray NonPlayerCharacter::serialize() const
 
 /**
  * @brief NonPlayerCharacter::deserialize
+ * @param data
  */
-void NonPlayerCharacter::deserialize(const QByteArray &)
+void NonPlayerCharacter::deserialize(const QByteArray& data)
 {
 }
 
@@ -109,6 +110,6 @@ QString NonPlayerCharacter::represent() const
 /**
  * @brief NonPlayerCharacter::fromString
  */
-void NonPlayerCharacter::fromString(const QStringList &)
+void NonPlayerCharacter::fromString(const QStringList& data)
 {
 }

@@ -95,6 +95,24 @@ Player &Player::getInstance()
 }
 
 /**
+ * @brief Player::setName
+ * @param name
+ */
+void Player::setName(const QString &name)
+{
+    this->name = name;
+}
+
+/**
+ * @brief Player::getName
+ * @return
+ */
+QString Player::getName() const noexcept
+{
+    return this->name;
+}
+
+/**
  * @brief Player::init
  *
  * @return true if it's builded

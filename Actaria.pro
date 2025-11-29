@@ -18,11 +18,13 @@ SOURCES += \
     src/Entities/character.cpp \
     src/Entities/nonplayercharacter.cpp \
     src/Entities/player.cpp \
+    src/Entities/context.cpp \
     src/main.cpp \
     src/GUI/mainwindow.cpp \
     src/Entities/trigger.cpp
 
 HEADERS += \
+    include/Entities/context.h \
     include/Entities/contextvarfabric.h \
     include/Entities/counter.h \
     include/Entities/contextvar.h \

@@ -5,9 +5,10 @@
 
 class NameVar : public ContextVar
 {
-protected:
+public:
     using value_type = QString;
 
+protected:
     value_type value;
 
     quint32 minimumSize() const override;

@@ -8,6 +8,7 @@
 #include "Entities/entity.h"
 
 enum class VarType {
+    Unknown = -1,
     Counter,
     Trigger,
     Named

@@ -2,11 +2,14 @@
 #define PLAYER_H
 
 #include "Entities/character.h"
+#include "Entities/context.h"
 
 class Builder;
 
 class Player : public Character
 {
+    Context inventory;
+
 protected:
     quint32 minimumStrings() const override;
 
@@ -22,13 +25,16 @@ public:
     friend class Builder;
 
     template<typename... Args>
-    static Player build(Args... args){
+    [[nodiscard]] static Player build(Args... args){
         return Player(std::forward<Args>(args)...);
     }
 
     Player();
 
     static Player& getInstance();
+
+    void setName(const QString& name);
+    QString getName() const noexcept;
 
     void setMood(Mood mood);
     Mood getMood() const noexcept;

@@ -21,9 +21,10 @@ public:
 
     static constexpr const char* separator = "::";
 
-protected:
+private:
     id_type id;
 
+protected:
     struct NonIncrementFlag {};
 
     Entity();
@@ -48,7 +49,6 @@ public:
     virtual void fromString(const QStringList&);
 
     id_type getId() const;
-
 };
 
 #endif // ENTITY_H

@@ -5,9 +5,10 @@
 
 class Counter : public ContextVar
 {
-protected:
+public:
     using value_type = int32_t;
 
+protected:
     value_type value;
 
     quint32 minimumSize() const override;
