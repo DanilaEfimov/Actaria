@@ -9,7 +9,7 @@
 class Context : public Entity
 {
 public:
-    using value_type = std::unique_ptr<ContextVar>;
+    using value_type = std::shared_ptr<ContextVar>;
 
 private:
     QMap<QString, value_type> context;
@@ -20,7 +20,9 @@ protected:
 
 public:
     Context();
-    Context(const QMap<QString, value_type> context);
+    Context(const QMap<QString, value_type>& context);
+
+    void merge(Context&& other);
 
     // Entity interface
     hash_type hash() const override;
@@ -42,6 +44,7 @@ public:
         this->context[name] = ContextVarFabric::make<T>(name, std::forward<T>(value));
     }
     void remove(const QString& name);
+    void clear();
 };
 
 #endif // CONTEXT_H

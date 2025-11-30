@@ -10,8 +10,17 @@ Context::Context()
  * @brief Context::Context
  * @param context
  */
-Context::Context(const QMap<QString, value_type> context)
+Context::Context(const QMap<QString, value_type> &context)
     : Entity(), context(context) {}
+
+/**
+ * @brief Context::merge
+ * @param other
+ */
+void Context::merge(Context&& other)
+{
+    this->context.insert(other.context);
+}
 
 /**
  * @brief Context::minimumSize
@@ -84,4 +93,12 @@ void Context::fromString(const QStringList& data)
 void Context::remove(const QString& name)
 {
 
+}
+
+/**
+ * @brief Context::clear
+ */
+void Context::clear()
+{
+    this->context.clear();
 }

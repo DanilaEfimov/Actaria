@@ -8,6 +8,7 @@ namespace {
 
 Player Player::instance = Player("Default", Mood::Normal);
 bool Player::built = false;
+Context Player::inventory = Context{};
 
 /**
  * @brief The Builder class

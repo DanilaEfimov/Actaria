@@ -53,6 +53,7 @@ inline constexpr bool is_same_entity_types(const T1& first, const T2& second) no
     return first.hash() == second.hash();
 }
 
+// abi stuff
 inline constexpr std::byte bitmask(int pos) noexcept {
     return std::byte(1 << pos % 8);
 }

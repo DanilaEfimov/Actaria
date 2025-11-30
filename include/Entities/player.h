@@ -8,8 +8,6 @@ class Builder;
 
 class Player : public Character
 {
-    Context inventory;
-
 protected:
     quint32 minimumStrings() const override;
 
@@ -28,6 +26,8 @@ public:
     [[nodiscard]] static Player build(Args... args){
         return Player(std::forward<Args>(args)...);
     }
+
+    static Context inventory;
 
     Player();
 

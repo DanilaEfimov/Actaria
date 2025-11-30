@@ -10,10 +10,14 @@ CONFIG += c++20
 
 INCLUDEPATH += include
 SOURCES += \
+    src/Entities/assignmentoperator.cpp \
     src/Entities/contextvarfabric.cpp \
     src/Entities/counter.cpp \
     src/Entities/contextvar.cpp \
+    src/Entities/dialog.cpp \
+    src/Entities/dialognode.cpp \
     src/Entities/entity.cpp \
+    src/Entities/event.cpp \
     src/Entities/namevar.cpp \
     src/Entities/character.cpp \
     src/Entities/nonplayercharacter.cpp \
@@ -24,18 +28,24 @@ SOURCES += \
     src/Entities/trigger.cpp
 
 HEADERS += \
+    include/Entities/assignmentoperator.h \
     include/Entities/context.h \
     include/Entities/contextvarfabric.h \
     include/Entities/counter.h \
     include/Entities/contextvar.h \
+    include/Entities/dialog.h \
+    include/Entities/dialognode.h \
     include/Entities/entity.h \
+    include/Entities/event.h \
     include/Entities/namevar.h \
     include/Entities/character.h \
     include/Entities/nonplayercharacter.h \
     include/Entities/player.h \
     include/GUI/mainwindow.h \
+    include/config.h \
     include/utils.h \
-    include/Entities/trigger.h
+    include/Entities/trigger.h \
+    include/Entities/operator.h
 
 FORMS += \
     mainwindow.ui
