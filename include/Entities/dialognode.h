@@ -17,6 +17,10 @@ class DialogNode : public Entity
     QVector<variant_t> variants;
     event_ptr onChoosen;
 
+    void collectVariants(QSet<variant_t>& all) const;
+    void collectEvents(QMap<id_type, event_ptr>& all) const;
+    void writeHeader(QDataStream& ret) const;
+
 protected:
     quint32 minimumSize() const override;
     quint32 minimumStrings() const override;
@@ -31,6 +35,16 @@ public:
     void deserialize(const QByteArray &) override;
     QString represent() const override;
     void fromString(const QStringList &) override;
+
+    QString getMessage() const noexcept;
+    void setMessage(const QString& msg);
+
+    event_ptr getEvent() const noexcept;
+    void setEvent(Event* event);
+
+    void addVariant(const variant_t& variant);
+    void removeChild(int idx);
+    void clear() noexcept;
 
     child_ptr getChild(int variant) const noexcept;
 

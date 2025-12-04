@@ -5,6 +5,7 @@
 #include "trigger.h"
 #include "contextvarfabric.h"
 #include "player.h"
+#include "dialognode.h"
 
 namespace {
     // Context Variables tests vvv
@@ -54,7 +55,7 @@ void trigger_serializing(){
         QByteArray data = triggerT.serialize();
         QString represent = triggerT.represent();
         auto varptr = ContextVarFabric::make<Trigger>(data);
-        QCOMPARE(varptr->serialize(), data);
+        QCOMPARE(varptr->represent(), data);
         QCOMPARE(varptr->represent(), represent);
     }
     {
@@ -77,6 +78,16 @@ void player_serializing(){
     player.setName("Danila");
     player.setMood(Mood::Excited);
 };
+    // ^^^ Character tests / Dialog stuff tests vvv
+void dialognode_serializing(){
+    DialogNode node;
+    node.setMessage("This is first scene in the game...");
+};
+
+void dialog_serializing(){
+
+};
+
 };
 
 EngineTest::EngineTest(QObject *parent)

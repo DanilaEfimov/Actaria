@@ -19,8 +19,10 @@ namespace {
     }
 };
 
-// quint32 contains length of string
-inline constexpr const int minimumQStringSize = sizeof(quint32);
+inline constexpr const int sizetypeSize = sizeof(quint32);
+inline constexpr const int minimumQStringSize = sizetypeSize;
+inline constexpr const int minimumQVectorSize = sizetypeSize;
+inline constexpr const int minimumQContainerSize = sizetypeSize;
 
 inline size_t QStringHexSize(const QString& str) noexcept {
     return minimumQStringSize + str.size() * sizeof(QChar);
@@ -34,7 +36,7 @@ template<typename T>
 concept GameEntity = std::derived_from<T, Entity>;
 
 template<typename T>
-concept ContextVariable = std::derived_from<T, ContextVar> && GameEntity<T>;
+concept ContextVariable = std::derived_from<T, ContextVar>;
 
 inline constexpr size_t strlen_ct(const char* str) noexcept {
     if (!str) return 0;
@@ -45,6 +47,15 @@ inline constexpr size_t strlen_ct(const char* str) noexcept {
 
 inline constexpr hash_type fnv1a_64(const char* str) {
     return __fnv1a_64(str, strlen_ct(str));
+}
+
+template<typename T>
+    requires utils::GameEntity<T>
+inline size_t QVectorOfEntitiesHexSize(const QVector<T>& container) noexcept {
+    if(container.empty()){
+        return minimumQVectorSize;
+    }
+    return minimumQVectorSize + container.size() * container.at(0).size();
 }
 
 template<typename T1, typename T2>

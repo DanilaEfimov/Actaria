@@ -120,9 +120,7 @@ size_t Trigger::size() const
 
 /**
  * @brief Trigger::serialize
- *
  * @param isPostfix - true if called by deriver
- *
  * @return hex-dump of object
  */
 QByteArray Trigger::serialize() const
