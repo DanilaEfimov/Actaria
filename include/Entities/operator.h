@@ -9,7 +9,7 @@
  * @brief The operators enum
  */
 enum class operators : int {
-
+    assignmentOperator
 };
 
 /**
@@ -22,6 +22,7 @@ public:
      * @param context
      */
     virtual void apply(Context& context) const = 0;
+    virtual QString toString() const = 0;
     virtual ~Operator() = default;
 };
 

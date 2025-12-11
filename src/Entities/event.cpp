@@ -5,6 +5,10 @@ namespace {
     constexpr int fieldCount = 1;
 };
 
+/**
+ * @brief Event::minimumSize
+ * @return
+ */
 quint32 Event::minimumSize() const
 {
 }

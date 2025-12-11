@@ -7,7 +7,7 @@ namespace {
 
 
 Dialog::Dialog()
-    : Entity() {}
+    : Entity(), root(-1, -1) {}
 
 quint32 Dialog::minimumSize() const
 {

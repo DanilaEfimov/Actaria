@@ -17,14 +17,13 @@ class Entity
 
 public:
     using hash_type = utils::hash_type;
-    using id_type = uint32_t;
+    using id_type = quint32;
 
     static constexpr const char* separator = "::";
 
-private:
+protected:
     id_type id;
 
-protected:
     struct NonIncrementFlag {};
 
     Entity();

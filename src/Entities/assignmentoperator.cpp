@@ -1,7 +1,7 @@
 #include "Entities/assignmentoperator.h"
 
 enum class arithmetic_op : int {
-    constant,   // assignment by a constant
+    constant,   // ... = C
     plus,
     minus,
     mul,

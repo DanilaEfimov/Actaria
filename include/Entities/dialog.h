@@ -2,10 +2,15 @@
 #define DIALOG_H
 
 #include "Entities/entity.h"
+#include "Entities/dialognode.h"
+#include "Entities/context.h"
 
 
 class Dialog : public Entity
 {
+    DialogNode root;
+    Context* context;
+
 protected:
     quint32 minimumSize() const override;
     quint32 minimumStrings() const override;

@@ -55,7 +55,7 @@ void trigger_serializing(){
         QByteArray data = triggerT.serialize();
         QString represent = triggerT.represent();
         auto varptr = ContextVarFabric::make<Trigger>(data);
-        QCOMPARE(varptr->represent(), data);
+        QCOMPARE(varptr->serialize(), data);
         QCOMPARE(varptr->represent(), represent);
     }
     {
@@ -78,32 +78,64 @@ void player_serializing(){
     player.setName("Danila");
     player.setMood(Mood::Excited);
 };
+
+void character_serializing(){
+    player_serializing();
+}
     // ^^^ Character tests / Dialog stuff tests vvv
 void dialognode_serializing(){
-    DialogNode node;
-    node.setMessage("This is first scene in the game...");
+    DialogNode node("This is first scene in the game...");
+
+    DialogNode var1("variant 1");
+    DialogNode var2("variant 2");
+    DialogNode var3("variant 3");
+
+    node.addVariant("to variant 1", var1);
+    node.addVariant("to variant 2", var2);
+    node.addVariant("to variant 3", var3);
+
+    QByteArray data = node.serialize();
+    node.deserialize(data);
+    QCOMPARE(node.serialize(), data);
+    QString represent = node.represent();
+    node.fromString(represent.split(Entity::separator));
+    QCOMPARE(node.represent(), represent);
 };
 
 void dialog_serializing(){
-
+    dialognode_serializing();
 };
 
 };
 
+/**
+ * @brief EngineTest::EngineTest
+ * @param parent
+ */
 EngineTest::EngineTest(QObject *parent)
     : QObject{parent}
 {}
 
+/**
+ * @brief EngineTest::test_serializing
+ */
 void EngineTest::test_serializing()
 {
     context_variable_serializing();
+    dialog_serializing();
 }
 
+/**
+ * @brief EngineTest::test_id_counting
+ */
 void EngineTest::test_id_counting()
 {
 
 }
 
+/**
+ * @brief EngineTest::test_OSG
+ */
 void EngineTest::test_OSG()
 {
 

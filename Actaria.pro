@@ -18,11 +18,13 @@ SOURCES += \
     src/Entities/dialognode.cpp \
     src/Entities/entity.cpp \
     src/Entities/event.cpp \
+    src/Entities/eventmanager.cpp \
     src/Entities/namevar.cpp \
     src/Entities/character.cpp \
     src/Entities/nonplayercharacter.cpp \
     src/Entities/player.cpp \
     src/Entities/context.cpp \
+    src/Entities/scene.cpp \
     src/main.cpp \
     src/GUI/mainwindow.cpp \
     src/Entities/trigger.cpp
@@ -37,10 +39,12 @@ HEADERS += \
     include/Entities/dialognode.h \
     include/Entities/entity.h \
     include/Entities/event.h \
+    include/Entities/eventmanager.h \
     include/Entities/namevar.h \
     include/Entities/character.h \
     include/Entities/nonplayercharacter.h \
     include/Entities/player.h \
+    include/Entities/scene.h \
     include/GUI/mainwindow.h \
     include/config.h \
     include/utils.h \
