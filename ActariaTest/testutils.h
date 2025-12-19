@@ -1,11 +1,30 @@
 #ifndef TESTUTILS_H
 #define TESTUTILS_H
 
+#include "entity.h"
 #include <QString>
+#include <QRandomGenerator64>
 
-inline QString randomString(int length)
+namespace {
+    QString sanitize(QString&& s)
+    {
+        QString result = s;
+        for (QChar ch : QString(Entity::separator)) {
+            result.remove(ch);
+        }
+        return result;
+    }
+};
+
+/**
+ * @brief randomString
+ * @param length
+ * @return random generated QString of length 'length'
+ * without chars, which contained in Entity::separator
+ */
+[[nodiscard]] inline QString randomString(int length) noexcept
 {
-    const QString chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:',.<>/?";
+    static const QString chars = sanitize("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:',.<>/?");
     QString result;
     result.reserve(length);
 

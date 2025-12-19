@@ -23,9 +23,11 @@ private:
 
     // dump-repr stuff
     void representField(QString& repr, int abiOrder) const;
-    void readFromStringField(QStringList& repr, int abiOrder, bool* ok);
+    int readFieldFromStrings(QStringList& repr, int abiOrder, bool* ok);
     void dumpField(QDataStream& out, int abiOrder) const;
     void readField(QDataStream& in, int abiOrder);
+    void dumpVariant(QDataStream& out, const variant_t& variant) const;
+    void readVariant(QDataStream& in);
     void dumpVariants(QDataStream& out) const;
     void readVariants(QDataStream& in);
     int fieldSize(int abiOrder) const noexcept;
@@ -36,6 +38,8 @@ protected:
     quint32 minimumStrings() const override;
 
 public:
+    DialogNode(const QByteArray& data);
+    DialogNode(const QStringList& data);
     DialogNode(id_type parent, id_type event, QString message = "");
     explicit DialogNode(QString&& message, id_type parent, id_type event);
 

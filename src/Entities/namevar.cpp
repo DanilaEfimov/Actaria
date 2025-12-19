@@ -76,7 +76,9 @@ Entity::hash_type NameVar::hash() const
  */
 size_t NameVar::size() const
 {
-    return sizeof(quint32) + this->value.size() * sizeof(QChar) + this->ContextVar::size();
+    return sizeof(quint32)
+           + this->value.size() * sizeof(QChar)
+           + this->ContextVar::size();
 }
 
 /**
@@ -143,10 +145,8 @@ QString NameVar::represent() const
 
 /**
  * @brief NameVar::fromString
- *
- * Parse QString in lineral order with typeName skipping.
- *
  * @param data
+ * parse QString in lineral order with typeName skipping
  */
 void NameVar::fromString(const QStringList &data)
 {

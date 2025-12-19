@@ -84,23 +84,53 @@ void character_serializing(){
 }
     // ^^^ Character tests / Dialog stuff tests vvv
 void dialognode_serializing(){
-    DialogNode node("This is first scene in the game...");
+    constexpr int NodesCount = 200;
 
-    DialogNode var1("variant 1");
-    DialogNode var2("variant 2");
-    DialogNode var3("variant 3");
+    QVector<DialogNode> nodes;
+    nodes.reserve(NodesCount);
 
-    node.addVariant("to variant 1", var1);
-    node.addVariant("to variant 2", var2);
-    node.addVariant("to variant 3", var3);
+    for (int i = 0; i < NodesCount; ++i) {
+        DialogNode node(
+            QRandomGenerator::global()->bounded(1, 50000),  // parent
+            QRandomGenerator::global()->bounded(1, 50000),  // event (allowed corner case)
+            randomString(QRandomGenerator::global()->bounded(5, 40))
+            );
 
-    QByteArray data = node.serialize();
-    node.deserialize(data);
-    QCOMPARE(node.serialize(), data);
-    QString represent = node.represent();
-    node.fromString(represent.split(Entity::separator));
-    QCOMPARE(node.represent(), represent);
-};
+        int variantsCount = QRandomGenerator::global()->bounded(0, 5);
+        for (int v = 0; v < variantsCount; ++v) {
+            DialogNode::variant_t variant(
+                randomString(QRandomGenerator::global()->bounded(3, 20)),
+                static_cast<DialogNode::id_type>(
+                    QRandomGenerator::global()->bounded(0, NodesCount)
+                    )
+                );
+            node.addVariant(variant);
+        }
+
+        nodes.push_back(node);
+    }
+
+    for (int i = 0; i < nodes.size(); ++i) {
+        const DialogNode& original = nodes.at(i);
+
+        QByteArray serialized = original.serialize();
+        QVERIFY(!serialized.isEmpty());
+
+        DialogNode restored(serialized);
+        QByteArray reserialized = restored.serialize();
+
+        QCOMPARE(reserialized, serialized);
+
+        QString repr = original.represent();
+        QVERIFY(!repr.isEmpty());
+
+        QStringList tokens = repr.split(Entity::separator, Qt::KeepEmptyParts);
+        DialogNode restored2(tokens);
+
+        QString repr2 = restored2.represent();
+        QCOMPARE(repr2, repr);
+    }
+}
 
 void dialog_serializing(){
     dialognode_serializing();

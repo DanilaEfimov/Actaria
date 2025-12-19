@@ -2,9 +2,14 @@
 #include <QBuffer>
 #include <QDataStream>
 
+//TODO: replace too much explicit 'if'-checking
+//TODO: normal validation
+//TODO: move Abi enum to header -> change signature + replace checking
+
 namespace {
     constexpr const char* typeName = "DialogNode";
     constexpr const int fieldCount = 4;
+    constexpr const int variantFieldCount = 2;
 
     enum Abi {
         MessageField,
@@ -42,10 +47,11 @@ namespace {
      */
     void reprVariant(QString& repr, const variant_t& variant){
         repr.append(variant.first);
-        repr.append(QString::number(variant.second));
+        repr.append(Entity::separator);
+        repr.append(QString::number(static_cast<quint32>(variant.second)));
     }
 
-    using variants_t = QVector<DialogNode::variant_t>;
+    using variants_t = QVector<variant_t>;
 
     /**
      * @brief reprVariants
@@ -81,17 +87,19 @@ namespace {
             qWarning() << "dialognode::<namespace>::parseVariants: Can not read variants size: '" + repr[0] + "'";
             return false;
         }
-        if(size > wordsCount - 1){
+        if(variantFieldCount * size > wordsCount - 1){  // -1 due to reading 'size'
             qWarning() << "dialognode::<namespace>::parseVariants: Not enough tokens to parse: " + QString::number(size);
             return false;
         }
 
+        variants.clear();
+        variants.reserve(size);
         int pos = 1;
         variant_t variant;
-        while (pos + 1 < wordsCount && ok) {
+        for (int i = 0; i < size && ok; ++i) {
             variant.first = repr[pos++];
             variant.second = static_cast<Entity::id_type>(repr[pos++].toInt(&ok));
-            variants.push_back(std::move(variant));
+            variants.push_back(variant);
         }
 
         if(pos < size || !ok){
@@ -105,9 +113,10 @@ namespace {
      * @brief wordsPerVariants
      * @param variants
      * @return required size to represent variants
+     * look at the variants serialize format
      */
     int wordsPerVariants(const variants_t& variants){
-        return 1 + variants.size()*2;
+        return 1 + variants.size()*variantFieldCount;
     }
 };
 
@@ -124,6 +133,26 @@ DialogNode::DialogNode(id_type parent, id_type event, QString message)
     parent(parent),
     event(event)
 {}
+
+/**
+ * @brief DialogNode::DialogNode
+ * @param data
+ */
+DialogNode::DialogNode(const QByteArray &data)
+    : Entity(Entity::NonIncrementFlag{})
+{
+    this->deserialize(data);
+}
+
+/**
+ * @brief DialogNode::DialogNode
+ * @param data
+ */
+DialogNode::DialogNode(const QStringList &data)
+    : Entity(Entity::NonIncrementFlag{})
+{
+    this->fromString(data);
+}
 
 /**
  * @brief DialogNode::DialogNode
@@ -163,12 +192,12 @@ void DialogNode::representField(QString &repr, int abiOrder) const
 }
 
 /**
- * @brief DialogNode::readFromStringField
+ * @brief DialogNode::readFieldFromStrings
  * @param repr
  * @param abiOrder
  * @param ok
  */
-void DialogNode::readFromStringField(QStringList &repr, int abiOrder, bool* ok)
+int DialogNode::readFieldFromStrings(QStringList &repr, int abiOrder, bool* ok)
 {
     if(abiOrder < 0 || abiOrder >= fieldCount){
         qWarning() << "DialogNode::readFromStringField: invalid field order: " + QString::number(abiOrder);
@@ -180,18 +209,23 @@ void DialogNode::readFromStringField(QStringList &repr, int abiOrder, bool* ok)
         *ok = false;
     }
 
-    if(!*ok) return;
+    if(!*ok) return 0;
     switch(static_cast<Abi>(abiOrder)){
-        case Abi::MessageField:  this->message = repr[0]; return;
-        case Abi::VariantsField: *ok = parseVariants(repr, this->variants); return;
-        case Abi::ParentField:   this->parent = repr[0].toInt(ok); return;
-        case Abi::EventField:    this->event = repr[0].toInt(ok); return;
+        case Abi::MessageField:  this->message = repr[0];
+            *ok = true;
+            return 1;
+        case Abi::VariantsField: *ok = parseVariants(repr, this->variants);
+            return wordsPerVariants(this->variants);
+        case Abi::ParentField:   this->parent = repr[0].toInt(ok);
+            return 1;
+        case Abi::EventField:    this->event = repr[0].toInt(ok);
+            return 1;
     default:
         qWarning() << "DialogNode::readFromStringField: unexpected order of field: " + toString(static_cast<Abi>(abiOrder));
         *ok = false;
-        return;
+        return 0;
     }
-    *ok = true;
+    return 0;
 }
 
 /**
@@ -229,21 +263,48 @@ void DialogNode::readField(QDataStream &in, int abiOrder)
         return;
     }
 
-    try{
-        switch(static_cast<Abi>(abiOrder)){
-            case Abi::MessageField:  in >> this->message; return;
-            case Abi::VariantsField: this->readVariants(in); return;
-            case Abi::ParentField:   in >> this->parent; return;
-            case Abi::EventField:    in >> this->event; return;
-        default:
-            qWarning("DialogNode::readField: unexpected order of field");
-            return;
-        }
-    }
-    catch(...){
-        qWarning() << "DialogNode::readField: can not read field at position: "  + toString(static_cast<Abi>(abiOrder));
+    if(in.status() != QDataStream::Ok){
+        qWarning("DialogNode::readField: something went wrong, data stream unreadable");
         return;
     }
+
+    switch(static_cast<Abi>(abiOrder)){
+        case Abi::MessageField:  in >> this->message; return;
+        case Abi::VariantsField: this->readVariants(in); return;
+        case Abi::ParentField:   in >> this->parent; return;
+        case Abi::EventField:    in >> this->event; return;
+    default:
+        qWarning("DialogNode::readField: unexpected order of field");
+        return;
+    }
+}
+
+/**
+ * @brief DialogNode::dumpVariant
+ * @param out
+ * @param variant
+ * variant's fields dumping/reading in natural order
+ */
+void DialogNode::dumpVariant(QDataStream &out, const variant_t &variant) const
+{
+    out << variant.first << variant.second;
+}
+
+/**
+ * @brief DialogNode::readVariant
+ * @param in
+ * variant's fields dumping/reading in natural order
+ */
+void DialogNode::readVariant(QDataStream &in)
+{
+    if(in.status() != QDataStream::Ok){
+        qWarning("DialogNode::readVariant: something went wrong, data stream unreadable");
+        return;
+    }
+
+    variant_t variant;
+    in >> variant.first >> variant.second;
+    this->variants.push_back(variant);
 }
 
 /**
@@ -359,7 +420,7 @@ QByteArray DialogNode::serialize() const
 void DialogNode::deserialize(const QByteArray& data)
 {
     if(data.size() < this->DialogNode::minimumSize()){
-        qWarning("Entity::deserialize: data too small");
+        qWarning("DialogNode::deserialize: data too small");
         return;
     }
 
@@ -370,9 +431,9 @@ void DialogNode::deserialize(const QByteArray& data)
     QDataStream in(&buffer);
     in.setVersion(QDataStream::Qt_6_5);
 
-    // reversed order
+    // same order
     for(int i = 0; i < fieldCount; i++){
-        this->readField(in, fieldCount - 1 - i);
+        this->readField(in, i);
     }
 
     quint64 pos = buffer.pos();
@@ -401,20 +462,26 @@ QString DialogNode::represent() const
  */
 void DialogNode::fromString(const QStringList& data)
 {
-    int pos = 0;
+    if(data.empty()){
+        qWarning("DialogNode::fromString: was given empty list");
+        return;
+    }
+
+    int pos = 1;    // typeName skipping
     int field = 0;
-    bool ok = false;
+    bool ok = true; // nesaccary to enter read field from strings
     QStringList repr = data;
     for(; field < fieldCount; field++){
-        repr = repr.mid(pos);
-        this->readFromStringField(repr, field, &ok);
+        repr = data.mid(pos);
+        pos += this->readFieldFromStrings(repr, field, &ok);
         if(!ok) break;
     }
     if(field < fieldCount - 1){
-        qWarning() << "DialogNode::fromString: Parsing was aborted at filed " + QString::number(field);
+        qWarning() << "DialogNode::fromString: Parsing was aborted at filed " + toString(static_cast<Abi>(field));
         return;
     }
-    this->Entity::fromString(repr.mid(1));  // skipp typeName
+
+    this->Entity::fromString(data.mid(pos));
 }
 
 /**
@@ -496,7 +563,7 @@ void DialogNode::clear() noexcept
  */
 DialogNode::id_type DialogNode::getChild(int variant) const noexcept
 {
-    if(variant > 0 && variant < this->variants.size())
+    if(variant >= 0 && variant < this->variants.size())
         return this->variants[variant].second;
     return static_cast<id_type>(-1);
 }
@@ -507,8 +574,9 @@ DialogNode::id_type DialogNode::getChild(int variant) const noexcept
  */
 void DialogNode::dumpVariants(QDataStream &out) const
 {
+    out << static_cast<quint32>(this->variants.size());
     for(auto& variant : this->variants){
-        out << variant.first << variant.second;
+        this->dumpVariant(out, variant);
     }
 }
 
@@ -518,24 +586,13 @@ void DialogNode::dumpVariants(QDataStream &out) const
  */
 void DialogNode::readVariants(QDataStream &in)
 {
-    QVector<variant_t> vec;
     quint32 size = 0;
     in >> size;
+    this->variants.clear();
+    this->variants.reserve(size);
 
-    QString message;
-    id_type variantId;
-    try{
-        for(int i = 0; i < size; i++){
-            in >> message >> variantId;
-            vec.push_back(
-                variant_t(std::move(message), variantId)
-            );
-        }
+    quint32 i = 0;
+    for(; i < size; i++){
+        this->readVariant(in);
     }
-    catch(...){
-        qWarning() << "DialogNode::readVariants: can not read variant at position: " + QString::number(size);
-        return;
-    }
-
-    this->variants = std::move(vec);
 }
