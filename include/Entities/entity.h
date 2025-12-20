@@ -11,6 +11,9 @@
 #include <QString>
 #include <QByteArray>
 
+#define UNDEFINED_ID static_cast<Entity::id_type>(-1)
+
+
 class Entity
 {
     static uint32_t counter;

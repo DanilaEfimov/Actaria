@@ -4,12 +4,14 @@
 #include "Entities/entity.h"
 #include "Entities/dialognode.h"
 #include "Entities/context.h"
+#include <QHash>
 
 
 class Dialog : public Entity
 {
-    DialogNode root;
-    Context* context;
+    QHash<id_type, DialogNode> nodes;
+    Context context;
+    id_type root;
 
 protected:
     quint32 minimumSize() const override;
@@ -25,6 +27,8 @@ public:
     void deserialize(const QByteArray &) override;
     QString represent() const override;
     void fromString(const QStringList &) override;
+
+    void switchBranch(int variant);
 };
 
 #endif // DIALOG_H

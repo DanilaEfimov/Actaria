@@ -2,24 +2,20 @@
 #include <QBuffer>
 #include <QDataStream>
 
-//TODO: replace too much explicit 'if'-checking
 //TODO: normal validation
-//TODO: move Abi enum to header -> change signature + replace checking
+//TODO: normal documentation
 
 namespace {
     constexpr const char* typeName = "DialogNode";
-    constexpr const int fieldCount = 4;
+    constexpr const int fieldCount = 5;
     constexpr const int variantFieldCount = 2;
 
-    enum Abi {
-        MessageField,
-        VariantsField,
-        ParentField,
-        EventField
-    };
-
-    constexpr const Abi order[] = {
-        Abi::MessageField, Abi::VariantsField, Abi::ParentField, Abi::EventField
+    constexpr const DialogNodeAbi order[] = {
+        DialogNodeAbi::FromMessageField,   // QString (character name)
+        DialogNodeAbi::MessageField,       // QString
+        DialogNodeAbi::VariantsField,      // QVector<DialogNode::variant_t>
+        DialogNodeAbi::ParentField,        // Entity::id_type
+        DialogNodeAbi::EventField,         // Entity::id_type
     };
 
     /**
@@ -27,12 +23,13 @@ namespace {
      * @param order
      * @return QString literal for Abi enum members
      */
-    QString toString(Abi order) {
+    QString toString(DialogNodeAbi order) {
         switch(order) {
-            case MessageField:  return QStringLiteral("MessageField");
-            case VariantsField: return QStringLiteral("VariantsField");
-            case ParentField:   return QStringLiteral("ParentField");
-            case EventField:    return QStringLiteral("EventField");
+            case MessageField:      return QStringLiteral("MessageField");
+            case FromMessageField:  return QStringLiteral("FromMessageField");
+            case VariantsField:     return QStringLiteral("VariantsField");
+            case ParentField:       return QStringLiteral("ParentField");
+            case EventField:        return QStringLiteral("EventField");
         default:
             return QStringLiteral("Unknown");
         }
@@ -94,6 +91,7 @@ namespace {
 
         variants.clear();
         variants.reserve(size);
+
         int pos = 1;
         variant_t variant;
         for (int i = 0; i < size && ok; ++i) {
@@ -102,8 +100,8 @@ namespace {
             variants.push_back(variant);
         }
 
-        if(pos < size || !ok){
-            qWarning() << "dialognode::<namespace>::parseVariants: Can not read id of entity: " + repr[pos-1];
+        if(pos / variantFieldCount < size || !ok){
+            qWarning() << "dialognode::<namespace>::parseVariants: Can not read id of entity: " + repr[(pos + variantFieldCount - 1) / variantFieldCount];
             return false;
         }
         return true;
@@ -113,7 +111,6 @@ namespace {
      * @brief wordsPerVariants
      * @param variants
      * @return required size to represent variants
-     * look at the variants serialize format
      */
     int wordsPerVariants(const variants_t& variants){
         return 1 + variants.size()*variantFieldCount;
@@ -124,11 +121,13 @@ namespace {
  * @brief DialogNode::DialogNode
  * @param parent
  * @param event
+ * @param fromMessage
  * @param message
  */
-DialogNode::DialogNode(id_type parent, id_type event, QString message)
+DialogNode::DialogNode(id_type parent, id_type event, QString fromMessage, QString message)
     : Entity(),
     message(message),
+    fromMessage(fromMessage),
     variants(),
     parent(parent),
     event(event)
@@ -155,38 +154,20 @@ DialogNode::DialogNode(const QStringList &data)
 }
 
 /**
- * @brief DialogNode::DialogNode
- * @param message
- * @param parent
- * @param event
- */
-DialogNode::DialogNode(QString&& message, id_type parent, id_type event)
-    : Entity(),
-    message(message),
-    variants(),
-    parent(parent),
-    event(event)
-{}
-
-/**
  * @brief DialogNode::representField
  * @param repr
  * @param abiOrder
  */
-void DialogNode::representField(QString &repr, int abiOrder) const
+void DialogNode::representField(QString &repr, DialogNodeAbi abiOrder) const
 {
-    if(abiOrder < 0 || abiOrder >= fieldCount){
-        qWarning() << "DialogNode::representField: invalid field order: " + QString::number(abiOrder);
-        return;
-    }
-
-    switch(static_cast<Abi>(abiOrder)){
-        case Abi::MessageField:  repr += this->message; return;
-        case Abi::VariantsField: reprVariants(repr, this->variants); return;
-        case Abi::ParentField:   repr += QString::number(this->parent); return;
-        case Abi::EventField:    repr += QString::number(this->event); return;
+    switch(abiOrder){
+        case DialogNodeAbi::MessageField:       repr += this->message; return;
+        case DialogNodeAbi::FromMessageField:   repr += this->fromMessage; return;
+        case DialogNodeAbi::VariantsField:      reprVariants(repr, this->variants); return;
+        case DialogNodeAbi::ParentField:        repr += QString::number(this->parent); return;
+        case DialogNodeAbi::EventField:         repr += QString::number(this->event); return;
     default:
-        qWarning() << "DialogNode::representField: unexpected order of field: " + toString(static_cast<Abi>(abiOrder));
+        qWarning() << "DialogNode::representField: unexpected order of field: " + toString(static_cast<DialogNodeAbi>(abiOrder));
         return;
     }
 }
@@ -197,31 +178,39 @@ void DialogNode::representField(QString &repr, int abiOrder) const
  * @param abiOrder
  * @param ok
  */
-int DialogNode::readFieldFromStrings(QStringList &repr, int abiOrder, bool* ok)
+int DialogNode::readFieldFromStrings(QStringList &repr, DialogNodeAbi abiOrder, bool* ok)
 {
-    if(abiOrder < 0 || abiOrder >= fieldCount){
-        qWarning() << "DialogNode::readFromStringField: invalid field order: " + QString::number(abiOrder);
-        *ok = false;
-    }
-
     if(repr.empty()){
         qWarning() << "DialogNode::readFromStringField: Empty representation was given";
         *ok = false;
     }
 
     if(!*ok) return 0;
-    switch(static_cast<Abi>(abiOrder)){
-        case Abi::MessageField:  this->message = repr[0];
+    switch(abiOrder){
+        case DialogNodeAbi::MessageField: {
+                this->message = repr[0];
+                *ok = true;
+                return 1;
+        }
+        case DialogNodeAbi::FromMessageField: {
+            this->fromMessage = repr[0];
             *ok = true;
             return 1;
-        case Abi::VariantsField: *ok = parseVariants(repr, this->variants);
+        }
+        case DialogNodeAbi::VariantsField: {
+            *ok = parseVariants(repr, this->variants);
             return wordsPerVariants(this->variants);
-        case Abi::ParentField:   this->parent = repr[0].toInt(ok);
+        }
+        case DialogNodeAbi::ParentField: {
+            this->parent = repr[0].toInt(ok);
             return 1;
-        case Abi::EventField:    this->event = repr[0].toInt(ok);
+        }
+        case DialogNodeAbi::EventField: {
+            this->event = repr[0].toInt(ok);
             return 1;
+        }
     default:
-        qWarning() << "DialogNode::readFromStringField: unexpected order of field: " + toString(static_cast<Abi>(abiOrder));
+        qWarning() << "DialogNode::readFromStringField: unexpected field: " + toString(abiOrder);
         *ok = false;
         return 0;
     }
@@ -233,20 +222,16 @@ int DialogNode::readFieldFromStrings(QStringList &repr, int abiOrder, bool* ok)
  * @param out
  * @param abiOrder
  */
-void DialogNode::dumpField(QDataStream &out, int abiOrder) const
+void DialogNode::dumpField(QDataStream &out, DialogNodeAbi abiOrder) const
 {
-    if(abiOrder < 0 || abiOrder >= fieldCount){
-        qWarning() << "DialogNode::dumpField: invalid field order: " + QString::number(abiOrder);
-        return;
-    }
-
-    switch(static_cast<Abi>(abiOrder)){
-        case Abi::MessageField:  out << this->message; return;
-        case Abi::VariantsField: this->dumpVariants(out); return;
-        case Abi::ParentField:   out << this->parent; return;
-        case Abi::EventField:    out << this->event; return;
+    switch(abiOrder){
+        case DialogNodeAbi::MessageField:       out << this->message; return;
+        case DialogNodeAbi::FromMessageField:   out << this->fromMessage; return;
+        case DialogNodeAbi::VariantsField:      this->dumpVariants(out); return;
+        case DialogNodeAbi::ParentField:        out << this->parent; return;
+        case DialogNodeAbi::EventField:         out << this->event; return;
     default:
-        qWarning() << "DialogNode::dumpField: unexpected order of field: " + toString(static_cast<Abi>(abiOrder));
+        qWarning() << "DialogNode::dumpField: unexpected order of field: " + toString(static_cast<DialogNodeAbi>(abiOrder));
         return;
     }
 }
@@ -256,25 +241,21 @@ void DialogNode::dumpField(QDataStream &out, int abiOrder) const
  * @param in
  * @param abiOrder
  */
-void DialogNode::readField(QDataStream &in, int abiOrder)
+void DialogNode::readField(QDataStream &in, DialogNodeAbi abiOrder)
 {
-    if(abiOrder < 0 || abiOrder >= fieldCount){
-        qWarning() << "DialogNode::readField: invalid field order: " + QString::number(abiOrder);
-        return;
-    }
-
     if(in.status() != QDataStream::Ok){
         qWarning("DialogNode::readField: something went wrong, data stream unreadable");
         return;
     }
 
-    switch(static_cast<Abi>(abiOrder)){
-        case Abi::MessageField:  in >> this->message; return;
-        case Abi::VariantsField: this->readVariants(in); return;
-        case Abi::ParentField:   in >> this->parent; return;
-        case Abi::EventField:    in >> this->event; return;
+    switch(abiOrder){
+        case DialogNodeAbi::MessageField:       in >> this->message; return;
+        case DialogNodeAbi::FromMessageField:   in >> this->fromMessage; return;
+        case DialogNodeAbi::VariantsField:      this->readVariants(in); return;
+        case DialogNodeAbi::ParentField:        in >> this->parent; return;
+        case DialogNodeAbi::EventField:         in >> this->event; return;
     default:
-        qWarning("DialogNode::readField: unexpected order of field");
+        qWarning() << "DialogNode::readField: unexpected field: " + toString(abiOrder);
         return;
     }
 }
@@ -312,21 +293,17 @@ void DialogNode::readVariant(QDataStream &in)
  * @param abiOrder
  * @return actual size of such field in bytes
  */
-int DialogNode::fieldSize(int abiOrder) const noexcept
+int DialogNode::fieldSize(DialogNodeAbi abiOrder) const noexcept
 {
-    if(abiOrder < 0 || abiOrder >= fieldCount){
-        qWarning() << "DialogNode::fieldSize: invalid field order: " + QString::number(abiOrder);
-        return 0;
-    }
-
     int size = 0;
-    switch(static_cast<Abi>(abiOrder)){
-        case Abi::MessageField: size = QStringHexSize(this->message); break;
-        case Abi::VariantsField: size = this->variantsSize(); break;
-        case Abi::ParentField: size = sizeof(this->parent); break;
-        case Abi::EventField: size = sizeof(this->event); break;
+    switch(abiOrder){
+        case DialogNodeAbi::MessageField:       size = QStringHexSize(this->message); break;
+        case DialogNodeAbi::FromMessageField:   size = QStringHexSize(this->fromMessage); break;
+        case DialogNodeAbi::VariantsField:      size = this->variantsSize(); break;
+        case DialogNodeAbi::ParentField:        size = sizeof(this->parent); break;
+        case DialogNodeAbi::EventField:         size = sizeof(this->event); break;
     default:
-        qWarning() << "DialogNode::fieldSize: unexpected order of field: " + toString(static_cast<Abi>(abiOrder));
+        qWarning() << "DialogNode::fieldSize: unexpected order of field: " + toString(static_cast<DialogNodeAbi>(abiOrder));
     }
 
     return size;
@@ -403,8 +380,8 @@ QByteArray DialogNode::serialize() const
     QDataStream out(&ret, QDataStream::WriteOnly);
     out.setVersion(QDataStream::Qt_6_5);
 
-    for(auto idx : order){
-        this->dumpField(out, static_cast<int>(idx));
+    for(DialogNodeAbi idx : order){
+        this->dumpField(out, idx);
     }
 
     QByteArray arr = this->Entity::serialize();
@@ -432,8 +409,8 @@ void DialogNode::deserialize(const QByteArray& data)
     in.setVersion(QDataStream::Qt_6_5);
 
     // same order
-    for(int i = 0; i < fieldCount; i++){
-        this->readField(in, i);
+    for(DialogNodeAbi idx : order){
+        this->readField(in, idx);
     }
 
     quint64 pos = buffer.pos();
@@ -467,17 +444,18 @@ void DialogNode::fromString(const QStringList& data)
         return;
     }
 
+    int parsed = 0;
     int pos = 1;    // typeName skipping
-    int field = 0;
     bool ok = true; // nesaccary to enter read field from strings
     QStringList repr = data;
-    for(; field < fieldCount; field++){
+    for(DialogNodeAbi field : order){
+        parsed++;
         repr = data.mid(pos);
         pos += this->readFieldFromStrings(repr, field, &ok);
         if(!ok) break;
     }
-    if(field < fieldCount - 1){
-        qWarning() << "DialogNode::fromString: Parsing was aborted at filed " + toString(static_cast<Abi>(field));
+    if(parsed < fieldCount - 1){
+        qWarning() << "DialogNode::fromString: Parsing was aborted at filed " + toString(order[parsed]);
         return;
     }
 
@@ -557,6 +535,15 @@ void DialogNode::clear() noexcept
 }
 
 /**
+ * @brief DialogNode::isValid
+ * @return
+ */
+bool DialogNode::isValid() const noexcept
+{
+    return !this->variants.empty();
+}
+
+/**
  * @brief DialogNode::getChild
  * @param variant
  * @return
@@ -565,7 +552,7 @@ DialogNode::id_type DialogNode::getChild(int variant) const noexcept
 {
     if(variant >= 0 && variant < this->variants.size())
         return this->variants[variant].second;
-    return static_cast<id_type>(-1);
+    return UNDEFINED_ID;
 }
 
 /**

@@ -2,10 +2,9 @@ Actaria Engine virtual machine works according to the following algorithm:
 
 while(!endOfGame) {
   while(!endOfDialog) {
-    answerChoice();
-    handlePlayerReaction(); // here the dialog context is updated
+    handlePlayerReaction(); // here the dialog context is updating
   }
-  handleDialogVerdict(); // here the scene and game context are updated
+  handleDialogVerdict(); // here the scene and game context are updating
 }
 
 ==================================================

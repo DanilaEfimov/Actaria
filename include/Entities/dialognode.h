@@ -2,7 +2,20 @@
 #define DIALOGNODE_H
 
 #include "Entities/entity.h"
-#include "Entities/event.h"
+
+namespace abi {
+
+    enum DialogNodeAbi {
+        MessageField,       // QString
+        FromMessageField,   // QString (character name)
+        VariantsField,      // QVector<DialogNode::variant_t>
+        ParentField,        // Entity::id_type
+        EventField          // Entity::id_type
+    };
+
+};  // namespace abi
+
+using namespace abi;
 
 /**
  * @brief The DialogNode class
@@ -10,27 +23,25 @@
 class DialogNode : public Entity
 {
 public:
-    using parent_ptr = QSharedPointer<DialogNode>;
-    using child_ptr = QSharedPointer<DialogNode>;
-    using event_ptr = QSharedPointer<Event>;
     using variant_t = QPair<QString, id_type>;
 
 private:
     QString message;
+    QString fromMessage;
     QVector<variant_t> variants;
     id_type parent;
     id_type event;
 
     // dump-repr stuff
-    void representField(QString& repr, int abiOrder) const;
-    int readFieldFromStrings(QStringList& repr, int abiOrder, bool* ok);
-    void dumpField(QDataStream& out, int abiOrder) const;
-    void readField(QDataStream& in, int abiOrder);
+    void representField(QString& repr, DialogNodeAbi abiOrder) const;
+    int readFieldFromStrings(QStringList& repr, DialogNodeAbi abiOrder, bool* ok);
+    void dumpField(QDataStream& out, DialogNodeAbi abiOrder) const;
+    void readField(QDataStream& in, DialogNodeAbi abiOrder);
     void dumpVariant(QDataStream& out, const variant_t& variant) const;
     void readVariant(QDataStream& in);
     void dumpVariants(QDataStream& out) const;
     void readVariants(QDataStream& in);
-    int fieldSize(int abiOrder) const noexcept;
+    int fieldSize(DialogNodeAbi abiOrder) const noexcept;
     int variantsSize() const noexcept;
 
 protected:
@@ -40,8 +51,8 @@ protected:
 public:
     DialogNode(const QByteArray& data);
     DialogNode(const QStringList& data);
-    DialogNode(id_type parent, id_type event, QString message = "");
-    explicit DialogNode(QString&& message, id_type parent, id_type event);
+    DialogNode(id_type parent = UNDEFINED_ID, id_type event = UNDEFINED_ID,
+               QString fromMessage = "", QString message = "");
 
     // Entity interface
     hash_type hash() const override;

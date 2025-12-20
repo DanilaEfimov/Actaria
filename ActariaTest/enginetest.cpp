@@ -84,7 +84,7 @@ void character_serializing(){
 }
     // ^^^ Character tests / Dialog stuff tests vvv
 void dialognode_serializing(){
-    constexpr int NodesCount = 200;
+    constexpr int NodesCount = 400;
 
     QVector<DialogNode> nodes;
     nodes.reserve(NodesCount);
@@ -93,6 +93,7 @@ void dialognode_serializing(){
         DialogNode node(
             QRandomGenerator::global()->bounded(1, 50000),  // parent
             QRandomGenerator::global()->bounded(1, 50000),  // event (allowed corner case)
+            randomString(QRandomGenerator::global()->bounded(5, 40)),
             randomString(QRandomGenerator::global()->bounded(5, 40))
             );
 
