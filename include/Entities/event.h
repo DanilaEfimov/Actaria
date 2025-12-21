@@ -7,10 +7,10 @@
 
 class Event : public Entity
 {
-    using operator_ptr = std::unique_ptr<Operator>;
+    using operator_ptr = QScopedPointer<Operator>;
 
 protected:
-    QVector<operator_ptr> onEvent;
+    QVector<operator_ptr> operators;
 
     quint32 minimumSize() const override;
     quint32 minimumStrings() const override;
@@ -26,7 +26,7 @@ public:
     QString represent() const override;
     void fromString(const QStringList &) override;
 
-    virtual void exec(Context& context, bool* ok = nullptr) = 0;
+    virtual bool exec(Context* context) const = 0;
 };
 
 #endif // EVENT_H

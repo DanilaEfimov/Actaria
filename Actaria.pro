@@ -38,6 +38,7 @@ HEADERS += \
     include/Entities/dialog.h \
     include/Entities/dialognode.h \
     include/Entities/entity.h \
+    include/Entities/entitymanager.h \
     include/Entities/event.h \
     include/Entities/eventmanager.h \
     include/Entities/namevar.h \

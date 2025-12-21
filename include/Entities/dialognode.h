@@ -2,6 +2,7 @@
 #define DIALOGNODE_H
 
 #include "Entities/entity.h"
+#include "Entities/context.h"
 
 namespace abi {
 

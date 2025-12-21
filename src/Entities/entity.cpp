@@ -5,32 +5,32 @@
 
 namespace {
     constexpr const char* typeName = "Entity";
+    constexpr const int fieldCount = 2;
 };
 
 uint32_t Entity::counter = 0;
 
 /**
  * @brief Entity::Entity
- *
  * Default indexing constructor.
  */
 Entity::Entity()
-    : id(++Entity::counter) {}
+    : id(++Entity::counter)
+{}
 
 /**
  * @brief Entity::Entity
- *
  * Fake protected constructor for parse-based constructors.
  * Don't increments Entity counter, because id must be parsed.
  */
-Entity::Entity(NonIncrementFlag &&) {}
+Entity::Entity(NonIncrementFlag &&)
+    : id(UNDEFINED_ID)
+{}
 
 /**
  * @brief Entity::Entity
- *
- * Just calls Entity::fromString(const QStringList&).
- *
  * @param represent (const QStrinList&)
+ * Just calls Entity::fromString(const QStringList&).
  */
 Entity::Entity(const QStringList &represent)
 {
@@ -39,10 +39,8 @@ Entity::Entity(const QStringList &represent)
 
 /**
  * @brief Entity::Entity
- *
- * Just calls Entity::deserialize(const QByteArray&).
- *
  * @param represent (const QByteArray&)
+ * Just calls Entity::deserialize(const QByteArray&)
  */
 Entity::Entity(const QByteArray &represent)
 {
@@ -51,7 +49,6 @@ Entity::Entity(const QByteArray &represent)
 
 /**
  * @brief Entity::minimumSize
- *
  * @return minimum required size of QByteArray to deserialize
  */
 quint32 Entity::minimumSize() const
@@ -61,19 +58,16 @@ quint32 Entity::minimumSize() const
 
 /**
  * @brief Entity::minimumStrings
- *
  * @return count of required strings in representation
  */
 quint32 Entity::minimumStrings() const
 {
-    return 2;
+    return fieldCount;
 }
 
 /**
  * @brief Entity::hash
- *
  * @return fnv-1A 64 bits hash by class name
- *
  * Uses for identify object type by Actaria VM e.g.
  */
 Entity::hash_type Entity::hash() const
@@ -83,7 +77,6 @@ Entity::hash_type Entity::hash() const
 
 /**
  * @brief Entity::size
- *
  * @return actuall size of serialized object in bytes
  */
 size_t Entity::size() const
@@ -93,7 +86,6 @@ size_t Entity::size() const
 
 /**
  * @brief Entity::serialize
- *
  * @return binary serialized onject
  */
 QByteArray Entity::serialize() const
@@ -109,11 +101,9 @@ QByteArray Entity::serialize() const
 
 /**
  * @brief Entity::deserialize
- *
- * Parsing prefix-formated binary data and rewrite object.
- *
  * @param data (const QByteArray&)
- */
+ * Parsing prefix-formated binary data and rewrite object
+*/
 void Entity::deserialize(const QByteArray& data)
 {
     if(data.size() < this->Entity::minimumSize()){
@@ -133,30 +123,30 @@ void Entity::deserialize(const QByteArray& data)
 
 /**
  * @brief Entity::represent
- *
  * @return readable representation of object
  */
 QString Entity::represent() const
 {
-    return QStringList{typeName, QString::number(this->id)}.join(separator);
+    return QStringList{
+        typeName,
+        QString::number(this->id)
+    }.join(separator);
 }
 
 /**
  * @brief Entity::fromString
- *
- * Parsing QStringList and rewrites object.
- *
  * @param data (const QStringList&)
+ * Parsing QStringList and rewrites object
  */
 void Entity::fromString(const QStringList &data)
 {
-    if(data.size() < 2){
+    if(data.size() < this->minimumSize()){
         qWarning("Entity::fromString: data too small");
         return;
     }
 
     bool ok;
-    this->id = static_cast<id_type>(data[1].toInt(&ok));
+    this->id = static_cast<id_type>(data[1 + IdField].toInt(&ok));
     if(!ok){
         qWarning("Entity::Failed to parse entity id");
     }
@@ -164,7 +154,6 @@ void Entity::fromString(const QStringList &data)
 
 /**
  * @brief Entity::getId
- *
  * @return unique id of game entity
  */
 Entity::id_type Entity::getId() const

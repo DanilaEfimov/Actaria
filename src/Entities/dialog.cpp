@@ -2,12 +2,25 @@
 
 
 namespace {
+
     constexpr const char* typeName = "Dialog";
+    constexpr const int fieldCount = 4;
+    constexpr const DialogAbi order[] = {
+        NodesField,     // EntityManager<DialogNode>
+        EventsField,    // EntityManager<Events>
+        ContextField,   // Context
+        RootField,      // id_type
+    };
+
 };
 
 
 Dialog::Dialog()
-    : Entity(), root(-1) {}
+    : Entity(),
+    nodes(),
+    events(),
+    root(UNDEFINED_ID)
+{}
 
 quint32 Dialog::minimumSize() const
 {
@@ -43,6 +56,20 @@ void Dialog::fromString(const QStringList &)
 }
 
 /**
+ * @brief Dialog::action
+ * @param eventId
+ * @param context
+ * @return true if context was changed successfully
+ */
+bool Dialog::action(id_type eventId, Context* context)
+{
+    Event* event = this->events.getObj(eventId);
+    if(!event)
+        return false;
+    return event->exec(context);
+}
+
+/**
  * @brief Dialog::switchBranch
  * @param variant
  * @throw invalid_argument if such variant doesn't exists for current root
@@ -51,16 +78,8 @@ void Dialog::fromString(const QStringList &)
  */
 void Dialog::switchBranch(int variant)
 {
-    auto it = this->nodes.find(this->root);
-    if (it == this->nodes.end()) {
-        throw std::logic_error(
-            "Dialog::switchBranch: root node not found: root=" +
-            std::to_string(this->root)
-            );
-    }
-
-    DialogNode& currentRoot = it.value();
-    id_type switchedBranch = currentRoot.getChild(variant);
+    DialogNode* currentRoot = this->nodes.getObj(this->root);
+    id_type switchedBranch = currentRoot->getChild(variant);
 
     if (switchedBranch == UNDEFINED_ID) {
         throw std::invalid_argument(

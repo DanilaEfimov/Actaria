@@ -11,8 +11,17 @@
 #include <QString>
 #include <QByteArray>
 
-#define UNDEFINED_ID static_cast<Entity::id_type>(-1)
+#define UNDEFINED_ID (static_cast<Entity::id_type>(-1))
 
+namespace abi {
+
+    enum EntityAbi {
+        IdField,    // id_type
+    };
+
+};  // namespace abi
+
+using namespace abi;
 
 class Entity
 {
@@ -22,6 +31,7 @@ public:
     using hash_type = utils::hash_type;
     using id_type = quint32;
 
+    // using for human-readable serializing
     static constexpr const char* separator = "::";
 
 protected:

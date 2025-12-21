@@ -37,8 +37,8 @@ hash_type Event::hash() const
  */
 size_t Event::size() const
 {
-    size_t size = sizeof(this->onEvent.size());
-    for(const auto& op : this->onEvent){
+    size_t size = sizeof(this->operators.size());
+    for(const auto& op : this->operators){
         size += op->size();
     }
     size += this->Event::size();
