@@ -48,6 +48,8 @@ HEADERS += \
     include/Entities/scene.h \
     include/GUI/mainwindow.h \
     include/config.h \
+    include/engineinfo.h \
+    include/readwrite.h \
     include/utils.h \
     include/Entities/trigger.h \
     include/Entities/operator.h

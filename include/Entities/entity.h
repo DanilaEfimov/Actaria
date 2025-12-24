@@ -8,6 +8,7 @@
 #define ENTITY_H
 
 #include "utils.h"
+#include "readwrite.h"
 #include <QString>
 #include <QByteArray>
 
@@ -52,12 +53,23 @@ public:
 
     virtual hash_type hash() const;
 
+    template <utils::GameEntity T, abi::Version V>
+    friend void abi::write(QDataStream& out, const T& obj);
+
+    template <utils::GameEntity T, abi::Version V>
+    friend void abi::read(QDataStream& in, T& obj);
+
     // returns serialized object size in bytes
+    [[deprecated("Use abi::write/read instead")]]
     virtual size_t size() const;
+    [[deprecated("Use abi::write/read instead")]]
     virtual QByteArray serialize() const;
+    [[deprecated("Use abi::write/read instead")]]
     virtual void deserialize(const QByteArray&);
 
+    [[deprecated("Use abi::write/read instead")]]
     virtual QString represent() const;
+    [[deprecated("Use abi::write/read instead")]]
     virtual void fromString(const QStringList&);
 
     id_type getId() const;
