@@ -8,10 +8,6 @@ class NonPlayerCharacter : public Character
 private:
     QString description;
 
-protected:
-    quint32 minimumSize() const override;
-    quint32 minimumStrings() const override;
-
 public:
     explicit NonPlayerCharacter();
     NonPlayerCharacter(const QString& name, Mood mood = Mood::Normal);
@@ -21,13 +17,8 @@ public:
     void setDescription(const QString& description);
     QString getDescription() const noexcept;
 
-    // Entity interface
-    hash_type hash() const override;
-    size_t size() const override;
-    QByteArray serialize() const override;
-    void deserialize(const QByteArray &) override;
-    QString represent() const override;
-    void fromString(const QStringList &) override;
+    virtual QByteArray hexHeader() const override;
+    virtual QStringList strHeader() const override;
 };
 
 #endif // NONPLAYERCHARACTER_H

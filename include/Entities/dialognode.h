@@ -45,23 +45,15 @@ private:
     int fieldSize(DialogNodeAbi abiOrder) const noexcept;
     int variantsSize() const noexcept;
 
-protected:
-    quint32 minimumSize() const override;
-    quint32 minimumStrings() const override;
-
 public:
     DialogNode(const QByteArray& data);
     DialogNode(const QStringList& data);
     DialogNode(id_type parent = UNDEFINED_ID, id_type event = UNDEFINED_ID,
                QString fromMessage = "", QString message = "");
+    virtual ~DialogNode() = default;
 
-    // Entity interface
-    hash_type hash() const override;
-    size_t size() const override;
-    QByteArray serialize() const override;
-    void deserialize(const QByteArray &) override;
-    QString represent() const override;
-    void fromString(const QStringList &) override;
+    virtual QByteArray hexHeader() const override;
+    virtual QStringList strHeader() const override;
 
     QString getMessage() const noexcept;
     void setMessage(const QString& msg);

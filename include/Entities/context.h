@@ -14,23 +14,14 @@ public:
 private:
     QMap<QString, value_type> context;
 
-protected:
-    quint32 minimumSize() const override;
-    quint32 minimumStrings() const override;
-
 public:
     Context();
     Context(const QMap<QString, value_type>& context);
 
     void merge(Context&& other);
 
-    // Entity interface
-    hash_type hash() const override;
-    size_t size() const override;
-    QByteArray serialize() const override;
-    void deserialize(const QByteArray &) override;
-    QString represent() const override;
-    void fromString(const QStringList &) override;
+    virtual QByteArray hexHeader() const override;
+    virtual QStringList strHeader() const override;
 
     template<typename T>
     void update(const QString& name, T&& value){

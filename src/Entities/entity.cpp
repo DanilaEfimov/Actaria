@@ -4,47 +4,58 @@
 #include <QStringList>
 #include <QBuffer>
 
-namespace {
-    constexpr const char* typeName = "Entity";
-    constexpr const int fieldCount = 1;
+
+/**
+ * @brief The entity_traits class
+ * byte and words measuring traits for Entity
+ */
+template<abi::Version V>
+struct entity_traits<Entity, V> {
+    static constexpr bool is_fixed = true;
+    static constexpr int minimum_bytes = sizeof(Entity::id_type);
+    static constexpr int maximum_bytes = minimum_bytes;
+
+    static constexpr const char* name = "Entity";
+    static constexpr int minimum_words = 1;
+    static constexpr int maximum_words = minimum_words;
 };
 
-template<>
-struct abi::Writer<Entity, abi::Version::Act_1_0> {
-    static void write(QDataStream& out, const Entity& obj) {
-        out << obj.id;
+/**
+ * @brief The Writer class
+ * version generalized write interface
+ */
+template<abi::Version V>
+struct Writer<Entity, V> {
+    static void write(QDataStream& out, const Entity& e) {
+        out << e.hexHeader().constData();
     }
 
-    static void write(QStringList& out, const Entity& obj) {
-        out.append(QStringList{
-            typeName,
-            QString::number(obj.id)
-        });
+    static void write(QStringList& out, const Entity& e) {
+        out << e.strHeader();
     }
 };
 
-template <>
-struct abi::Reader<Entity, abi::Version::Act_1_0> {
-    static void read(QDataStream& in, Entity& obj){
-        in >> obj.id;
+/**
+ * @brief The Reader class
+ * version generalized read interface
+ */
+template<abi::Version V>
+struct Reader<Entity, V> {
+    static void read(QDataStream& in, Entity& e) {
+        in >> e.id;
     }
 
-    static void read(const QStringList& in, Entity& obj) {
-        if(in.size() < 2){
-            qWarning("abi::Reader<Entity, abi::Version::Act_1_0>: not enought words for parsing: %s",
-                     in.join(Entity::separator).toStdString().c_str());
-            return;
-        }
-
+    static void read(const QStringList& in, Entity& e) {
         bool ok = true;
-        obj.id = static_cast<Entity::id_type>(in.at(1).toLongLong(&ok));
+        e.id = static_cast<Entity::id_type>(in.at(0).toLongLong(&ok));
 
         if(!ok){
-            qWarning("abi::Reader<Entity, abi::Version::Act_1_0>: failed to parse id from expr: %s",
-                     in.at(1).toStdString().c_str());
+            qWarning("Reader<Entity, V>::read: can not to parse id from: %s",
+                     in.empty() ? "<empty>" : in.at(0).toStdString().c_str());
         }
     }
 };
+
 
 uint32_t Entity::counter = 0;
 
@@ -81,25 +92,8 @@ Entity::Entity(const QStringList &represent)
 Entity::Entity(const QByteArray &represent)
 {
     QDataStream in(represent);
+
     Reader<Entity, EngineInfo::defaultVersion>::read(in, *this);
-}
-
-/**
- * @brief Entity::minimumSize
- * @return minimum required size of QByteArray to deserialize
- */
-quint32 Entity::minimumSize() const
-{
-    return sizeof(Entity::id_type);
-}
-
-/**
- * @brief Entity::minimumStrings
- * @return count of required strings in representation
- */
-quint32 Entity::minimumStrings() const
-{
-    return fieldCount;
 }
 
 /**
@@ -107,86 +101,33 @@ quint32 Entity::minimumStrings() const
  * @return fnv-1A 64 bits hash by class name
  * Uses for identify object type by Actaria VM e.g.
  */
-Entity::hash_type Entity::hash() const
+constexpr Entity::hash_type Entity::hash() const
 {
-    return utils::fnv1a_64(typeName);
+    using entity_t = std::remove_cvref_t<decltype(*this)>;
+    constexpr auto version = EngineInfo::defaultVersion;
+
+    return utils::fnv1a_64(entity_traits<entity_t, version>::name);
 }
 
 /**
- * @brief Entity::size
- * @return actuall size of serialized object in bytes
+ * @brief Entity::hexHeader
+ * @return dumped fields of *this
  */
-size_t Entity::size() const
-{
-    return sizeof(hash_type) + sizeof(id_type);
-}
-
-/**
- * @brief Entity::serialize
- * @return binary serialized onject
- */
-QByteArray Entity::serialize() const
+QByteArray Entity::hexHeader() const
 {
     QByteArray ret;
-    QDataStream out(&ret, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_6_5);
-
-    out << static_cast<id_type>(this->id);
+    ret.append(this->id);
 
     return ret;
 }
 
 /**
- * @brief Entity::deserialize
- * @param data (const QByteArray&)
- * Parsing prefix-formated binary data and rewrite object
-*/
-void Entity::deserialize(const QByteArray& data)
-{
-    if(data.size() < this->Entity::minimumSize()){
-        qWarning("Entity::deserialize: data too small");
-        return;
-    }
-
-    QBuffer buffer;
-    buffer.setData(data);
-    buffer.open(QIODevice::ReadOnly);
-
-    QDataStream in(&buffer);
-    in.setVersion(QDataStream::Qt_6_5);
-
-    in >> this->id;
-}
-
-/**
- * @brief Entity::represent
- * @return readable representation of object
+ * @brief Entity::strHeader
+ * @return human readable header
  */
-QString Entity::represent() const
+QStringList Entity::strHeader() const
 {
-    return QStringList{
-        typeName,
-        QString::number(this->id)
-    }.join(separator);
-}
-
-/**
- * @brief Entity::fromString
- * @param data (const QStringList&)
- * Parsing QStringList and rewrites object
- */
-void Entity::fromString(const QStringList &data)
-{
-    if(data.size() < this->minimumSize()){
-        qWarning("Entity::fromString: data too small");
-        return;
-    }
-
-    bool ok;
-    this->id = static_cast<id_type>(data[1 + IdField].toInt(&ok));
-    if(!ok){
-        qWarning("Entity::Failed to parse entity id");
-    }
+    return QStringList{QString::number(this->id)};
 }
 
 /**

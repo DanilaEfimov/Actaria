@@ -5,25 +5,29 @@
 #include "Entities/context.h"
 
 
-/**
- * @brief The operators enum
- */
 enum class operators : int {
     assignmentOperator
 };
 
-/**
- * @brief The Operator class
- */
 class Operator : public Entity {
 public:
-    /**
-     * @brief apply
-     * @param context
-     */
+
+    virtual QByteArray hexHeader() const override;
+    virtual QStringList strHeader() const override;
+
     virtual void apply(Context& context) const = 0;
     virtual QString toString() const = 0;
     virtual ~Operator() = default;
 };
+
+inline QByteArray Operator::hexHeader() const
+{
+
+}
+
+inline QStringList Operator::strHeader() const
+{
+
+}
 
 #endif // OPERATOR_H

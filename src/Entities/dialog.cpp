@@ -22,37 +22,15 @@ Dialog::Dialog()
     root(UNDEFINED_ID)
 {}
 
-quint32 Dialog::minimumSize() const
+
+QByteArray Dialog::hexHeader() const
 {
+
 }
 
-quint32 Dialog::minimumStrings() const
+QStringList Dialog::strHeader() const
 {
-}
 
-Entity::hash_type Dialog::hash() const
-{
-    return utils::fnv1a_64(typeName);
-}
-
-size_t Dialog::size() const
-{
-}
-
-QByteArray Dialog::serialize() const
-{
-}
-
-void Dialog::deserialize(const QByteArray &)
-{
-}
-
-QString Dialog::represent() const
-{
-}
-
-void Dialog::fromString(const QStringList &)
-{
 }
 
 /**

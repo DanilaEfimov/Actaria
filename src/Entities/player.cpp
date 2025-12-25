@@ -41,16 +41,6 @@ public:
 };
 
 /**
- * @brief Player::minimumStrings
- *
- * @return
- */
-quint32 Player::minimumStrings() const
-{
-    return fieldCount + this->Character::minimumStrings();
-}
-
-/**
  * @brief Player::Player
  *
  * @param name
@@ -68,7 +58,6 @@ Player::Player(const QString &name, Mood mood)
 Player::Player(const QByteArray &data)
     : Character()
 {
-    this->deserialize(data);
 }
 
 /**
@@ -79,7 +68,6 @@ Player::Player(const QByteArray &data)
 Player::Player(const QStringList &data)
     : Character()
 {
-    this->fromString(data);
 }
 
 /**
@@ -151,62 +139,12 @@ Mood Player::getMood() const noexcept
     return this->mood;
 }
 
-/**
- * @brief Player::hash
- *
- * @return fnva1 hash by typename
- */
-Entity::hash_type Player::hash() const
+QByteArray Player::hexHeader() const
 {
-    return utils::fnv1a_64(typeName);
+
 }
 
-/**
- * @brief Player::serialize
- *
- * @return hex dump of player instance
- */
-QByteArray Player::serialize() const
+QStringList Player::strHeader() const
 {
-    QByteArray ret;
-    QDataStream out(&ret, QDataStream::WriteOnly);
-    out.setVersion(QDataStream::Qt_6_5);
 
-    QByteArray arr = Player::instance.Character::serialize();
-    out.writeRawData(arr.constData(), arr.size());
-
-    return ret;
-}
-
-/**
- * @brief Player::deserialize
- *
- * @param data
- */
-void Player::deserialize(const QByteArray& data)
-{
-    this->Character::deserialize(data);
-}
-
-/**
- * @brief Player::represent
- *
- * @return QString representation of instance
- */
-QString Player::represent() const
-{
-    return QStringList{
-        typeName,
-        Player::instance.Character::represent()
-    }.join(separator);
-}
-
-/**
- * @brief Player::fromString
- *
- * @param data
- */
-void Player::fromString(const QStringList& data)
-{
-    this->Character::fromString(data.mid(fieldCount));
 }

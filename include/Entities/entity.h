@@ -1,4 +1,5 @@
 /**
+ * @file entity.h
  * Base class for a game entity.
  * Provides an interface for identification and serialization.
  * Derived classes: Scene, Dialog, Trigger, and other game objects.
@@ -16,7 +17,7 @@
 
 namespace abi {
 
-    enum EntityAbi {
+    enum EntityFieldsOrder {
         IdField,    // id_type
     };
 
@@ -29,11 +30,9 @@ class Entity
     static uint32_t counter;
 
 public:
+    using base_t = Entity;  // absolute base pattern
     using hash_type = utils::hash_type;
     using id_type = quint32;
-
-    // using for human-readable serializing
-    static constexpr const char* separator = "::";
 
 protected:
     id_type id;
@@ -45,13 +44,10 @@ protected:
     Entity(const QStringList& represent);
     Entity(const QByteArray& represent);
 
-    virtual quint32 minimumSize() const;
-    virtual quint32 minimumStrings() const;
-
 public:
     virtual ~Entity() = default;
 
-    virtual hash_type hash() const;
+    constexpr hash_type hash() const;
 
     template <typename T, abi::Version V>
     friend struct abi::Writer;
@@ -59,18 +55,8 @@ public:
     template <typename T, abi::Version V>
     friend struct abi::Reader;
 
-    // returns serialized object size in bytes
-    [[deprecated("Use abi::write/read instead")]]
-    virtual size_t size() const;
-    [[deprecated("Use abi::write/read instead")]]
-    virtual QByteArray serialize() const;
-    [[deprecated("Use abi::write/read instead")]]
-    virtual void deserialize(const QByteArray&);
-
-    [[deprecated("Use abi::write/read instead")]]
-    virtual QString represent() const;
-    [[deprecated("Use abi::write/read instead")]]
-    virtual void fromString(const QStringList&);
+    virtual QByteArray hexHeader() const;
+    virtual QStringList strHeader() const;
 
     id_type getId() const;
 };

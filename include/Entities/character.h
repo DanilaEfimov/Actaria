@@ -24,18 +24,11 @@ protected:
     Character(const QByteArray& data);
     Character(const QStringList& data);
 
-    quint32 minimumSize() const override;
-    quint32 minimumStrings() const override;
-
 public:
     QString getName() const noexcept;
 
-    // Entity interface
-    size_t size() const override;
-    QByteArray serialize() const override;
-    void deserialize(const QByteArray &) override;
-    QString represent() const override;
-    void fromString(const QStringList &) override;
+    virtual QByteArray hexHeader() const override;
+    virtual QStringList strHeader() const override;
 };
 
 #endif // CHARACTER_H

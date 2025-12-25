@@ -44,7 +44,7 @@ namespace {
      */
     void reprVariant(QString& repr, const variant_t& variant){
         repr.append(variant.first);
-        repr.append(Entity::separator);
+        repr.append(EngineInfo::separator);
         repr.append(QString::number(static_cast<quint32>(variant.second)));
     }
 
@@ -60,7 +60,7 @@ namespace {
         repr.append(QString::number(size));
 
         for(int i = 0; i < size; i++){
-            repr.append(Entity::separator);
+            repr.append(EngineInfo::separator);
             reprVariant(repr, variants.at(i));
         }
     }
@@ -133,6 +133,16 @@ DialogNode::DialogNode(id_type parent, id_type event, QString fromMessage, QStri
     event(event)
 {}
 
+QByteArray DialogNode::hexHeader() const
+{
+
+}
+
+QStringList DialogNode::strHeader() const
+{
+
+}
+
 /**
  * @brief DialogNode::DialogNode
  * @param data
@@ -140,7 +150,6 @@ DialogNode::DialogNode(id_type parent, id_type event, QString fromMessage, QStri
 DialogNode::DialogNode(const QByteArray &data)
     : Entity(Entity::NonIncrementFlag{})
 {
-    this->deserialize(data);
 }
 
 /**
@@ -150,7 +159,6 @@ DialogNode::DialogNode(const QByteArray &data)
 DialogNode::DialogNode(const QStringList &data)
     : Entity(Entity::NonIncrementFlag{})
 {
-    this->fromString(data);
 }
 
 /**
@@ -322,144 +330,6 @@ int DialogNode::variantsSize() const noexcept
         size += sizeof(this->variants.at(i).second);    // fixed size
     }
     return size;
-}
-
-/**
- * @brief DialogNode::minimumSize
- * @return minimum required size to deserialize in bytes
- */
-quint32 DialogNode::minimumSize() const
-{
-    return minimumQStringSize
-            + minimumQVectorSize
-            + sizeof(this->parent)
-            + sizeof(this->event)
-            + this->Entity::minimumSize();
-}
-
-/**
- * @brief DialogNode::minimumStrings
- * @return
- */
-quint32 DialogNode::minimumStrings() const
-{
-    return fieldCount + this->Entity::minimumStrings();
-}
-
-/**
- * @brief DialogNode::hash
- * @return
- */
-Entity::hash_type DialogNode::hash() const
-{
-    return utils::fnv1a_64(typeName);
-}
-
-/**
- * @brief DialogNode::size
- * @return actual size of *this in bytes
- */
-size_t DialogNode::size() const
-{
-    int size = 0;
-    for(auto field : order){
-        size += this->fieldSize(field);
-    }
-
-    size += this->Entity::size();
-    return size;
-}
-
-/**
- * @brief DialogNode::serialize
- * @return
- */
-QByteArray DialogNode::serialize() const
-{
-    QByteArray ret;
-    QDataStream out(&ret, QDataStream::WriteOnly);
-    out.setVersion(QDataStream::Qt_6_5);
-
-    for(DialogNodeAbi idx : order){
-        this->dumpField(out, idx);
-    }
-
-    QByteArray arr = this->Entity::serialize();
-    out.writeRawData(arr.constData(), arr.size());
-
-    return ret;
-}
-
-/**
- * @brief DialogNode::deserialize
- * @param data
- */
-void DialogNode::deserialize(const QByteArray& data)
-{
-    if(data.size() < this->DialogNode::minimumSize()){
-        qWarning("DialogNode::deserialize: data too small");
-        return;
-    }
-
-    QBuffer buffer;
-    buffer.setData(data);
-    buffer.open(QIODevice::ReadOnly);
-
-    QDataStream in(&buffer);
-    in.setVersion(QDataStream::Qt_6_5);
-
-    // same order
-    for(DialogNodeAbi idx : order){
-        this->readField(in, idx);
-    }
-
-    quint64 pos = buffer.pos();
-    this->Entity::deserialize(data.mid(pos));
-}
-
-/**
- * @brief DialogNode::represent
- * @return human readable representation of *this
- */
-QString DialogNode::represent() const
-{
-    QString repr = typeName;
-    for(auto idx : order){
-        repr.append(Entity::separator);
-        this->representField(repr, idx);
-    }
-    repr.append(Entity::separator);
-    repr.append(this->Entity::represent());
-    return repr;
-}
-
-/**
- * @brief DialogNode::fromString
- * @param data
- */
-void DialogNode::fromString(const QStringList& data)
-{
-    if(data.empty()){
-        qWarning("DialogNode::fromString: was given empty list");
-        return;
-    }
-
-    int parsed = 0;
-    int pos = 1;    // typeName skipping
-    bool ok = true; // nesaccary to enter read field from strings
-    QStringList repr = data;
-    for(DialogNodeAbi field : order){
-        parsed++;
-        repr = data.mid(pos);
-        pos += this->readFieldFromStrings(repr, field, &ok);
-        if(!ok) break;
-    }
-    if(parsed < fieldCount - 1){
-        qWarning() << "DialogNode::fromString: Parsing was aborted at filed " + toString(order[parsed]);
-        return;
-    }
-
-    this->Entity::fromString(data.mid(pos));
 }
 
 /**

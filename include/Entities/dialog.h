@@ -28,20 +28,12 @@ class Dialog : public Entity
     Context context;
     id_type root;
 
-protected:
-    quint32 minimumSize() const override;
-    quint32 minimumStrings() const override;
-
 public:
     Dialog();
+    virtual ~Dialog() = default;
 
-    // Entity interface
-    hash_type hash() const override;
-    size_t size() const override;
-    QByteArray serialize() const override;
-    void deserialize(const QByteArray &) override;
-    QString represent() const override;
-    void fromString(const QStringList &) override;
+    virtual QByteArray hexHeader() const override;
+    virtual QStringList strHeader() const override;
 
     bool action(id_type eventId, Context* context);
     void switchBranch(int variant);

@@ -24,17 +24,11 @@ protected:
     ContextVar(const QStringList& represent);
     ContextVar(const QByteArray& represent);
 
-    size_t size() const override;
-    quint32 minimumSize() const override;
-    quint32 minimumStrings() const override;
-
 public:
     virtual ~ContextVar() = default;
 
-    QByteArray serialize() const override;
-    void deserialize(const QByteArray& data) override;
-    QString represent() const override;
-    void fromString(const QStringList& data) override;
+    virtual QByteArray hexHeader() const override;
+    virtual QStringList strHeader() const override;
 
     QString getName() const;
     void setName(const QString& name) noexcept;

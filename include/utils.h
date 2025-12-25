@@ -59,7 +59,9 @@ namespace utils {
 using hash_type = uint64_t;
 
 template<typename T>
-concept GameEntity = std::derived_from<T, Entity>;
+concept GameEntity =
+    std::derived_from<T, Entity> ||
+    std::is_same_v<T, Entity>;
 
 template<typename T>
 concept ContextVariable = std::derived_from<T, ContextVar>;

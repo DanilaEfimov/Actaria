@@ -22,83 +22,22 @@ void Context::merge(Context&& other)
     this->context.insert(other.context);
 }
 
-/**
- * @brief Context::minimumSize
- * @return
- */
-quint32 Context::minimumSize() const
-{
-}
-
-/**
- * @brief Context::minimumStrings
- * @return
- */
-quint32 Context::minimumStrings() const
-{
-}
-
-/**
- * @brief Context::hash
- * @return
- */
-Entity::hash_type Context::hash() const
-{
-}
-
-/**
- * @brief Context::size
- * @return
- */
-size_t Context::size() const
-{
-}
-
-/**
- * @brief Context::serialize
- * @return
- */
-QByteArray Context::serialize() const
-{
-}
-
-/**
- * @brief Context::deserialize
- * @param data
- */
-void Context::deserialize(const QByteArray& data)
-{
-}
-
-/**
- * @brief Context::represent
- * @return
- */
-QString Context::represent() const
-{
-}
-
-/**
- * @brief Context::fromString
- * @param data
- */
-void Context::fromString(const QStringList& data)
-{
-}
-
-/**
- * @brief Context::remove
- * @param name
- */
-void Context::remove(const QString& name)
+QByteArray Context::hexHeader() const
 {
 
 }
 
-/**
- * @brief Context::clear
- */
+QStringList Context::strHeader() const
+{
+
+}
+
+void Context::remove(const QString &name)
+{
+
+}
+
 void Context::clear()
 {
-    this->context.clear();
+
 }

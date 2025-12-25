@@ -14,23 +14,30 @@
 #include <QDataStream>
 #include <QStringList>
 
+
 namespace abi {
 
 static constexpr int unlimited = -1;
 
-template <typename T, Version V = EngineInfo::defaultVersion>
-struct measure_traits {
-    static constexpr bool is_fixed = std::is_fundamental<T>::value;
+/**
+ * @brief The entity_traits class
+ */
+template <utils::GameEntity T, Version V = EngineInfo::defaultVersion>
+struct entity_traits {
+    static_assert(sizeof(T) == 0, "abi::entity_traits<T, V>: specialization required");
+
+    static constexpr bool is_fixed = std::is_fundamental_v<T>;
     static constexpr int minimum_bytes = sizeof(T);
     static constexpr int maximum_bytes = sizeof(T);
-};
 
-template <utils::GameEntity T, Version V = EngineInfo::defaultVersion>
-struct entity_measure_traits : public measure_traits<T, V> {
+    static constexpr const char* name = "";
     static constexpr int minimum_words = 1;
     static constexpr int maximum_words = unlimited;
 };
 
+/**
+ * @brief The Writer class
+ */
 template <typename T, Version V = EngineInfo::defaultVersion>
 struct Writer {
     static_assert(sizeof(T) == 0, "abi::Writer<T, V>: specialization required");
@@ -39,6 +46,9 @@ struct Writer {
     static void write(QStringList&, const T&);
 };
 
+/**
+ * @brief The Reader class
+ */
 template <typename T, Version V = EngineInfo::defaultVersion>
 struct Reader {
     static_assert(sizeof(T) == 0, "abi::Reader<T, V>: specialization required");
@@ -47,7 +57,9 @@ struct Reader {
     static void read(const QStringList&, T&);
 };
 
-/// fundamental types specification for read-write interface
+/**
+ * @brief The Writer class
+ */
 template <FundamentalType T, Version V>
 struct Writer<T, V> {
     static_assert(StreamWriteable<T> && Stringable<T>, "abi::Writer<T, V>: can not write non-specified fundamental type");
@@ -70,6 +82,9 @@ struct Writer<T, V> {
     }
 };
 
+/**
+ * @brief The Reader class
+ */
 template <FundamentalType T, Version V>
 struct Reader<T, V> {
     static void read(QDataStream& in, T& obj) {
@@ -101,21 +116,86 @@ struct Reader<T, V> {
     }
 };
 
-/// entity-based types declarations for read-write interface
+/**
+ * @brief The Writer class
+ */
 template <utils::GameEntity T, Version V>
 struct Writer<T, V> {
-    static_assert(sizeof(T) == 0, "abi::Writer<utils::GameEntity T, V>: specialization required");
+    using base_t = typename T::base_t;
 
-    static void write(QDataStream&, const T&);
-    static void write(QStringList&, const T&);
+    static void write(QDataStream& in, const T& obj) {
+        if(std::is_same_v<T, base_t>){
+            return;
+        }
+
+        in.setByteOrder(static_cast<QDataStream::ByteOrder>(EngineInfo::endian));
+
+        if constexpr (EngineInfo::defaultOrder == AbiOrder::Post) {
+            in << obj.hexHeader();
+            Writer<base_t, V>::write(in, static_cast<const base_t&>(obj));
+        }
+        else {
+            Writer<base_t, V>::write(in, static_cast<const base_t&>(obj));
+            in << obj.hexHeader();
+        }
+    }
+
+    static void write(QStringList& in, const T& obj) {
+        if(std::is_same_v<T, base_t>){
+            return;
+        }
+
+        if constexpr (EngineInfo::defaultOrder == AbiOrder::Post) {
+            in.append(obj.strHeader());
+            Writer<base_t, V>::write(in, static_cast<const base_t&>(obj));
+        }
+        else {
+            Writer<base_t, V>::write(in, static_cast<const base_t&>(obj));
+            in.append(obj.strHeader());
+        }
+    }
 };
 
+/**
+ * @brief The Reader class
+ */
 template <utils::GameEntity T, Version V>
 struct Reader<T, V> {
-    static_assert(sizeof(T) == 0, "abi::Reader<utils::GameEntity T, V>: specialization required");
+    using base_t = typename T::base_t;
 
-    static void read(QDataStream&, const T&);
-    static void read(const QStringList&, const T&);
+    static void read(QDataStream& in, T& obj) {
+        if(std::is_same_v<T, base_t>){
+            return;
+        }
+
+        in.setByteOrder(static_cast<QDataStream::ByteOrder>(EngineInfo::endian));
+
+        if constexpr (EngineInfo::defaultOrder == AbiOrder::Post) {
+            // [Derived][Base]
+            obj.fromDump(in);
+            Reader<base_t, V>::read(in, static_cast<base_t&>(obj));
+        }
+        else {
+            // [Base][Derived]
+            Reader<base_t, V>::read(in, static_cast<base_t&>(obj));
+            obj.fromDump(in);
+        }
+    }
+
+    static void read(const QStringList& in, T& obj) {
+        if(std::is_same_v<T, base_t>){
+            return;
+        }
+
+        if constexpr (EngineInfo::defaultOrder == AbiOrder::Post) {
+            obj.readStrHeader(in);
+            Reader<base_t, V>::read(in, static_cast<base_t&>(obj));
+        }
+        else {
+            Reader<base_t, V>::read(in, static_cast<base_t&>(obj));
+            obj.readStrHeader(in);
+        }
+    }
 };
 
 };  // namespace abi

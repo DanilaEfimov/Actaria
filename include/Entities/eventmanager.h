@@ -7,6 +7,10 @@ class EventManager : public Entity
 {
 public:
     EventManager();
+    virtual ~EventManager() = default;
+
+    virtual QByteArray hexHeader() const;
+    virtual QStringList strHeader() const;
 };
 
 #endif // EVENTMANAGER_H

@@ -10,26 +10,6 @@ namespace {
 };
 
 /**
- * @brief Trigger::minimumSize
- *
- * @return minimum required size for hex-dump
- */
-quint32 Trigger::minimumSize() const
-{
-    return sizeof(value_type) + this->ContextVar::minimumSize();
-}
-
-/**
- * @brief Trigger::minimumStrings
- *
- * @return count of required strings in representation
- */
-quint32 Trigger::minimumStrings() const
-{
-    return fieldCount + this->ContextVar::minimumStrings();
-}
-
-/**
  * @brief Trigger::Trigger
  *
  * Normal constructor for context counter.
@@ -52,7 +32,6 @@ Trigger::Trigger(value_type value, const QString &name)
 Trigger::Trigger(const QStringList &represent)
     : ContextVar()
 {
-    this->fromString(represent);
 }
 
 /**
@@ -66,7 +45,6 @@ Trigger::Trigger(const QStringList &represent)
 Trigger::Trigger(const QByteArray &represent)
     : ContextVar()
 {
-    this->deserialize(represent);
 }
 
 /**
@@ -97,106 +75,12 @@ Trigger::operator bool() const noexcept
     return this->value;
 }
 
-/**
- * @brief Trigger::hash
- *
- * @return fnv-1a hash of typeName string
- */
-Entity::hash_type Trigger::hash() const
+QByteArray Trigger::hexHeader() const
 {
-    return utils::fnv1a_64(typeName);
+
 }
 
-/**
- * @brief Trigger::size
- *
- * @return actual size of object in bytes
- */
-size_t Trigger::size() const
+QStringList Trigger::strHeader() const
 {
-    return sizeof(value_type)
-           + this->ContextVar::size();
-}
 
-/**
- * @brief Trigger::serialize
- * @param isPostfix - true if called by deriver
- * @return hex-dump of object
- */
-QByteArray Trigger::serialize() const
-{
-    QByteArray ret;
-    QDataStream out(&ret, QDataStream::WriteOnly);
-    out.setVersion(QDataStream::Qt_6_5);
-
-    out << static_cast<value_type>(this->value);
-
-    QByteArray arr = this->ContextVar::serialize();
-    out.writeRawData(arr.constData(), arr.size());
-
-    return ret;
-}
-
-/**
- * @brief Trigger::deserialize
- *
- * Parse raw bytes in lineral order.
- *
- * @param data
- */
-void Trigger::deserialize(const QByteArray& data)
-{
-    if(data.size() < this->Trigger::minimumSize()){
-        qWarning("Trigger::deserialize: data too small");
-        return;
-    }
-
-    QBuffer buffer;
-    buffer.setData(data);
-    buffer.open(QBuffer::ReadOnly);
-
-    QDataStream in(&buffer);
-    in.setVersion(QDataStream::Qt_6_5);
-
-    in >> this->value;
-
-    quint64 pos = buffer.pos();
-    this->ContextVar::deserialize(data.mid(pos));
-}
-
-/**
- * @brief Trigger::represent
- *
- * @return Readable QString presentation
- */
-QString Trigger::represent() const
-{
-    return QStringList{
-        typeName,
-        QString::number(this->value),
-        this->ContextVar::represent()
-    }.join(separator);
-}
-
-/**
- * @brief Trigger::fromString
- *
- * Parse QString in lineral order with typeName skipping.
- *
- * @param data
- */
-void Trigger::fromString(const QStringList &data)
-{
-    if(data.size() < this->Trigger::minimumSize()){
-        qWarning("Trigger::fromString: data too small");
-        return;
-    }
-
-    bool ok;
-    this->value = static_cast<value_type>(data[1].toInt(&ok));
-    if(!ok){
-        qWarning("Trigger::Failed to parse entity id");
-    }
-
-    this->ContextVar::fromString(data.mid(fieldCount));
 }

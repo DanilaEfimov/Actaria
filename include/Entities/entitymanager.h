@@ -10,8 +10,7 @@
 #include <QHash>
 #include <QBuffer>
 
-template<typename T>
-    requires utils::GameEntity<T>
+template<utils::GameEntity T>
 class EntityManager
 {
 public:

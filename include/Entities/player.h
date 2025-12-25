@@ -9,11 +9,10 @@ class Builder;
 class Player : public Character
 {
 protected:
-    quint32 minimumStrings() const override;
-
     Player(const QString& name, Mood mood=Mood::Normal);
     Player(const QByteArray& data);
     Player(const QStringList& data);
+
 
     static Player instance;
     static bool built;
@@ -30,6 +29,7 @@ public:
     static Context inventory;
 
     Player();
+    virtual ~Player() = default;
 
     static Player& getInstance();
 
@@ -39,12 +39,8 @@ public:
     void setMood(Mood mood);
     Mood getMood() const noexcept;
 
-    // Entity interface
-    hash_type hash() const override;
-    QByteArray serialize() const override;
-    void deserialize(const QByteArray &) override;
-    QString represent() const override;
-    void fromString(const QStringList &) override;
+    virtual QByteArray hexHeader() const override;
+    virtual QStringList strHeader() const override;
 };
 
 #endif // PLAYER_H

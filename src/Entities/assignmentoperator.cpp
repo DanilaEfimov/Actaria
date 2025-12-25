@@ -16,3 +16,13 @@ enum class arithmetic_op : int {
 AssignmentOperator::AssignmentOperator(ContextVar *lvalue)
     : Operator(), lvalue(lvalue)
 {}
+
+QByteArray AssignmentOperator::hexHeader() const
+{
+
+}
+
+QStringList AssignmentOperator::strHeader() const
+{
+
+}

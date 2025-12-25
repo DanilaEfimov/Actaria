@@ -26,7 +26,6 @@ NonPlayerCharacter::NonPlayerCharacter(const QString &name, Mood mood)
 NonPlayerCharacter::NonPlayerCharacter(const QByteArray &data)
     : Character(), description()
 {
-    this->deserialize(data);
 }
 
 /**
@@ -47,69 +46,12 @@ QString NonPlayerCharacter::getDescription() const noexcept
     return this->description;
 }
 
-/**
- * @brief NonPlayerCharacter::minimumSize
- * @return
- */
-quint32 NonPlayerCharacter::minimumSize() const
+QByteArray NonPlayerCharacter::hexHeader() const
 {
-    return minimumQStringSize + this->Character::minimumSize();
+
 }
 
-/**
- * @brief NonPlayerCharacter::minimumStrings
- * @return
- */
-quint32 NonPlayerCharacter::minimumStrings() const
+QStringList NonPlayerCharacter::strHeader() const
 {
-    return fieldCount + this->Character::minimumStrings();
-}
 
-/**
- * @brief NonPlayerCharacter::hash
- * @return
- */
-Entity::hash_type NonPlayerCharacter::hash() const
-{
-    return utils::fnv1a_64(typeName);
-}
-
-/**
- * @brief NonPlayerCharacter::size
- * @return
- */
-size_t NonPlayerCharacter::size() const
-{
-    return QStringHexSize(this->description) + this->Character::size();
-}
-
-/**
- * @brief NonPlayerCharacter::serialize
- * @return
- */
-QByteArray NonPlayerCharacter::serialize() const
-{
-}
-
-/**
- * @brief NonPlayerCharacter::deserialize
- * @param data
- */
-void NonPlayerCharacter::deserialize(const QByteArray& data)
-{
-}
-
-/**
- * @brief NonPlayerCharacter::represent
- * @return
- */
-QString NonPlayerCharacter::represent() const
-{
-}
-
-/**
- * @brief NonPlayerCharacter::fromString
- */
-void NonPlayerCharacter::fromString(const QStringList& data)
-{
 }

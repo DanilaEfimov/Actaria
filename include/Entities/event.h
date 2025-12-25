@@ -12,19 +12,11 @@ class Event : public Entity
 protected:
     QVector<operator_ptr> operators;
 
-    quint32 minimumSize() const override;
-    quint32 minimumStrings() const override;
-
 public:
     Event();
 
-    // Entity interface
-    hash_type hash() const override;
-    size_t size() const override;
-    QByteArray serialize() const override;
-    void deserialize(const QByteArray &) override;
-    QString represent() const override;
-    void fromString(const QStringList &) override;
+    virtual QByteArray hexHeader() const override;
+    virtual QStringList strHeader() const override;
 
     virtual bool exec(Context* context) const = 0;
 };

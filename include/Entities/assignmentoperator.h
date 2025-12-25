@@ -12,6 +12,10 @@ class AssignmentOperator : public Operator
 
 public:
     AssignmentOperator(ContextVar* lvalue);
+    virtual ~AssignmentOperator() = default;
+
+    virtual QByteArray hexHeader() const;
+    virtual QStringList strHeader() const;
 };
 
 #endif // ASSIGNMENTOPERATOR_H

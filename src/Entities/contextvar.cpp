@@ -1,9 +1,56 @@
 #include "Entities/contextvar.h"
 #include <QBuffer>
 
-namespace {
-    constexpr const int fieldCount = 1;
-}
+/**
+ * @brief The entity_traits class
+ * byte and words measuring traits for Entity
+ */
+template<abi::Version V>
+struct entity_traits<Entity, V> {
+    static constexpr bool is_fixed = true;
+    static constexpr int minimum_bytes = sizeof(Entity::id_type);
+    static constexpr int maximum_bytes = minimum_bytes;
+
+    static constexpr const char* name = "Entity";
+    static constexpr int minimum_words = 1;
+    static constexpr int maximum_words = minimum_words;
+};
+
+/**
+ * @brief The Writer class
+ * version generalized write interface
+ */
+template<abi::Version V>
+struct Writer<ContextVar, V> {
+    static void write(QDataStream& out, const ContextVar& c) {
+        out << c.hexHeader().constData();
+    }
+
+    static void write(QStringList& out, const ContextVar& c) {
+        out << c.strHeader();
+    }
+};
+
+/**
+ * @brief The Reader class
+ * version generalized read interface
+ */
+template<abi::Version V>
+struct Reader<ContextVar, V> {
+    static void read(QDataStream& in, ContextVar& c) {
+        in >> c.name;
+    }
+
+    static void read(const QStringList& in, ContextVar& c) {
+        bool ok = true;
+        c.id = static_cast<Entity::id_type>(in.at(0).toLongLong(&ok));
+
+        if(!ok){
+            qWarning("Reader<Entity, V>::read: can not to parse id from: %s",
+                     in.empty() ? "<empty>" : in.at(0).toStdString().c_str());
+        }
+    }
+};
 
 ContextVar::ContextVar()
     : Entity(NonIncrementFlag{}), name() {}
@@ -14,78 +61,21 @@ ContextVar::ContextVar(const QString &name)
 ContextVar::ContextVar(const QStringList& represent)
     : Entity(NonIncrementFlag{})
 {
-    this->fromString(represent);
 }
 
 ContextVar::ContextVar(const QByteArray& represent)
     : Entity(NonIncrementFlag{})
 {
-    this->deserialize(represent);
 }
 
-size_t ContextVar::size() const
+QByteArray ContextVar::hexHeader() const
 {
-    return QStringHexSize(this->name) + this->Entity::size();
+
 }
 
-quint32 ContextVar::minimumSize() const
+QStringList ContextVar::strHeader() const
 {
-    return minimumQStringSize + this->Entity::minimumSize();
-}
 
-quint32 ContextVar::minimumStrings() const
-{
-    return fieldCount;
-}
-
-QByteArray ContextVar::serialize() const
-{
-    QByteArray ret;
-    QDataStream out(&ret, QDataStream::WriteOnly);
-    out.setVersion(QDataStream::Qt_6_5);
-
-    out << static_cast<QString>(this->name);
-
-    QByteArray arr = this->Entity::serialize();
-    out.writeRawData(arr.constData(), arr.size());
-
-    return ret;
-}
-
-void ContextVar::deserialize(const QByteArray &data)
-{
-    if (data.size() < this->ContextVar::minimumSize()) {
-        qWarning("ContextVar::deserialize: data too small");
-        return;
-    }
-
-    QBuffer buffer;
-    buffer.setData(data);
-    buffer.open(QIODevice::ReadOnly);
-
-    QDataStream in(&buffer);
-    in.setVersion(QDataStream::Qt_6_5);
-
-    in >> name; // QString
-    quint64 pos = buffer.pos();
-    this->Entity::deserialize(data.mid(pos));
-}
-
-
-QString ContextVar::represent() const
-{
-    return this->name + separator + this->Entity::represent();
-}
-
-void ContextVar::fromString(const QStringList &data)
-{
-    if(data.size() < this->ContextVar::minimumStrings()){
-        qWarning("ContextVar::fromString: data too small");
-        return;
-    }
-
-    this->name = data[0];
-    this->Entity::fromString(data.mid(fieldCount));
 }
 
 QString ContextVar::getName() const

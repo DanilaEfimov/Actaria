@@ -2,9 +2,16 @@
 #define CONFIG_H
 
 #ifdef ACTARIA_TEST
-#define DEBUG_ONLY(code) code
+    #define DEBUG_ONLY(code) code
 #else
-#define DEBUG_ONLY(code)
+    #define DEBUG_ONLY(code)
+#endif
+
+// order of dumping fields
+#ifndef POST_ORDER
+    #define POST_ORDER
+#else
+    #define PRE_ORDER
 #endif
 
 #endif // CONFIG_H

@@ -11,9 +11,6 @@ public:
 protected:
     value_type value;
 
-    quint32 minimumSize() const override;
-    quint32 minimumStrings() const override;
-
 public:
     NameVar() = delete;
     NameVar(value_type value, const QString& name);
@@ -25,13 +22,8 @@ public:
 
     operator QString() const noexcept;
 
-    // Entity interface
-    hash_type hash() const override;
-    size_t size() const override;
-    QByteArray serialize() const override;
-    void deserialize(const QByteArray &) override;
-    QString represent() const override;
-    void fromString(const QStringList &) override;
+    virtual QByteArray hexHeader() const override;
+    virtual QStringList strHeader() const override;
 };
 
 #endif // NAMEVAR_H
