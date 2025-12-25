@@ -138,13 +138,3 @@ Mood Player::getMood() const noexcept
 {
     return this->mood;
 }
-
-QByteArray Player::hexHeader() const
-{
-
-}
-
-QStringList Player::strHeader() const
-{
-
-}

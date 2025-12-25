@@ -133,16 +133,6 @@ DialogNode::DialogNode(id_type parent, id_type event, QString fromMessage, QStri
     event(event)
 {}
 
-QByteArray DialogNode::hexHeader() const
-{
-
-}
-
-QStringList DialogNode::strHeader() const
-{
-
-}
-
 /**
  * @brief DialogNode::DialogNode
  * @param data

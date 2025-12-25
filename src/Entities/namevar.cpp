@@ -46,13 +46,3 @@ void NameVar::setValue(value_type value) noexcept
 {
 
 }
-
-QByteArray NameVar::hexHeader() const
-{
-
-}
-
-QStringList NameVar::strHeader() const
-{
-
-}

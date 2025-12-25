@@ -22,17 +22,6 @@ Dialog::Dialog()
     root(UNDEFINED_ID)
 {}
 
-
-QByteArray Dialog::hexHeader() const
-{
-
-}
-
-QStringList Dialog::strHeader() const
-{
-
-}
-
 /**
  * @brief Dialog::action
  * @param eventId

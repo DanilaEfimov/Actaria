@@ -32,9 +32,6 @@ public:
     Dialog();
     virtual ~Dialog() = default;
 
-    virtual QByteArray hexHeader() const override;
-    virtual QStringList strHeader() const override;
-
     bool action(id_type eventId, Context* context);
     void switchBranch(int variant);
 };

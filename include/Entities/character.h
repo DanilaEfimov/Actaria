@@ -26,9 +26,6 @@ protected:
 
 public:
     QString getName() const noexcept;
-
-    virtual QByteArray hexHeader() const override;
-    virtual QStringList strHeader() const override;
 };
 
 #endif // CHARACTER_H

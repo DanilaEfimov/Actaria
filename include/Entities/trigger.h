@@ -23,9 +23,6 @@ public:
     void setValue(value_type value) noexcept;
 
     operator bool() const noexcept;
-
-    virtual QByteArray hexHeader() const override;
-    virtual QStringList strHeader() const override;
 };
 
 #endif // TRIGGER_H

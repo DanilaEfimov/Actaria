@@ -2,7 +2,6 @@
 #include "utils.h"
 #include "engineinfo.h"
 #include <QStringList>
-#include <QBuffer>
 
 
 /**
@@ -16,7 +15,7 @@ struct entity_traits<Entity, V> {
     static constexpr int maximum_bytes = minimum_bytes;
 
     static constexpr const char* name = "Entity";
-    static constexpr int minimum_words = 1;
+    static constexpr int minimum_words = 2;
     static constexpr int maximum_words = minimum_words;
 };
 
@@ -27,11 +26,11 @@ struct entity_traits<Entity, V> {
 template<abi::Version V>
 struct Writer<Entity, V> {
     static void write(QDataStream& out, const Entity& e) {
-        out << e.hexHeader().constData();
+        out << e.id;
     }
 
     static void write(QStringList& out, const Entity& e) {
-        out << e.strHeader();
+        out << entity_traits<Entity, V>::name << QString::number(e.id);
     }
 };
 
@@ -47,11 +46,18 @@ struct Reader<Entity, V> {
 
     static void read(const QStringList& in, Entity& e) {
         bool ok = true;
-        e.id = static_cast<Entity::id_type>(in.at(0).toLongLong(&ok));
+
+        if(in.size() < entity_traits<Entity, V>::minimum_words){
+            ok = false;
+            e.id = UNDEFINED_ID;
+        }
+        else {
+            e.id = static_cast<Entity::id_type>(in.at(1).toLongLong(&ok));
+        }
 
         if(!ok){
             qWarning("Reader<Entity, V>::read: can not to parse id from: %s",
-                     in.empty() ? "<empty>" : in.at(0).toStdString().c_str());
+                     entity_traits<Entity, V>::minimum_words ? "<no such line>" : in.at(1).toStdString().c_str());
         }
     }
 };
@@ -107,27 +113,6 @@ constexpr Entity::hash_type Entity::hash() const
     constexpr auto version = EngineInfo::defaultVersion;
 
     return utils::fnv1a_64(entity_traits<entity_t, version>::name);
-}
-
-/**
- * @brief Entity::hexHeader
- * @return dumped fields of *this
- */
-QByteArray Entity::hexHeader() const
-{
-    QByteArray ret;
-    ret.append(this->id);
-
-    return ret;
-}
-
-/**
- * @brief Entity::strHeader
- * @return human readable header
- */
-QStringList Entity::strHeader() const
-{
-    return QStringList{QString::number(this->id)};
 }
 
 /**

@@ -45,13 +45,3 @@ QString NonPlayerCharacter::getDescription() const noexcept
 {
     return this->description;
 }
-
-QByteArray NonPlayerCharacter::hexHeader() const
-{
-
-}
-
-QStringList NonPlayerCharacter::strHeader() const
-{
-
-}

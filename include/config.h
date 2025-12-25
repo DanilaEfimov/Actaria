@@ -7,11 +7,16 @@
     #define DEBUG_ONLY(code)
 #endif
 
-// order of dumping fields
 #ifndef POST_ORDER
-    #define POST_ORDER
+    #define POST_ORDER 1
 #else
-    #define PRE_ORDER
+    #define POST_ORDER 0
+#endif
+
+#ifndef LITTLE_ENDIAN
+    #define LITTLE_ENDIAN 1
+#else
+    #define BIG_ENDIAN 1
 #endif
 
 #endif // CONFIG_H

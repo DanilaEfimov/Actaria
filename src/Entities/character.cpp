@@ -28,16 +28,6 @@ QString Character::getName() const noexcept
     return this->name;
 }
 
-QByteArray Character::hexHeader() const
-{
-
-}
-
-QStringList Character::strHeader() const
-{
-
-}
-
 /**
  * @brief Character::Character
  *

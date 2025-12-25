@@ -15,9 +15,6 @@ protected:
 public:
     Event();
 
-    virtual QByteArray hexHeader() const override;
-    virtual QStringList strHeader() const override;
-
     virtual bool exec(Context* context) const = 0;
 };
 

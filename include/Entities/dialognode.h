@@ -52,9 +52,6 @@ public:
                QString fromMessage = "", QString message = "");
     virtual ~DialogNode() = default;
 
-    virtual QByteArray hexHeader() const override;
-    virtual QStringList strHeader() const override;
-
     QString getMessage() const noexcept;
     void setMessage(const QString& msg);
 

@@ -16,9 +16,6 @@ public:
 
     void setDescription(const QString& description);
     QString getDescription() const noexcept;
-
-    virtual QByteArray hexHeader() const override;
-    virtual QStringList strHeader() const override;
 };
 
 #endif // NONPLAYERCHARACTER_H

@@ -15,24 +15,18 @@
 
 #define UNDEFINED_ID (static_cast<Entity::id_type>(-1))
 
-namespace abi {
-
-    enum EntityFieldsOrder {
-        IdField,    // id_type
-    };
-
-};  // namespace abi
-
 using namespace abi;
 
 class Entity
 {
+    ACT_SERIALIZABLE
+
     static uint32_t counter;
 
 public:
-    using base_t = Entity;  // absolute base pattern
+    using base_t = void;  // absolute base type pattern
     using hash_type = utils::hash_type;
-    using id_type = quint32;
+    using id_type = utils::id_type;
 
 protected:
     id_type id;
@@ -48,15 +42,6 @@ public:
     virtual ~Entity() = default;
 
     constexpr hash_type hash() const;
-
-    template <typename T, abi::Version V>
-    friend struct abi::Writer;
-
-    template <typename T, abi::Version V>
-    friend struct abi::Reader;
-
-    virtual QByteArray hexHeader() const;
-    virtual QStringList strHeader() const;
 
     id_type getId() const;
 };

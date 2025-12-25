@@ -1,5 +1,5 @@
 /**
- * readwrite.h
+ * @file readwrite.h
  * here declared interface of reading and writing
  * engine entities as byte array and string
 */
@@ -14,6 +14,25 @@
 #include <QDataStream>
 #include <QStringList>
 
+/**
+ * @macro ACT_SERIALIZABLE
+ * Marks a class as serializable in the ABI system.
+ *
+ * Usage:
+ *   class MyClass {
+ *       ACT_SERIALIZABLE
+ *       ...
+ *   };
+ *
+ * This macro declares friendship with the abi::Writer and abi::Reader
+ * templates for all versions, allowing serialization and deserialization
+ * of the class without exposing private members.
+ */
+#define ACT_SERIALIZABLE \
+    template <typename T, abi::Version V> \
+    friend struct abi::Writer;  \
+    template <typename T, abi::Version V> \
+    friend struct abi::Reader;
 
 namespace abi {
 
@@ -48,13 +67,14 @@ struct Writer {
 
 /**
  * @brief The Reader class
+ * read methods returns offset of readed data
  */
 template <typename T, Version V = EngineInfo::defaultVersion>
 struct Reader {
     static_assert(sizeof(T) == 0, "abi::Reader<T, V>: specialization required");
 
     static void read(QDataStream&, T&);
-    static void read(const QStringList&, T&);
+    static void read(QStringList&, T&);
 };
 
 /**
@@ -87,6 +107,8 @@ struct Writer<T, V> {
  */
 template <FundamentalType T, Version V>
 struct Reader<T, V> {
+    static_assert(StreamReadable<T>, "Reader<Fundamental T, V>:: can not read non-specified fundamental type");
+
     static void read(QDataStream& in, T& obj) {
         in >> obj;
     }
@@ -110,93 +132,86 @@ struct Reader<T, V> {
             qWarning() << "abi::Reader<FundamentalType T, V>: failed to convert string to number";
         }
 
-        qWarning("%s", QString::asprintf("abi::Read<%s, %s>: cannot write non-specified fundamental type",
+        qWarning("%s", QString::asprintf("abi::Read<%s, %s>: cannot read non-specified fundamental type",
                                          typeid(T).name(),
                                          typeid(V).name()).toUtf8().constData());
     }
 };
 
 /**
- * @brief The Writer class
+ * @brief write
+ * @param out
+ * @param obj
  */
 template <utils::GameEntity T, Version V>
-struct Writer<T, V> {
+void write(QDataStream& out, const T& obj) {
     using base_t = typename T::base_t;
 
-    static void write(QDataStream& in, const T& obj) {
-        if(std::is_same_v<T, base_t>){
-            return;
-        }
-
-        in.setByteOrder(static_cast<QDataStream::ByteOrder>(EngineInfo::endian));
-
-        if constexpr (EngineInfo::defaultOrder == AbiOrder::Post) {
-            in << obj.hexHeader();
-            Writer<base_t, V>::write(in, static_cast<const base_t&>(obj));
-        }
-        else {
-            Writer<base_t, V>::write(in, static_cast<const base_t&>(obj));
-            in << obj.hexHeader();
-        }
+    if constexpr (std::is_same_v<base_t, void>){
+        return;
     }
 
-    static void write(QStringList& in, const T& obj) {
-        if(std::is_same_v<T, base_t>){
-            return;
-        }
+    out.setByteOrder(static_cast<QDataStream::ByteOrder>(EngineInfo::endian));
+    out << Writer<base_t, V>::write(out, static_cast<const base_t&>(obj));
+}
 
-        if constexpr (EngineInfo::defaultOrder == AbiOrder::Post) {
-            in.append(obj.strHeader());
-            Writer<base_t, V>::write(in, static_cast<const base_t&>(obj));
-        }
-        else {
-            Writer<base_t, V>::write(in, static_cast<const base_t&>(obj));
-            in.append(obj.strHeader());
-        }
+/**
+ * @brief write
+ * @param out
+ * @param obj
+ */
+template <utils::GameEntity T, Version V>
+void write(QStringList& out, const T& obj) {
+    using base_t = typename T::base_t;
+
+    if constexpr (!std::is_same_v<base_t, void>){
+        out.append(entity_traits<T>::name);
+        out.append(Writer<base_t, V>::write(out, static_cast<const base_t&>(obj)));
     }
+
+    out.clear();
+    out.append(QString::number(obj.id));
 };
 
 /**
- * @brief The Reader class
+ * @brief read
+ * @param in
+ * @param obj
  */
 template <utils::GameEntity T, Version V>
-struct Reader<T, V> {
+void read(QDataStream& in, T& obj) {
     using base_t = typename T::base_t;
 
-    static void read(QDataStream& in, T& obj) {
-        if(std::is_same_v<T, base_t>){
-            return;
-        }
-
-        in.setByteOrder(static_cast<QDataStream::ByteOrder>(EngineInfo::endian));
-
-        if constexpr (EngineInfo::defaultOrder == AbiOrder::Post) {
-            // [Derived][Base]
-            obj.fromDump(in);
-            Reader<base_t, V>::read(in, static_cast<base_t&>(obj));
-        }
-        else {
-            // [Base][Derived]
-            Reader<base_t, V>::read(in, static_cast<base_t&>(obj));
-            obj.fromDump(in);
-        }
+    if constexpr (!std::is_same_v<base_t, void>) {
+        Reader<base_t, V>::read(in, static_cast<base_t&>(obj));
     }
 
-    static void read(const QStringList& in, T& obj) {
-        if(std::is_same_v<T, base_t>){
-            return;
-        }
+    in.setByteOrder(static_cast<QDataStream::ByteOrder>(EngineInfo::endian));
+    in >> obj.id;
+}
 
-        if constexpr (EngineInfo::defaultOrder == AbiOrder::Post) {
-            obj.readStrHeader(in);
-            Reader<base_t, V>::read(in, static_cast<base_t&>(obj));
-        }
-        else {
-            Reader<base_t, V>::read(in, static_cast<base_t&>(obj));
-            obj.readStrHeader(in);
+/**
+ * @brief read
+ * @param in
+ * @param obj
+ */
+template <utils::GameEntity T, Version V>
+void read(QStringList& in, T& obj) {
+    using base_t = typename T::base_t;
+
+    if constexpr (!std::is_same_v<base_t, void>) {
+        Reader<base_t, V>::read(in, static_cast<base_t&>(obj));
+    }
+
+    if (!in.isEmpty()) {
+        bool ok = true;
+        obj.id = static_cast<utils::id_type>(in.last().toLongLong(&ok));
+        in.removeLast();
+        if (!ok) {
+            qWarning() << "abi::read: failed to parse id for " << entity_traits<T,V>::name;
         }
     }
-};
+}
 
 };  // namespace abi
 

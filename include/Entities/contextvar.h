@@ -16,6 +16,8 @@ enum class VarType {
 
 class ContextVar : public Entity
 {
+    ACT_SERIALIZABLE
+
 protected:
     QString name;
 
@@ -26,9 +28,6 @@ protected:
 
 public:
     virtual ~ContextVar() = default;
-
-    virtual QByteArray hexHeader() const override;
-    virtual QStringList strHeader() const override;
 
     QString getName() const;
     void setName(const QString& name) noexcept;

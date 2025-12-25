@@ -20,9 +20,6 @@ public:
 
     void merge(Context&& other);
 
-    virtual QByteArray hexHeader() const override;
-    virtual QStringList strHeader() const override;
-
     template<typename T>
     void update(const QString& name, T&& value){
         if(!this->context.contains(name)){

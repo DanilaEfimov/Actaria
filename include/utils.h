@@ -1,3 +1,7 @@
+/**
+ * @file utils.h
+ */
+
 #ifndef UTILS_H
 #define UTILS_H
 
@@ -56,6 +60,7 @@ concept StreamReadable = requires(QDataStream& s, T const& t) {
 
 namespace utils {
 
+using id_type = quint32;
 using hash_type = uint64_t;
 
 template<typename T>

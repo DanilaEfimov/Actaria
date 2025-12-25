@@ -74,13 +74,3 @@ Trigger::operator bool() const noexcept
 {
     return this->value;
 }
-
-QByteArray Trigger::hexHeader() const
-{
-
-}
-
-QStringList Trigger::strHeader() const
-{
-
-}

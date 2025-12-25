@@ -60,13 +60,3 @@ Counter::operator int() const noexcept
 {
     return this->value;
 }
-
-QByteArray Counter::hexHeader() const
-{
-
-}
-
-QStringList Counter::strHeader() const
-{
-
-}

@@ -21,9 +21,6 @@ public:
     void setValue(value_type value) noexcept;
 
     operator QString() const noexcept;
-
-    virtual QByteArray hexHeader() const override;
-    virtual QStringList strHeader() const override;
 };
 
 #endif // NAMEVAR_H

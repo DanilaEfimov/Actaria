@@ -22,16 +22,6 @@ void Context::merge(Context&& other)
     this->context.insert(other.context);
 }
 
-QByteArray Context::hexHeader() const
-{
-
-}
-
-QStringList Context::strHeader() const
-{
-
-}
-
 void Context::remove(const QString &name)
 {
 

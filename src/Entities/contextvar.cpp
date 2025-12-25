@@ -6,28 +6,28 @@
  * byte and words measuring traits for Entity
  */
 template<abi::Version V>
-struct entity_traits<Entity, V> {
-    static constexpr bool is_fixed = true;
-    static constexpr int minimum_bytes = sizeof(Entity::id_type);
-    static constexpr int maximum_bytes = minimum_bytes;
+struct entity_traits<ContextVar, V> {
+    static constexpr bool is_fixed = false;
+    static constexpr int minimum_bytes = minimumQStringSize;
+    static constexpr int maximum_bytes = unlimited;
 
-    static constexpr const char* name = "Entity";
+    static constexpr const char* name = "ContextVar";
     static constexpr int minimum_words = 1;
     static constexpr int maximum_words = minimum_words;
 };
 
 /**
  * @brief The Writer class
- * version generalized write interface
+ * version generalized conetext var write interface
  */
 template<abi::Version V>
 struct Writer<ContextVar, V> {
     static void write(QDataStream& out, const ContextVar& c) {
-        out << c.hexHeader().constData();
+
     }
 
     static void write(QStringList& out, const ContextVar& c) {
-        out << c.strHeader();
+
     }
 };
 
@@ -66,16 +66,6 @@ ContextVar::ContextVar(const QStringList& represent)
 ContextVar::ContextVar(const QByteArray& represent)
     : Entity(NonIncrementFlag{})
 {
-}
-
-QByteArray ContextVar::hexHeader() const
-{
-
-}
-
-QStringList ContextVar::strHeader() const
-{
-
 }
 
 QString ContextVar::getName() const
