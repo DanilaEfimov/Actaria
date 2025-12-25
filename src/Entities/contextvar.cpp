@@ -1,5 +1,4 @@
 #include "Entities/contextvar.h"
-#include <QBuffer>
 
 /**
  * @brief The entity_traits class
@@ -12,7 +11,7 @@ struct entity_traits<ContextVar, V> {
     static constexpr int maximum_bytes = unlimited;
 
     static constexpr const char* name = "ContextVar";
-    static constexpr int minimum_words = 1;
+    static constexpr int minimum_words = 2;
     static constexpr int maximum_words = minimum_words;
 };
 
@@ -23,11 +22,11 @@ struct entity_traits<ContextVar, V> {
 template<abi::Version V>
 struct Writer<ContextVar, V> {
     static void write(QDataStream& out, const ContextVar& c) {
-
+        out << c.name;
     }
 
     static void write(QStringList& out, const ContextVar& c) {
-
+        out << entity_traits<ContextVar>::name << c.name;
     }
 };
 
@@ -41,38 +40,45 @@ struct Reader<ContextVar, V> {
         in >> c.name;
     }
 
-    static void read(const QStringList& in, ContextVar& c) {
-        bool ok = true;
-        c.id = static_cast<Entity::id_type>(in.at(0).toLongLong(&ok));
-
-        if(!ok){
-            qWarning("Reader<Entity, V>::read: can not to parse id from: %s",
-                     in.empty() ? "<empty>" : in.at(0).toStdString().c_str());
+    static void read(QStringList& in, ContextVar& c) {
+        if(in.size() < entity_traits<ContextVar>::minimum_words){
+            qWarning() << "Reader<ContextVar, V>: not enought words in list";
+            c.name = "unknown";
+            return;
         }
+
+        c.name = in.last();
+        in.removeLast();    // this->name
+        in.removeLast();    // entity_traits<>::name
     }
 };
 
+/**
+ * @brief ContextVar::ContextVar
+ */
 ContextVar::ContextVar()
     : Entity(NonIncrementFlag{}), name() {}
 
+/**
+ * @brief ContextVar::ContextVar
+ * @param name
+ */
 ContextVar::ContextVar(const QString &name)
     : Entity(), name(name) {}
 
-ContextVar::ContextVar(const QStringList& represent)
-    : Entity(NonIncrementFlag{})
-{
-}
-
-ContextVar::ContextVar(const QByteArray& represent)
-    : Entity(NonIncrementFlag{})
-{
-}
-
+/**
+ * @brief ContextVar::getName
+ * @return name of variable
+ */
 QString ContextVar::getName() const
 {
     return this->name;
 }
 
+/**
+ * @brief ContextVar::setName
+ * @param name
+ */
 void ContextVar::setName(const QString &name) noexcept
 {
     this->name = name;

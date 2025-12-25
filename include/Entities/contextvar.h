@@ -23,8 +23,6 @@ protected:
 
     ContextVar();
     ContextVar(const QString& name);
-    ContextVar(const QStringList& represent);
-    ContextVar(const QByteArray& represent);
 
 public:
     virtual ~ContextVar() = default;

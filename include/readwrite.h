@@ -194,6 +194,10 @@ void read(QDataStream& in, T& obj) {
  * @brief read
  * @param in
  * @param obj
+ *
+ * This method "consumes" the string.
+ * This approach was chosen because other options would require complex
+ * polymorphic offset calculations.
  */
 template <utils::GameEntity T, Version V>
 void read(QStringList& in, T& obj) {

@@ -58,6 +58,7 @@ concept StreamReadable = requires(QDataStream& s, T const& t) {
     { s >> t } -> std::same_as<QDataStream&>;
 };
 
+// namespace utils vvv
 namespace utils {
 
 using id_type = quint32;
@@ -95,7 +96,7 @@ inline constexpr bool is_same_entity_types(const T1& first, const T2& second) no
     return first.hash() == second.hash();
 }
 
-// abi stuff
+// bits stuff
 inline constexpr std::byte bitmask(int pos) noexcept {
     return std::byte(1 << pos % 8);
 }
@@ -105,4 +106,5 @@ inline constexpr std::byte resetbit(int pos) noexcept {
 }
 
 }   // namespace utils
+
 #endif // UTILS_H

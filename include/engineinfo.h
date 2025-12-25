@@ -15,22 +15,9 @@ enum Version {
     Act_1_0,
 };
 
-//TODO: AbiOrderPolicy
-enum class AbiOrder {
-    Pre,
-    Post
-};
-
 struct EngineInfo {
     // abi section
     static constexpr Version defaultVersion = Version::Act_1_0;
-
-    // static constexpr AbiOrder defaultOrder =
-    // #if defined(POST_ORDER)
-    //     AbiOrder::Post;
-    // #else
-    //     AbiOrder::Pre;
-    // #endif
 
     static constexpr int endian =
     #if defined(BIG_ENDIAN)

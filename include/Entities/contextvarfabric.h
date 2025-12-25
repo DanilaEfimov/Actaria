@@ -35,8 +35,7 @@ public:
      * @param data
      * @return
      */
-    template<typename T>
-        requires utils::ContextVariable<T>
+    template<utils::ContextVariable T>
     static std::unique_ptr<ContextVar> make(const QByteArray& data){
         return std::make_unique<T>(data);
     };
@@ -46,8 +45,7 @@ public:
      * @param data
      * @return
      */
-    template<typename T>
-        requires utils::ContextVariable<T>
+    template<utils::ContextVariable T>
     static std::unique_ptr<ContextVar> make(const QStringList& data){
         return std::make_unique<T>(data);
     };
@@ -60,7 +58,7 @@ public:
      */
     template<typename T>
     static std::unique_ptr<ContextVar> make(const QString& name, T&& value){
-        constexpr auto type = vartype_traits<T>::value;
+        static constexpr auto type = vartype_traits<T>::value;
         switch(type){
             case VarType::Counter: return std::make_unique<Counter>(name, std::forward<T>(value));
             case VarType::Trigger: return std::make_unique<Trigger>(name, std::forward<T>(value));

@@ -5,7 +5,10 @@
 
 class Trigger : public ContextVar
 {
+    ACT_SERIALIZABLE
+
 public:
+    using base_t = ContextVar;
     using value_type = bool;
 
 protected:
@@ -14,8 +17,6 @@ protected:
 public:
     Trigger() = delete;
     Trigger(value_type value, const QString& name);
-    Trigger(const QStringList& represent);
-    Trigger(const QByteArray& represent);
 
     virtual ~Trigger() = default;
 

@@ -5,6 +5,8 @@
 
 class NameVar : public ContextVar
 {
+    ACT_SERIALIZABLE
+
 public:
     using value_type = QString;
 
@@ -14,8 +16,6 @@ protected:
 public:
     NameVar() = delete;
     NameVar(value_type value, const QString& name);
-    NameVar(const QStringList& represent);
-    NameVar(const QByteArray& represent);
 
     value_type getValue() const;
     void setValue(value_type value) noexcept;
