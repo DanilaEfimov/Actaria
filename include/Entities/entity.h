@@ -53,11 +53,11 @@ public:
 
     virtual hash_type hash() const;
 
-    template <utils::GameEntity T, abi::Version V>
-    friend void abi::write(QDataStream& out, const T& obj);
+    template <typename T, abi::Version V>
+    friend struct abi::Writer;
 
-    template <utils::GameEntity T, abi::Version V>
-    friend void abi::read(QDataStream& in, T& obj);
+    template <typename T, abi::Version V>
+    friend struct abi::Reader;
 
     // returns serialized object size in bytes
     [[deprecated("Use abi::write/read instead")]]

@@ -1,11 +1,49 @@
 #include "Entities/entity.h"
 #include "utils.h"
+#include "engineinfo.h"
 #include <QStringList>
 #include <QBuffer>
 
 namespace {
     constexpr const char* typeName = "Entity";
-    constexpr const int fieldCount = 2;
+    constexpr const int fieldCount = 1;
+};
+
+template<>
+struct abi::Writer<Entity, abi::Version::Act_1_0> {
+    static void write(QDataStream& out, const Entity& obj) {
+        out << obj.id;
+    }
+
+    static void write(QStringList& out, const Entity& obj) {
+        out.append(QStringList{
+            typeName,
+            QString::number(obj.id)
+        });
+    }
+};
+
+template <>
+struct abi::Reader<Entity, abi::Version::Act_1_0> {
+    static void read(QDataStream& in, Entity& obj){
+        in >> obj.id;
+    }
+
+    static void read(const QStringList& in, Entity& obj) {
+        if(in.size() < 2){
+            qWarning("abi::Reader<Entity, abi::Version::Act_1_0>: not enought words for parsing: %s",
+                     in.join(Entity::separator).toStdString().c_str());
+            return;
+        }
+
+        bool ok = true;
+        obj.id = static_cast<Entity::id_type>(in.at(1).toLongLong(&ok));
+
+        if(!ok){
+            qWarning("abi::Reader<Entity, abi::Version::Act_1_0>: failed to parse id from expr: %s",
+                     in.at(1).toStdString().c_str());
+        }
+    }
 };
 
 uint32_t Entity::counter = 0;
@@ -30,21 +68,20 @@ Entity::Entity(NonIncrementFlag &&)
 /**
  * @brief Entity::Entity
  * @param represent (const QStrinList&)
- * Just calls Entity::fromString(const QStringList&).
  */
 Entity::Entity(const QStringList &represent)
 {
-    this->fromString(represent);
+    Reader<Entity, EngineInfo::defaultVersion>::read(represent, *this);
 }
 
 /**
  * @brief Entity::Entity
  * @param represent (const QByteArray&)
- * Just calls Entity::deserialize(const QByteArray&)
  */
 Entity::Entity(const QByteArray &represent)
 {
-    this->deserialize(represent);
+    QDataStream in(represent);
+    Reader<Entity, EngineInfo::defaultVersion>::read(in, *this);
 }
 
 /**

@@ -28,6 +28,32 @@ inline size_t QStringHexSize(const QString& str) noexcept {
     return minimumQStringSize + str.size() * sizeof(QChar);
 }
 
+template<typename T>
+concept StringType =
+    std::same_as<T, QString> ||
+    std::same_as<T, std::string> ||
+    std::is_base_of_v<std::basic_string_view<char>, T>;
+
+template<typename T>
+concept FundamentalType = std::is_fundamental_v<T>;
+
+template<typename T>
+concept Stringable =
+    std::is_arithmetic_v<T> ||
+    std::convertible_to<T, std::basic_string_view<char>> ||
+    std::convertible_to<T, std::string> ||
+    std::convertible_to<T, QString>;
+
+template<typename T>
+concept StreamWriteable = requires(QDataStream& s, T const& t) {
+    { s << t } -> std::same_as<QDataStream&>;
+};
+
+template<typename T>
+concept StreamReadable = requires(QDataStream& s, T const& t) {
+    { s >> t } -> std::same_as<QDataStream&>;
+};
+
 namespace utils {
 
 using hash_type = uint64_t;
@@ -49,8 +75,7 @@ inline constexpr hash_type fnv1a_64(const char* str) {
     return __fnv1a_64(str, strlen_ct(str));
 }
 
-template<typename T>
-    requires utils::GameEntity<T>
+template<GameEntity T>
 inline size_t QVectorOfEntitiesHexSize(const QVector<T>& container) noexcept {
     if(container.empty()){
         return minimumQVectorSize;
@@ -58,8 +83,7 @@ inline size_t QVectorOfEntitiesHexSize(const QVector<T>& container) noexcept {
     return minimumQVectorSize + container.size() * container.at(0).size();
 }
 
-template<typename T1, typename T2>
-    requires GameEntity<T1> && GameEntity<T2>
+template<GameEntity T1, GameEntity T2>
 inline constexpr bool is_same_entity_types(const T1& first, const T2& second) noexcept {
     return first.hash() == second.hash();
 }
