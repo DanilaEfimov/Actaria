@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QtTest/QtTest>
 
+#define ACTARIA_TEST
+
 class EngineTest : public QObject
 {
     Q_OBJECT

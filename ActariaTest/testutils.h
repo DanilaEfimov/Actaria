@@ -9,7 +9,7 @@ namespace {
     QString sanitize(QString&& s)
     {
         QString result = s;
-        for (QChar ch : QString(Entity::separator)) {
+        for (QChar ch : QString(EngineInfo::separator)) {
             result.remove(ch);
         }
         return result;
