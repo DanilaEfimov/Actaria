@@ -39,7 +39,7 @@ void namedvar_serializing()
         QCOMPARE(restored.getName(), variable.getName());
         QCOMPARE(restored.getId(), variable.getId());
 
-        QStringList list;
+        StringListCursor list;
         abi::write<NameVar, currentVersion>(list, variable);
 
         NameVar restored2;
@@ -73,7 +73,7 @@ void counter_serializing() {
         QCOMPARE(restored.getName(), variable.getName());
         QCOMPARE(restored.getId(), variable.getId());
 
-        QStringList list;
+        StringListCursor list;
         abi::write<Counter, currentVersion>(list, variable);
 
         Counter restored2;
@@ -105,7 +105,7 @@ void trigger_serializing()
         QCOMPARE(restored.getName(), variable.getName());
         QCOMPARE(restored.getId(), variable.getId());
 
-        QStringList list;
+        StringListCursor list;
         abi::write<Trigger, currentVersion>(list, variable);
 
         Trigger restored2;

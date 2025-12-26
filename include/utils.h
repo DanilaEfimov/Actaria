@@ -1,6 +1,11 @@
 /**
  * @file utils.h
+ * @brief Common helper types and utilities.
+ *
+ * Contains small utility functions, type aliases and C++20 concepts
+ * used in different parts of the engine.
  */
+
 
 #ifndef UTILS_H
 #define UTILS_H

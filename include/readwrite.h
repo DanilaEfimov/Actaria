@@ -9,6 +9,7 @@
 
 #include "utils.h"
 #include "engineinfo.h"
+#include "stringlistcursor.h"
 #include <type_traits>
 #include <QByteArray>
 #include <QDataStream>
@@ -29,10 +30,21 @@
  * of the class without exposing private members.
  */
 #define ACT_SERIALIZABLE \
+    template <utils::GameEntity T, abi::Version V> \
+    friend struct abi::entity_traits; \
     template <typename T, abi::Version V> \
-    friend struct abi::Writer;  \
+    friend struct abi::Writer; \
     template <typename T, abi::Version V> \
-    friend struct abi::Reader;
+    friend struct abi::Reader; \
+    template <utils::GameEntity T, abi::Version V> \
+    friend void abi::write(QDataStream&, const T&); \
+    template <utils::GameEntity T, abi::Version V> \
+    friend void abi::write(StringListCursor&, const T&); \
+    template <utils::GameEntity T, abi::Version V> \
+    friend void abi::read(QDataStream&, T&); \
+    template <utils::GameEntity T, abi::Version V> \
+    friend void abi::read(StringListCursor&, T&);
+
 
 namespace abi {
 
@@ -49,7 +61,7 @@ struct entity_traits {
     static constexpr int minimum_bytes = sizeof(T);
     static constexpr int maximum_bytes = sizeof(T);
 
-    static constexpr const char* name = "";
+    static constexpr const char* name = typeid(T).name();
     static constexpr int minimum_words = 1;
     static constexpr int maximum_words = unlimited;
 };
@@ -62,7 +74,7 @@ struct Writer {
     static_assert(sizeof(T) == 0, "abi::Writer<T, V>: specialization required");
 
     static void write(QDataStream&, const T&);
-    static void write(QStringList&, const T&);
+    static void write(StringListCursor&, const T&);
 };
 
 /**
@@ -74,8 +86,9 @@ struct Reader {
     static_assert(sizeof(T) == 0, "abi::Reader<T, V>: specialization required");
 
     static void read(QDataStream&, T&);
-    static void read(QStringList&, T&);
+    static void read(StringListCursor&, T&);
 };
+
 
 /**
  * @brief The Writer class
@@ -88,7 +101,7 @@ struct Writer<T, V> {
         out << obj;
     }
 
-    static void write(QStringList& out, const T& obj) {
+    static void write(StringListCursor& out, const T& obj) {
         if constexpr (std::is_arithmetic_v<T>) {
             out.append(QString::number(obj));
         }
@@ -113,7 +126,7 @@ struct Reader<T, V> {
         in >> obj;
     }
 
-    static void read(const QStringList& in, T& obj) {
+    static void read(const StringListCursor& in, T& obj) {
         if(in.empty()){
             qWarning("abi::Reader<FundamentalType T, V>: was given empti string list");
             return;
@@ -143,16 +156,22 @@ struct Reader<T, V> {
  * @param out
  * @param obj
  */
-template <utils::GameEntity T, Version V>
+template <utils::GameEntity T, abi::Version V>
 void write(QDataStream& out, const T& obj) {
     using base_t = typename T::base_t;
-
-    if constexpr (std::is_same_v<base_t, void>){
-        return;
+#ifdef POST_ORDER
+    if constexpr (!std::is_same_v<base_t, void>) {
+        write<base_t, V>(out, static_cast<const base_t&>(obj));
     }
 
-    out.setByteOrder(static_cast<QDataStream::ByteOrder>(EngineInfo::endian));
-    out << Writer<base_t, V>::write(out, static_cast<const base_t&>(obj));
+    Writer<T, V>::write(out, obj);
+#else
+    Writer<T, V>::write(out, obj);
+
+    if constexpr (!std::is_same_v<base_t, void>) {
+        write<base_t, V>(out, static_cast<const base_t&>(obj));
+    }
+#endif
 }
 
 /**
@@ -160,61 +179,68 @@ void write(QDataStream& out, const T& obj) {
  * @param out
  * @param obj
  */
-template <utils::GameEntity T, Version V>
-void write(QStringList& out, const T& obj) {
+template <utils::GameEntity T, abi::Version V>
+void write(StringListCursor& out, const T& obj) {
     using base_t = typename T::base_t;
-
-    if constexpr (!std::is_same_v<base_t, void>){
-        out.append(entity_traits<T>::name);
-        out.append(Writer<base_t, V>::write(out, static_cast<const base_t&>(obj)));
+#ifdef POST_ORDER
+    if constexpr (!std::is_same_v<base_t, void>) {
+        write<base_t, V>(out, static_cast<const base_t&>(obj));
     }
 
-    out.clear();
-    out.append(QString::number(obj.id));
-};
-
-/**
- * @brief read
- * @param in
- * @param obj
- */
-template <utils::GameEntity T, Version V>
-void read(QDataStream& in, T& obj) {
-    using base_t = typename T::base_t;
+    Writer<T, V>::write(out, obj);
+#else
+    Writer<T, V>::write(out, obj);
 
     if constexpr (!std::is_same_v<base_t, void>) {
-        Reader<base_t, V>::read(in, static_cast<base_t&>(obj));
+        write<base_t, V>(out, static_cast<const base_t&>(obj));
     }
-
-    in.setByteOrder(static_cast<QDataStream::ByteOrder>(EngineInfo::endian));
-    in >> obj.id;
+#endif
 }
 
 /**
  * @brief read
  * @param in
  * @param obj
- *
- * This method "consumes" the string.
- * This approach was chosen because other options would require complex
- * polymorphic offset calculations.
  */
-template <utils::GameEntity T, Version V>
-void read(QStringList& in, T& obj) {
+template <utils::GameEntity T, abi::Version V>
+void read(QDataStream& in, T& obj) {
     using base_t = typename T::base_t;
+#ifdef POST_ORDER
+    if constexpr (!std::is_same_v<base_t, void>) {
+        read<base_t, V>(in, static_cast<base_t&>(obj));
+    }
+
+    Reader<T, V>::read(in, obj);
+#else
+    Reader<T, V>::read(in, obj);
 
     if constexpr (!std::is_same_v<base_t, void>) {
-        Reader<base_t, V>::read(in, static_cast<base_t&>(obj));
+        read<base_t, V>(in, static_cast<base_t&>(obj));
+    }
+#endif
+}
+
+/**
+ * @brief read
+ * @param in
+ * @param obj
+ */
+template <utils::GameEntity T, abi::Version V>
+void read(StringListCursor& in, T& obj) {
+    using base_t = typename T::base_t;
+#ifdef POST_ORDER
+    if constexpr (!std::is_same_v<base_t, void>) {
+        read<base_t, V>(in, static_cast<base_t&>(obj));
     }
 
-    if (!in.isEmpty()) {
-        bool ok = true;
-        obj.id = static_cast<utils::id_type>(in.last().toLongLong(&ok));
-        in.removeLast();
-        if (!ok) {
-            qWarning() << "abi::read: failed to parse id for " << entity_traits<T,V>::name;
-        }
+    Reader<T, V>::read(in, obj);
+#else
+    Reader<T, V>::read(in, obj);
+
+    if constexpr (!std::is_same_v<base_t, void>) {
+        read<base_t, V>(in, static_cast<base_t&>(obj));
     }
+#endif
 }
 
 };  // namespace abi

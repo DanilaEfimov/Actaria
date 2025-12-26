@@ -2,40 +2,19 @@
 #include <QBuffer>
 #include <QDataStream>
 
-namespace {
-    constexpr const char* typeName = "Counter";
-    constexpr const int fieldCount = 2;
-}
 
 /**
  * @brief Counter::Counter
- *
  * Normal constructor for context counter.
- *
  * @param value
- *
  * @param name
  */
 Counter::Counter(value_type value, const QString &name)
-    : ContextVar(name), value(value) {}
-
-
-/**
- * @brief Counter::Counter
- *
- * Non global entity counter increment.
- * QString parse-based constructor.
- *
- * @param represent
- */
-Counter::Counter(const QByteArray &represent)
-    : ContextVar()
-{
-}
+    : ContextVar(name), value(value)
+{}
 
 /**
  * @brief Counter::getValue
- *
  * @return trigger-counter
  */
 Counter::value_type Counter::getValue() const
@@ -45,7 +24,6 @@ Counter::value_type Counter::getValue() const
 
 /**
  * @brief Counter::setValue
- *
  * @param value
  */
 void Counter::setValue(value_type value) noexcept

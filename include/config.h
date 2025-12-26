@@ -8,15 +8,15 @@
 #endif
 
 #ifndef POST_ORDER
-    #define POST_ORDER 1
+    #define PRE_ORDER 1
 #else
     #define POST_ORDER 0
 #endif
 
 #ifndef LITTLE_ENDIAN
-    #define LITTLE_ENDIAN 1
-#else
     #define BIG_ENDIAN 1
+#else
+    #define LITTLE_ENDIAN 1
 #endif
 
 #endif // CONFIG_H

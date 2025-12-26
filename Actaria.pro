@@ -1,4 +1,4 @@
-QT       += core gui
+QT += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -8,51 +8,22 @@ CONFIG += c++20
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-INCLUDEPATH += include
-SOURCES += \
-    src/Entities/assignmentoperator.cpp \
-    src/Entities/contextvarfabric.cpp \
-    src/Entities/counter.cpp \
-    src/Entities/contextvar.cpp \
-    src/Entities/dialog.cpp \
-    src/Entities/dialognode.cpp \
-    src/Entities/entity.cpp \
-    src/Entities/event.cpp \
-    src/Entities/eventmanager.cpp \
-    src/Entities/namevar.cpp \
-    src/Entities/character.cpp \
-    src/Entities/nonplayercharacter.cpp \
-    src/Entities/player.cpp \
-    src/Entities/context.cpp \
-    src/Entities/scene.cpp \
-    src/main.cpp \
-    src/GUI/mainwindow.cpp \
-    src/Entities/trigger.cpp
+INCLUDEPATH += include \
+            include/Aliases
 
-HEADERS += \
-    include/Entities/assignmentoperator.h \
-    include/Entities/context.h \
-    include/Entities/contextvarfabric.h \
-    include/Entities/counter.h \
-    include/Entities/contextvar.h \
-    include/Entities/dialog.h \
-    include/Entities/dialognode.h \
-    include/Entities/entity.h \
-    include/Entities/entitymanager.h \
-    include/Entities/event.h \
-    include/Entities/eventmanager.h \
-    include/Entities/namevar.h \
-    include/Entities/character.h \
-    include/Entities/nonplayercharacter.h \
-    include/Entities/player.h \
-    include/Entities/scene.h \
-    include/GUI/mainwindow.h \
-    include/config.h \
-    include/engineinfo.h \
-    include/readwrite.h \
-    include/utils.h \
-    include/Entities/trigger.h \
-    include/Entities/operator.h
+SOURCES += $$files(src/Entities/*.cpp) \
+           $$files(src/GUI/*.cpp) \
+           src/main.cpp \
+           src/stringlistcursor.cpp
+
+HEADERS += $$files(include/Entities/*.h) \
+           $$files(include/GUI/*.h) \
+           $$files(include/Aliases/*.h) \
+           include/config.h \
+           include/engineinfo.h \
+           include/readwrite.h \
+           include/stringlistcursor.h \
+           include/utils.h
 
 FORMS += \
     mainwindow.ui
@@ -64,4 +35,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 DISTFILES += \
     abi \
+    include/Aliases/variables \
     target

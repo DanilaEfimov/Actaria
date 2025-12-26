@@ -16,10 +16,10 @@ INCLUDEPATH += ../include/VM
 SOURCES += $$files(../src/Entities/*.cpp)
 SOURCES += $$files(../src/Compiler/*.cpp)
 SOURCES += $$files(../src/VM/*.cpp)
+SOURCES += $$files($$PWD/*.cpp)
 
 SOURCES += \
-        enginetest.cpp \
-        main.cpp
+    ../src/stringlistcursor.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

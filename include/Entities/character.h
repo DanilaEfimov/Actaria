@@ -15,17 +15,18 @@ enum class Mood {
 
 class Character : public Entity
 {
+    ACT_SERIALIZABLE
+
 protected:
     QString name;
     Mood mood;
 
     Character();
     Character(const QString& name, Mood mood = Mood::Normal);
-    Character(const QByteArray& data);
-    Character(const QStringList& data);
 
 public:
     QString getName() const noexcept;
+    void setName(QString name);
 };
 
 #endif // CHARACTER_H

@@ -1,66 +1,6 @@
 #include "Entities/entity.h"
 #include "utils.h"
 #include "engineinfo.h"
-#include <QStringList>
-
-
-/**
- * @brief The entity_traits class
- * byte and words measuring traits for Entity
- */
-template<abi::Version V>
-struct entity_traits<Entity, V> {
-    static constexpr bool is_fixed = true;
-    static constexpr int minimum_bytes = sizeof(Entity::id_type);
-    static constexpr int maximum_bytes = minimum_bytes;
-
-    static constexpr const char* name = "Entity";
-    static constexpr int minimum_words = 2;
-    static constexpr int maximum_words = minimum_words;
-};
-
-/**
- * @brief The Writer class
- * version generalized write interface
- */
-template<abi::Version V>
-struct Writer<Entity, V> {
-    static void write(QDataStream& out, const Entity& e) {
-        out << e.id;
-    }
-
-    static void write(QStringList& out, const Entity& e) {
-        out << entity_traits<Entity, V>::name << QString::number(e.id);
-    }
-};
-
-/**
- * @brief The Reader class
- * version generalized read interface
- */
-template<abi::Version V>
-struct Reader<Entity, V> {
-    static void read(QDataStream& in, Entity& e) {
-        in >> e.id;
-    }
-
-    static void read(const QStringList& in, Entity& e) {
-        bool ok = true;
-
-        if(in.size() < entity_traits<Entity, V>::minimum_words){
-            ok = false;
-            e.id = UNDEFINED_ID;
-        }
-        else {
-            e.id = static_cast<Entity::id_type>(in.at(1).toLongLong(&ok));
-        }
-
-        if(!ok){
-            qWarning("Reader<Entity, V>::read: can not to parse id from: %s",
-                     entity_traits<Entity, V>::minimum_words ? "<no such line>" : in.at(1).toStdString().c_str());
-        }
-    }
-};
 
 
 uint32_t Entity::counter = 0;
@@ -86,9 +26,10 @@ Entity::Entity(NonIncrementFlag &&)
  * @brief Entity::Entity
  * @param represent (const QStrinList&)
  */
-Entity::Entity(const QStringList &represent)
+Entity::Entity(QStringList &represent)
 {
-    Reader<Entity, EngineInfo::defaultVersion>::read(represent, *this);
+    StringListCursor cursor(represent);
+    Reader<Entity, EngineInfo::defaultVersion>::read(cursor, *this);
 }
 
 /**
@@ -98,7 +39,6 @@ Entity::Entity(const QStringList &represent)
 Entity::Entity(const QByteArray &represent)
 {
     QDataStream in(represent);
-
     Reader<Entity, EngineInfo::defaultVersion>::read(in, *this);
 }
 
