@@ -55,7 +55,7 @@ struct Writer<Counter, V> {
     }
 
     static void write(StringListCursor& out, const Counter& c) {
-        out.append(entity_traits<ContextVar, V>::name);
+        out.append(entity_traits<Counter, V>::name);
         out.append(QString::number(c.value));
     }
 };

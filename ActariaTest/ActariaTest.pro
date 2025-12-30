@@ -21,6 +21,8 @@ SOURCES += $$files($$PWD/*.cpp)
 SOURCES += \
     ../src/stringlistcursor.cpp
 
+DEFINES += ACTARIA_TEST
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin

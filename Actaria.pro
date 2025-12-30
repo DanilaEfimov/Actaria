@@ -28,6 +28,8 @@ HEADERS += $$files(include/Entities/*.h) \
 FORMS += \
     mainwindow.ui
 
+DEFINES += PRE_ORDER
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin

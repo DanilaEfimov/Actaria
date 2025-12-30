@@ -33,38 +33,38 @@ public:
     /**
      * @brief make
      * @param data
-     * @return
+     * @return context variable
      */
     template<utils::ContextVariable T>
-    static std::unique_ptr<ContextVar> make(const QByteArray& data){
-        return std::make_unique<T>(data);
+    static QScopedPointer<ContextVar> make(const QByteArray& data){
+        return QScopedPointer<T>(data);
     };
 
     /**
      * @brief make
      * @param data
-     * @return
+     * @return context variable
      */
     template<utils::ContextVariable T>
-    static std::unique_ptr<ContextVar> make(const QStringList& data){
-        return std::make_unique<T>(data);
+    static QScopedPointer<ContextVar> make(const QStringList& data){
+        return QScopedPointer<T>(data);
     };
 
     /**
      * @brief make
      * @param name
      * @param value
-     * @return
+     * @return context variable
      */
     template<typename T>
-    static std::unique_ptr<ContextVar> make(const QString& name, T&& value){
+    static QScopedPointer<ContextVar> make(const QString& name, T&& value){
         static constexpr auto type = vartype_traits<T>::value;
         switch(type){
             case VarType::Counter: return std::make_unique<Counter>(name, std::forward<T>(value));
             case VarType::Trigger: return std::make_unique<Trigger>(name, std::forward<T>(value));
             case VarType::Named: return std::make_unique<NameVar>(name, std::forward<T>(value));
         default:
-            return nullptr;
+            return QScopedPointer<ContextVar>(nullptr);
         }
     }
 };

@@ -195,9 +195,9 @@ void StringListCursor::remove(qsizetype idx) noexcept
 void StringListCursor::removeLast() noexcept
 {
     if(this->words.empty()){
-#       ifdef ACTARIA_TEST
+#   ifdef ACTARIA_TEST
         qWarning("StringListCursor::removeLast: list is empty");
-#       endif
+#   endif
         return;
     }
 
@@ -210,9 +210,9 @@ void StringListCursor::removeLast() noexcept
 void StringListCursor::removeFirst() noexcept
 {
     if(this->words.empty()){
-#       ifdef ACTARIA_TEST
+#   ifdef ACTARIA_TEST
         qWarning("StringListCursor::removeFirst: list is empty");
-#       endif
+#   endif
         return;
     }
 

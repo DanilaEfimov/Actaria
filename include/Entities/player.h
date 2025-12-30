@@ -13,7 +13,6 @@ protected:
     Player(const QByteArray& data);
     Player(const QStringList& data);
 
-
     static Player instance;
     static bool built;
     static bool init();

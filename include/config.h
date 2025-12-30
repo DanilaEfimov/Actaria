@@ -9,14 +9,10 @@
 
 #ifndef POST_ORDER
     #define PRE_ORDER 1
-#else
-    #define POST_ORDER 0
 #endif
 
 #ifndef LITTLE_ENDIAN
     #define BIG_ENDIAN 1
-#else
-    #define LITTLE_ENDIAN 1
 #endif
 
 #endif // CONFIG_H

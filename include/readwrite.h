@@ -134,11 +134,11 @@ struct Reader<T, V> {
 
         bool ok = true;
         if constexpr (std::is_integral_v<T>) {
-            obj = static_cast<T>(in.at(0).toLongLong(&ok));
+            obj = static_cast<T>(in.next().toLongLong(&ok));
         } else if constexpr (std::is_floating_point_v<T>) {
-            obj = static_cast<T>(in.at(0).toDouble(&ok));
+            obj = static_cast<T>(in.next().toDouble(&ok));
         } else if constexpr (StringType<T>){
-            obj = static_cast<T>(in.at(0).toStdString().c_str());
+            obj = static_cast<T>(in.next());
         }
 
         if (!ok) {

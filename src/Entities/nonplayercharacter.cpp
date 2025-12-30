@@ -1,9 +1,5 @@
 #include "Entities/nonplayercharacter.h"
 
-namespace {
-    constexpr const char* typeName = "NonPlayerCharacter";
-    constexpr const int fieldCount = 1;
-}
 
 /**
  * @brief NonPlayerCharacter::NonPlayerCharacter
@@ -26,6 +22,14 @@ NonPlayerCharacter::NonPlayerCharacter(const QString &name, Mood mood)
 NonPlayerCharacter::NonPlayerCharacter(const QByteArray &data)
     : Character(), description()
 {
+    QDataStream in(data);
+    abi::read<NonPlayerCharacter, EngineInfo::defaultVersion>(in, *this);
+}
+
+NonPlayerCharacter::NonPlayerCharacter(StringListCursor &data)
+    : Character(), description()
+{
+    abi::read<NonPlayerCharacter, EngineInfo::defaultVersion>(data, *this);
 }
 
 /**
