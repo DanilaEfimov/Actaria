@@ -1,0 +1,1 @@
+every class marked as ACT_SERIALIZABLE must have a base_t using - alias for base class

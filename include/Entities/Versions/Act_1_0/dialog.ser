@@ -1,0 +1,6 @@
+#ifndef DIALOG_SER
+#define DIALOG_SER
+
+#include "Entities/dialog.h"
+
+#endif // DIALOG_SER

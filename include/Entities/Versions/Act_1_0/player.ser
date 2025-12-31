@@ -1,0 +1,6 @@
+#ifndef PLAYER_SER
+#define PLAYER_SER
+
+#include "Entities/player.h"
+
+#endif // PLAYER_SER

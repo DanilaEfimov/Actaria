@@ -45,7 +45,6 @@
     template <utils::GameEntity T, abi::Version V> \
     friend void abi::read(StringListCursor&, T&);
 
-
 namespace abi {
 
 static constexpr int unlimited = -1;
@@ -126,9 +125,9 @@ struct Reader<T, V> {
         in >> obj;
     }
 
-    static void read(const StringListCursor& in, T& obj) {
+    static void read(StringListCursor& in, T& obj) {
         if(in.empty()){
-            qWarning("abi::Reader<FundamentalType T, V>: was given empti string list");
+            qWarning("abi::Reader<FundamentalType T, V>: was given empty string list");
             return;
         }
 

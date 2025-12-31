@@ -33,58 +33,6 @@ public:
     operator bool() const noexcept;
 };
 
-
-/**
- * @brief The entity_traits class
- * byte and words measuring traits for Entity
- */
-template<abi::Version V>
-struct entity_traits<Trigger, V> {
-    static constexpr bool is_fixed = entity_traits<Trigger, V>::is_fixed;
-    static constexpr int minimum_bytes = minimumQStringSize;
-    static constexpr int maximum_bytes = unlimited;
-
-    static constexpr const char* name = "Trigger";
-    static constexpr int minimum_words = 2;
-    static constexpr int maximum_words = minimum_words;
-};
-
-/**
- * @brief The Writer class
- * version generalized conetext var write interface
- */
-template<abi::Version V>
-struct Writer<Trigger, V> {
-    static void write(QDataStream& out, const Trigger& t) {
-        out << (t.value ? true : false);
-    }
-
-    static void write(StringListCursor& out, const Trigger& t) {
-        out.append(entity_traits<Trigger>::name);
-        out.append(t.value ? TRUE_S : FALSE_S);
-    }
-};
-
-/**
- * @brief The Reader class
- * version generalized read interface
- */
-template<abi::Version V>
-struct Reader<Trigger, V> {
-    static void read(QDataStream& in, Trigger& t) {
-        in >> t.value;
-    }
-
-    static void read(StringListCursor& in, Trigger& t) {
-        if(in.remaining() < entity_traits<Trigger>::minimum_words){
-            qWarning() << "Reader<Trigger, V>: not enought words in list";
-            t.value = false;
-            return;
-        }
-
-        t.value = in.next() == TRUE_S;
-        in.skip();    // skipping this->value field
-    }
-};
+#include "trigger.ser"
 
 #endif // TRIGGER_H

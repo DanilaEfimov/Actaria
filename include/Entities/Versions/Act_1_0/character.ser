@@ -1,0 +1,78 @@
+/**
+ * @file character.ser
+ * @version Act_1_0
+ */
+
+#ifndef CHARACTER_SER
+#define CHARACTER_SER
+
+#include "Entities/character.h"
+
+namespace abi {
+
+/**
+ * @brief The entity_traits class
+ * byte and words measuring traits for Entity
+ */
+template<>
+struct entity_traits<Character, abi::Version::Act_1_0> {
+    static constexpr bool is_fixed = false;
+    static constexpr int minimum_bytes = sizeof(Entity::id_type)*3 + sizeof(qsizetype)*2;
+    static constexpr int maximum_bytes = minimum_bytes;
+
+    static constexpr const char* name = "Character";
+    static constexpr int minimum_words = 5;
+    static constexpr int maximum_words = unlimited;
+};
+
+/**
+ * @brief The Writer class
+ * version generalized write interface
+ */
+template<>
+struct Writer<Character, abi::Version::Act_1_0> {
+    static void write(QDataStream& out, const Character& c) {
+        out << c.name << static_cast<int>(c.mood);
+    }
+
+    static void write(StringListCursor& out, const Character& c) {
+        out.append(entity_traits<Character, abi::Version::Act_1_0>::name);
+        out.append(c.name);
+        out.append(QString::number(static_cast<int>(c.mood)));
+    }
+};
+
+/**
+ * @brief The Reader class
+ * version generalized read interface
+ */
+template<>
+struct Reader<Character, abi::Version::Act_1_0> {
+    static void read(QDataStream& in, Character& c) {
+        in >> c.name >> c.mood;
+    }
+
+    static void read(StringListCursor& in, Character& c) {
+        c.name = "";
+        c.mood = Mood::Normal;
+
+        if(in.remaining() < entity_traits<Character, abi::Version::Act_1_0>::minimum_words){
+            qWarning() << "Reader<Character, V>::read: not enought words at cursor";
+            return;
+        }
+
+        bool ok = true;
+        c.name = in.next();
+        c.mood = static_cast<Mood>(in.next().toInt(&ok));
+
+        if(!ok){
+            qWarning() << "Reader<Character, V>::read: can not parse mood from: " << in.peek();
+        }
+
+        in.skip();
+    }
+};
+
+}   // namespace abi
+
+#endif // CHARACTER_SER

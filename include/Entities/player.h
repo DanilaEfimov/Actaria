@@ -39,4 +39,6 @@ public:
     Mood getMood() const noexcept;
 };
 
+#include "player.ser"
+
 #endif // PLAYER_H
