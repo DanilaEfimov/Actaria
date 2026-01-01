@@ -1,18 +1,12 @@
-#define ACTARIA_TEST
-
 #include "enginetest.h"
-#include "testutils.h"
-#include "namevar.h"
-#include "counter.h"
-#include "trigger.h"
-#include "player.h"
 
-namespace {
+EngineTest::EngineTest(QObject *parent)
+    : QObject(parent)
+{}
 
-static constexpr abi::Version currentVersion = EngineInfo::defaultVersion;
+// ---------------- Context Variables ----------------
 
-    // Context Variables tests vvv
-void namedvar_serializing()
+void EngineTest::namedvar_serializing()
 {
     QStringList names = {
         "Danila", "", "-1201-20*@&#&!@%#!&", "Данила",
@@ -25,14 +19,14 @@ void namedvar_serializing()
     }
 
     for(const auto& name : names){
-        NameVar variable(name, randomString(10)); // value, name
+        NameVar variable(name, randomString(10));
 
         QByteArray data;
         QDataStream out(&data, QIODevice::WriteOnly);
         abi::write<NameVar, currentVersion>(out, variable);
 
         NameVar restored;
-        QDataStream in(data);
+        QDataStream in(&data, QIODevice::ReadOnly);
         abi::read<NameVar, currentVersion>(in, restored);
 
         QCOMPARE(restored.getValue(), variable.getValue());
@@ -51,8 +45,8 @@ void namedvar_serializing()
     }
 }
 
-
-void counter_serializing() {
+void EngineTest::counter_serializing()
+{
     QList<int> values = {0, 1, -1, INT_MAX, INT_MIN};
     for(int i = 0; i < 20; i++){
         values.append(i*i*i*i + 0xFFFF);
@@ -66,7 +60,7 @@ void counter_serializing() {
         abi::write<Counter, currentVersion>(out, variable);
 
         Counter restored;
-        QDataStream in(data);
+        QDataStream in(&data, QIODevice::ReadOnly);
         abi::read<Counter, currentVersion>(in, restored);
 
         QCOMPARE(restored.getValue(), variable.getValue());
@@ -85,8 +79,7 @@ void counter_serializing() {
     }
 }
 
-
-void trigger_serializing()
+void EngineTest::trigger_serializing()
 {
     QList<bool> values = {true, false};
 
@@ -98,7 +91,7 @@ void trigger_serializing()
         abi::write<Trigger, currentVersion>(out, variable);
 
         Trigger restored;
-        QDataStream in(data);
+        QDataStream in(&data, QIODevice::ReadOnly);
         abi::read<Trigger, currentVersion>(in, restored);
 
         QCOMPARE(restored.getValue(), variable.getValue());
@@ -117,62 +110,98 @@ void trigger_serializing()
     }
 }
 
-
-void context_variable_serializing(){
+void EngineTest::context_variable_serializing()
+{
     namedvar_serializing();
     counter_serializing();
     trigger_serializing();
-};
-    // ^^^ Context Variables tests / Characters tests vvv
-void player_serializing(){
+}
+
+// ---------------- Characters ----------------
+
+void EngineTest::player_serializing()
+{
     Player player;
     player.setName("Danila");
     player.setMood(Mood::Excited);
-};
+}
 
-void character_serializing(){
+void EngineTest::character_serializing()
+{
     player_serializing();
 }
-    // ^^^ Character tests / Dialog stuff tests vvv
-void dialognode_serializing(){
 
+// ---------------- Dialog ----------------
+
+void EngineTest::dialognode_serializing()
+{
+    DialogNode root(UNDEFINED_ID, UNDEFINED_ID, UNDEFINED_ID, "Hello, World!");
+    QVector<DialogNode> nodes = {root};
+    QSet<Entity::id_type> parents = {UNDEFINED_ID};
+
+    for(int i = 0; i < 200; i++){
+        DialogNode node(randomElement(parents), UNDEFINED_ID, UNDEFINED_ID,
+                        randomString(QRandomGenerator::global()->bounded(20)));
+
+        nodes[QRandomGenerator::global()->bounded(nodes.size())]
+            .addVariant(DialogNode::variant_t(randomString(10), node.getId()));
+
+        nodes.push_back(node);
+        parents.insert(node.getId());
+    }
+
+    auto checkNode = [](const DialogNode& a, const DialogNode& b){
+        QCOMPARE(a.getId(), b.getId());
+        QCOMPARE(a.getMessage(), b.getMessage());
+        QCOMPARE(a.getEventId(), b.getEventId());
+        QCOMPARE(a.getFromCharacter(), b.getFromCharacter());
+        QCOMPARE(a.variants, b.variants);
+    };
+
+    for(const auto& n : nodes){
+        {
+            QByteArray serialized;
+            QDataStream out(&serialized, QIODevice::WriteOnly);
+            abi::write<DialogNode, currentVersion>(out, n);
+
+            DialogNode copy;
+            QDataStream in(&serialized, QIODevice::ReadOnly);
+            abi::read<DialogNode, currentVersion>(in, copy);
+
+            checkNode(n, copy);
+        }
+
+        {
+            StringListCursor original;
+            abi::write<DialogNode, currentVersion>(original, n);
+
+            DialogNode copy(original);
+            checkNode(n, copy);
+        }
+    }
 }
 
-void dialog_serializing(){
+void EngineTest::dialognode_variant_management()
+{
+}
+
+void EngineTest::dialog_serializing()
+{
     dialognode_serializing();
-};
+}
 
-};
+// ---------------- Private slots ----------------
 
-/**
- * @brief EngineTest::EngineTest
- * @param parent
- */
-EngineTest::EngineTest(QObject *parent)
-    : QObject{parent}
-{}
-
-/**
- * @brief EngineTest::test_serializing
- */
 void EngineTest::test_serializing()
 {
     context_variable_serializing();
     dialog_serializing();
 }
 
-/**
- * @brief EngineTest::test_id_counting
- */
 void EngineTest::test_id_counting()
 {
-
 }
 
-/**
- * @brief EngineTest::test_OSG
- */
 void EngineTest::test_OSG()
 {
-
 }

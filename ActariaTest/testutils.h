@@ -35,4 +35,22 @@ namespace {
     return result;
 }
 
+/**
+ * @brief randomElement
+ * @param set
+ * @return a random element from QSet
+ */
+template<typename T>
+[[nodiscard]] const T& randomElement(const QSet<T>& set)
+{
+    if (set.isEmpty()) {
+        throw std::runtime_error("Cannot choose random element from empty QSet");
+    }
+
+    int index = QRandomGenerator::global()->bounded(set.size());
+    auto it = set.constBegin();
+    std::advance(it, index);
+    return *it;
+}
+
 #endif // TESTUTILS_H
