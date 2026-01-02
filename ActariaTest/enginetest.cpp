@@ -1,5 +1,7 @@
 #include "enginetest.h"
 #include "contextvarfabric.h"
+#include <variant>
+
 
 EngineTest::EngineTest(QObject *parent)
     : QObject(parent)
@@ -195,49 +197,74 @@ void EngineTest::dialog_serializing()
 
 void EngineTest::context_serializing()
 {
-    Context currentContext;
+    Context ctx;
 
-    // 3 уникальные имена
-    QString name1 = "var_name";
-    QString name2 = "counter_var";
-    QString name3 = "trigger_var";
+    const int varCount = 300;
+    QVector<QString> names;
+    names.reserve(varCount);
 
-    // Создаем переменные разного типа
-    currentContext.addVariable(ContextVariableFabric::make_namevar(name1, QString("Hello")));
-    currentContext.addVariable(ContextVariableFabric::make_counter(name2, 42));
-    currentContext.addVariable(ContextVariableFabric::make_trigger(name3, true));
+    for(int i = 0; i < varCount; ++i){
+        names.append(randomString(12));
+    }
 
-    // ---- Сериализация / Десериализация через StringListCursor ----
-    StringListCursor list;
-    abi::write<Context, currentVersion>(list, currentContext);
+    for(int i = 0; i < varCount; ++i){
+        const QString& name = names[i];
+        std::unique_ptr<ContextVar> var;
 
-    Context restored2;
-    abi::read<Context, currentVersion>(list, restored2);
+        switch(i % 3){
+        case 0: var = ContextVariableFabric::make_namevar(name, QString("val%1").arg(i)); break;
+        case 1: var = ContextVariableFabric::make_counter(name, i); break;
+        case 2: var = ContextVariableFabric::make_trigger(name, i % 2 == 0); break;
+        }
 
-    QCOMPARE(restored2.variables.size(), currentContext.variables.size());
-    QCOMPARE(restored2.variables.at(name1)->getValue(), currentContext.variables.at(name1)->getValue());
-    QCOMPARE(restored2.variables.at(name2)->getValue(), currentContext.variables.at(name2)->getValue());
-    QCOMPARE(restored2.variables.at(name3)->getValue(), currentContext.variables.at(name3)->getValue());
+        ctx.addVariable(std::move(var));
+    }
 
-    // ---- Сериализация / Десериализация через QByteArray ----
+    QCOMPARE(ctx.size(), varCount);
+
+    for(int i = 0; i < varCount; ++i){
+        const QString& name = names[i];
+        QVERIFY(ctx.containsVariable(name));
+
+        auto val = ctx.getValue(name);
+        QVERIFY(!val.valueless_by_exception());
+
+        switch(i % 3){
+        case 0: QCOMPARE(std::get<QString>(val), QString("val%1").arg(i)); break;
+        case 1: QCOMPARE(std::get<int>(val), i); break;
+        case 2: QCOMPARE(std::get<bool>(val), i % 2 == 0); break;
+        }
+    }
+
+    for(int i = 0; i < varCount; i += 3){
+        ctx.removeVariable(names[i]);
+    }
+
+    for(int i = 0; i < varCount; ++i){
+        const QString& name = names[i];
+        if(i % 3 == 0){
+            QVERIFY(!ctx.containsVariable(name));
+        } else {
+            QVERIFY(ctx.containsVariable(name));
+        }
+    }
+
+    QCOMPARE(ctx.size(), varCount - varCount/3);
+
     QByteArray serialized;
     QDataStream out(&serialized, QIODevice::WriteOnly);
-    abi::write<Context, currentVersion>(out, currentContext);
+    abi::write<Context, currentVersion>(out, ctx);
 
     Context restored;
     QDataStream in(&serialized, QIODevice::ReadOnly);
     abi::read<Context, currentVersion>(in, restored);
 
-    QCOMPARE(restored.variables.size(), currentContext.variables.size());
-
-    QCOMPARE(restored.variables.at(name1)->getName(), name1);
-    QCOMPARE(restored.variables.at(name1)->getValue(), currentContext.variables.at(name1)->getValue());
-
-    QCOMPARE(restored.variables.at(name2)->getName(), name2);
-    QCOMPARE(restored.variables.at(name2)->getValue(), currentContext.variables.at(name2)->getValue());
-
-    QCOMPARE(restored.variables.at(name3)->getName(), name3);
-    QCOMPARE(restored.variables.at(name3)->getValue(), currentContext.variables.at(name3)->getValue());
+    QCOMPARE(restored.size(), ctx.size());
+    for(int i = 0; i < varCount; ++i){
+        const QString& name = names[i];
+        if(i % 3 == 0) continue;
+        QCOMPARE(restored.variables.at(name)->getValue(), ctx.variables.at(name)->getValue());
+    }
 }
 
 // ---------------- Private slots ----------------
