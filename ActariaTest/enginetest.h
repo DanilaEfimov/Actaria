@@ -31,6 +31,9 @@ private:
     void trigger_serializing();
     void context_variable_serializing();
 
+    // Context
+    void context_serializing();
+
     // Characters
     void player_serializing();
     void character_serializing();

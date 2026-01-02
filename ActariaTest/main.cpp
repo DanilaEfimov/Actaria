@@ -1,8 +1,6 @@
 #include <QCoreApplication>
 #include "enginetest.h"
 
-#define ACTARIA_TEST
-
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);

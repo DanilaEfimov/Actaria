@@ -1,4 +1,5 @@
 #include "enginetest.h"
+#include "contextvarfabric.h"
 
 EngineTest::EngineTest(QObject *parent)
     : QObject(parent)
@@ -190,12 +191,62 @@ void EngineTest::dialog_serializing()
     dialognode_serializing();
 }
 
+// ---------------- Context ----------------
+
+void EngineTest::context_serializing()
+{
+    Context currentContext;
+
+    // 3 уникальные имена
+    QString name1 = "var_name";
+    QString name2 = "counter_var";
+    QString name3 = "trigger_var";
+
+    // Создаем переменные разного типа
+    currentContext.addVariable(ContextVariableFabric::make_namevar(name1, QString("Hello")));
+    currentContext.addVariable(ContextVariableFabric::make_counter(name2, 42));
+    currentContext.addVariable(ContextVariableFabric::make_trigger(name3, true));
+
+    // ---- Сериализация / Десериализация через StringListCursor ----
+    StringListCursor list;
+    abi::write<Context, currentVersion>(list, currentContext);
+
+    Context restored2;
+    abi::read<Context, currentVersion>(list, restored2);
+
+    QCOMPARE(restored2.variables.size(), currentContext.variables.size());
+    QCOMPARE(restored2.variables.at(name1)->getValue(), currentContext.variables.at(name1)->getValue());
+    QCOMPARE(restored2.variables.at(name2)->getValue(), currentContext.variables.at(name2)->getValue());
+    QCOMPARE(restored2.variables.at(name3)->getValue(), currentContext.variables.at(name3)->getValue());
+
+    // ---- Сериализация / Десериализация через QByteArray ----
+    QByteArray serialized;
+    QDataStream out(&serialized, QIODevice::WriteOnly);
+    abi::write<Context, currentVersion>(out, currentContext);
+
+    Context restored;
+    QDataStream in(&serialized, QIODevice::ReadOnly);
+    abi::read<Context, currentVersion>(in, restored);
+
+    QCOMPARE(restored.variables.size(), currentContext.variables.size());
+
+    QCOMPARE(restored.variables.at(name1)->getName(), name1);
+    QCOMPARE(restored.variables.at(name1)->getValue(), currentContext.variables.at(name1)->getValue());
+
+    QCOMPARE(restored.variables.at(name2)->getName(), name2);
+    QCOMPARE(restored.variables.at(name2)->getValue(), currentContext.variables.at(name2)->getValue());
+
+    QCOMPARE(restored.variables.at(name3)->getName(), name3);
+    QCOMPARE(restored.variables.at(name3)->getValue(), currentContext.variables.at(name3)->getValue());
+}
+
 // ---------------- Private slots ----------------
 
 void EngineTest::test_serializing()
 {
     context_variable_serializing();
     dialog_serializing();
+    context_serializing();
 }
 
 void EngineTest::test_id_counting()
