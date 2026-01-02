@@ -1,11 +1,10 @@
 #ifndef CONTEXT_H
 #define CONTEXT_H
 
-#include "Entities/entity.h"
-#include "Entities/contextvar.h"
-#include "Entities/contextvarfabric.h"
-#include <QMap>
-#include <QScopedPointer>
+#include "character.h"
+#include "variables"
+#include <memory>
+#include <unordered_map>
 
 
 class Context : public Entity
@@ -14,33 +13,38 @@ class Context : public Entity
 
 public:
     using base_t = Entity;
-    using value_type = QScopedPointer<ContextVar>;
+    using contextvar_p = std::unique_ptr<ContextVar>;
+    using key_t = QString;
+    using value_t = contextvar_p;
+    using value_types = ContextVar::ContextValue;
 
 private:
-    QMap<QString, value_type> context;
+    std::unordered_map<key_t, value_t> variables;
+    std::unordered_map<key_t, Character> characters;
 
 public:
     Context();
-    Context(const QMap<QString, value_type>& context);
+    Context(Context&& other);
+    ~Context() = default;
 
-    qsizetype size() const;
+    void merge(Context&& context);
 
-    void merge(Context&& other);
+    void addVariable(contextvar_p contextvar);
+    void addCharacter(const Character& character);
 
-    template<typename T>
-    void update(const QString& name, T&& value){
-        if(!this->context.contains(name)){
-            throw std::invalid_argument("no variable named " + name.toStdString() + " in context (id=" + std::to_string(this->getId()) + ")");
-        }
-        this->context[name] = ContextVarFabric::make<T>(name, std::forward<T>(value));
-    }
-    template<typename T>
-    void set(const QString& name, T&& value){
-        this->context[name] = ContextVarFabric::make<T>(name, std::forward<T>(value));
-    }
+    void removeVariable(const key_t& name);
+    void removeCharacter(const key_t& name);
 
-    void remove(const QString& name);
-    void clear();
+    bool containsVariable(const key_t& name) const noexcept;
+    bool containsCharacter(const key_t& name) const noexcept;
+    bool empty() const noexcept;
+
+    void clear() noexcept;
+    qsizetype size() const noexcept;
+
+    bool equals(const QString& name, value_types value) const;
+    void set(const QString& name, value_types value);
+    const value_types getValue(const QString& name) const noexcept;
 };
 
 #include "context.ser"

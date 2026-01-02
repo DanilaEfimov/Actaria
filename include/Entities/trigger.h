@@ -13,6 +13,7 @@ class Trigger : public ContextVar
 public:
     using base_t = ContextVar;
     using value_type = bool;
+    static constexpr VarType contains = VarType::Trigger;
 
 protected:
     value_type value;
@@ -27,8 +28,10 @@ public:
 
     virtual ~Trigger() = default;
 
-    value_type getValue() const;
-    void setValue(value_type value) noexcept;
+    virtual VarType type() const override;
+
+    virtual ContextValue getValue() const override;
+    virtual void setValue(ContextValue value) noexcept override;
 
     operator bool() const noexcept;
 };

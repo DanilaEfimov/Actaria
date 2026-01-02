@@ -14,10 +14,19 @@ Trigger::Trigger(value_type value, const QString &name)
     : ContextVar(name), value(value) {}
 
 /**
+ * @brief Trigger::type
+ * @return
+ */
+VarType Trigger::type() const
+{
+    return VarType::Trigger;
+}
+
+/**
  * @brief Trigger::getValue
  * @return trigger-value
  */
-Trigger::value_type Trigger::getValue() const
+Trigger::ContextValue Trigger::getValue() const
 {
     return this->value;
 }
@@ -26,9 +35,9 @@ Trigger::value_type Trigger::getValue() const
  * @brief Trigger::setValue
  * @param value
  */
-void Trigger::setValue(value_type value) noexcept
+void Trigger::setValue(ContextValue value) noexcept
 {
-    this->value = value;
+    this->value = std::get<bool>(value);
 }
 
 /**

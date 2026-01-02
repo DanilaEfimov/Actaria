@@ -15,6 +15,12 @@
 #include <QDataStream>
 #include <QStringList>
 
+#ifdef ACTARIA_TEST
+#define ENGINE_TEST friend class EngineTest;
+#else
+#define ENGINE_TEST
+#endif
+
 /**
  * @macro ACT_SERIALIZABLE
  * Marks a class as serializable in the ABI system.
@@ -30,6 +36,7 @@
  * of the class without exposing private members.
  */
 #define ACT_SERIALIZABLE \
+    ENGINE_TEST \
     template <utils::GameEntity T, abi::Version V> \
     friend struct abi::entity_traits; \
     template <typename T, abi::Version V> \

@@ -4,8 +4,8 @@
 
 
 /**
- * @brief Counter::Counter
- * Normal constructor for context counter.
+ * @brief   Counter::Counter
+ *          Normal constructor for context counter.
  * @param value
  * @param name
  */
@@ -14,10 +14,19 @@ Counter::Counter(value_type value, const QString &name)
 {}
 
 /**
+ * @brief Counter::type
+ * @return
+ */
+VarType Counter::type() const
+{
+    return VarType::Counter;
+}
+
+/**
  * @brief Counter::getValue
  * @return trigger-counter
  */
-Counter::value_type Counter::getValue() const
+Counter::ContextValue Counter::getValue() const
 {
     return this->value;
 }
@@ -26,9 +35,9 @@ Counter::value_type Counter::getValue() const
  * @brief Counter::setValue
  * @param value
  */
-void Counter::setValue(value_type value) noexcept
+void Counter::setValue(ContextValue value) noexcept
 {
-    this->value = value;
+    this->value = std::get<value_type>(value);
 }
 
 /**

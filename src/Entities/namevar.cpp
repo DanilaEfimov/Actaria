@@ -12,10 +12,19 @@ NameVar::NameVar(value_type value, const QString &name)
 {}
 
 /**
+ * @brief NameVar::type
+ * @return
+ */
+VarType NameVar::type() const
+{
+    return VarType::Name;
+}
+
+/**
  * @brief NameVar::getValue
  * @return contained value of variable
  */
-NameVar::value_type NameVar::getValue() const
+NameVar::ContextValue NameVar::getValue() const
 {
     return this->value;
 }
@@ -24,7 +33,7 @@ NameVar::value_type NameVar::getValue() const
  * @brief NameVar::setValue
  * @param value
  */
-void NameVar::setValue(value_type value) noexcept
+void NameVar::setValue(ContextValue value) noexcept
 {
-    this->value = value;
+    this->value = std::get<QString>(value);
 }

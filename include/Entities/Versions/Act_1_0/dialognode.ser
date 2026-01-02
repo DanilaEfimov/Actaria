@@ -103,6 +103,7 @@ struct Reader<DialogNode, abi::Version::Act_1_0> {
             DialogNode::variant_t variant;
             variant.first = in.next();
             variant.second = static_cast<Entity::id_type>(in.next().toLongLong(&ok));
+            d.variants.append(std::move(variant));
         }
 
         if(!ok){

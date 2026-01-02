@@ -77,6 +77,24 @@ void DialogNode::setEvent(id_type event)
 }
 
 /**
+ * @brief DialogNode::getFromCharacter
+ * @return
+ */
+Entity::id_type DialogNode::getFromCharacter() const noexcept
+{
+    return this->fromCharacter;
+}
+
+/**
+ * @brief DialogNode::setFromCharacter
+ * @param characterId
+ */
+void DialogNode::setFromCharacter(id_type characterId)
+{
+    this->fromCharacter = characterId;
+}
+
+/**
  * @brief DialogNode::addVariant
  * @param variant
  */

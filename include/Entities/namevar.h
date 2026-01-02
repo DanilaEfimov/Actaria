@@ -10,6 +10,7 @@ class NameVar : public ContextVar
 public:
     using base_t = ContextVar;
     using value_type = QString;
+    static constexpr VarType contains = VarType::Name;
 
 protected:
     value_type value;
@@ -22,8 +23,10 @@ public:
 #endif
     NameVar(value_type value, const QString& name);
 
-    value_type getValue() const;
-    void setValue(value_type value) noexcept;
+    virtual VarType type() const override;
+
+    virtual ContextValue getValue() const override;
+    virtual void setValue(ContextValue value) noexcept override;
 
     operator QString() const noexcept;
 };

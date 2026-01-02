@@ -1,20 +1,6 @@
 #include "Entities/dialog.h"
 
 
-namespace {
-
-    constexpr const char* typeName = "Dialog";
-    constexpr const int fieldCount = 4;
-    constexpr const DialogAbi order[] = {
-        NodesField,     // EntityManager<DialogNode>
-        EventsField,    // EntityManager<Events>
-        ContextField,   // Context
-        RootField,      // id_type
-    };
-
-};
-
-
 Dialog::Dialog()
     : Entity(),
     nodes(),

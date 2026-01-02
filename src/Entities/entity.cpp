@@ -63,3 +63,13 @@ Entity::id_type Entity::getId() const
 {
     return this->id;
 }
+
+/**
+ * @brief Entity::operator ==
+ * @param other
+ * @return true if id equals
+ */
+bool Entity::operator==(const Entity &other) const
+{
+    return this->id == other.id;
+}

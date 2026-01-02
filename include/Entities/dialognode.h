@@ -34,6 +34,9 @@ public:
     id_type getEventId() const noexcept;
     void setEvent(id_type eventId);
 
+    id_type getFromCharacter() const noexcept;
+    void setFromCharacter(id_type characterId);
+
     void addVariant(const variant_t& variant);
     void addVariant(QString&& title, const DialogNode& variant);
     void removeChild(int idx);

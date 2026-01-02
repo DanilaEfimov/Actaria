@@ -10,6 +10,7 @@ class Counter : public ContextVar
 public:
     using base_t = ContextVar;
     using value_type = int32_t;
+    static constexpr VarType contains = VarType::Counter;
 
 protected:
     value_type value;
@@ -22,8 +23,10 @@ public:
 #endif
     Counter(value_type value, const QString& name);
 
-    value_type getValue() const;
-    void setValue(value_type value) noexcept;
+    virtual VarType type() const override;
+
+    virtual ContextValue getValue() const override;
+    virtual void setValue(ContextValue value) noexcept override;
 
     operator int() const noexcept;
 };

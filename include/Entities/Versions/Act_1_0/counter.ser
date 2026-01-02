@@ -21,7 +21,7 @@ struct entity_traits<Counter, abi::Version::Act_1_0> {
     static constexpr int maximum_bytes = unlimited;
 
     static constexpr const char* name = "Counter";
-    static constexpr int minimum_words = 2;
+    static constexpr int minimum_words = 3;
     static constexpr int maximum_words = minimum_words;
 };
 
@@ -32,11 +32,12 @@ struct entity_traits<Counter, abi::Version::Act_1_0> {
 template<>
 struct Writer<Counter, abi::Version::Act_1_0> {
     static void write(QDataStream& out, const Counter& c) {
-        out << c.value;
+        out << static_cast<int>(Counter::contains) << c.value;
     }
 
     static void write(StringListCursor& out, const Counter& c) {
         out.append(entity_traits<Counter, abi::Version::Act_1_0>::name);
+        out.append(QString::number(static_cast<int>(Counter::contains)));
         out.append(QString::number(c.value));
     }
 };
@@ -48,6 +49,7 @@ struct Writer<Counter, abi::Version::Act_1_0> {
 template<>
 struct Reader<Counter, abi::Version::Act_1_0> {
     static void read(QDataStream& in, Counter& c) {
+        in.skipRawData(sizeof(int));    // Counter::contains
         in >> c.value;
     }
 
@@ -57,6 +59,8 @@ struct Reader<Counter, abi::Version::Act_1_0> {
             c.value = 0;
             return;
         }
+
+        in.skip();  // skip Counter::contains
 
         bool ok = true;
         c.value = static_cast<Counter::value_type>(in.next().toLongLong(&ok));

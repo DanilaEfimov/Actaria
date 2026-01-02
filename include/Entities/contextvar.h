@@ -11,7 +11,7 @@ enum class VarType {
     Unknown = -1,
     Counter,
     Trigger,
-    Named
+    Name
 };
 
 class ContextVar : public Entity
@@ -20,18 +20,25 @@ class ContextVar : public Entity
 
 public:
     using base_t = Entity;
+    using ContextValue = std::variant<int, bool, QString>;
+    static constexpr VarType contains = VarType::Unknown;
 
 protected:
     QString name;
 
-    ContextVar();
     ContextVar(const QString& name);
 
 public:
+    ContextVar();
     virtual ~ContextVar() = default;
+
+    virtual VarType type() const = 0;
 
     QString getName() const;
     void setName(const QString& name) noexcept;
+
+    virtual ContextValue getValue() const = 0;
+    virtual void setValue(ContextValue value) = 0;
 };
 
 #include "contextvar.ser"

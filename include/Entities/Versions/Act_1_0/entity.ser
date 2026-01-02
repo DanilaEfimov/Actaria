@@ -64,7 +64,7 @@ struct Reader<Entity, V> {
         }
 
         if(!ok){
-            qWarning() << "Reader<Entity, V>::read: can not parse id from: " << in.peek();
+            qWarning() << "Reader<Entity, Act_1_0>::read: can not parse id from: " << in.peek();
         }
 
         in.skip();  // skipping this->id field

@@ -1,55 +1,149 @@
 #include "Entities/context.h"
 
-
 /**
  * @brief Context::Context
  */
 Context::Context()
-    : Entity() {}
+    : Entity(), variables(), characters()
+{}
 
 /**
  * @brief Context::Context
- * @param context
+ * @param other
  */
-Context::Context(const QMap<QString, value_type> &context)
-    : Entity(), context()
+Context::Context(Context &&other)
 {
-    for(auto& variable : context){
-
-    }
-}
-
-/**
- * @brief Context::size
- * @return actual count of context variables
- */
-qsizetype Context::size() const
-{
-    return this->context.size();
+    this->merge(std::move(other));
 }
 
 /**
  * @brief Context::merge
- * @param other
+ * @param context
  */
-void Context::merge(Context&& other)
+void Context::merge(Context&& context)
 {
-    //this->context.insert(std::move(other.context));
+    this->variables.merge(std::move(context.variables));
+    this->characters.merge(std::move(context.characters));
 }
 
 /**
- * @brief Context::remove
+ * @brief Context::addVariable
+ * @param contextvar
+ */
+void Context::addVariable(contextvar_p contextvar)
+{
+    this->variables.insert(std::make_pair(contextvar->getName(), std::move(contextvar)));
+}
+
+/**
+ * @brief Context::addCharacter
+ * @param character
+ */
+void Context::addCharacter(const Character &character)
+{
+    this->characters.insert(std::make_pair(character.getName(), character));
+}
+
+/**
+ * @brief Context::removeVariable
  * @param name
  */
-void Context::remove(const QString &name)
+void Context::removeVariable(const QString& name)
 {
-    //this->context.remove(name);
+    this->variables.erase(name);
 }
 
 /**
- * @brief Context::clear
+ * @brief Context::removeCharacter
+ * @param name
  */
-void Context::clear()
+void Context::removeCharacter(const key_t& name)
 {
-    this->context.clear();
+    this->characters.erase(name);
+}
+
+/**
+ * @brief Context::containsVariable
+ * @param name
+ * @return
+ */
+bool Context::containsVariable(const key_t& name) const noexcept
+{
+    return this->variables.contains(name);
+}
+
+/**
+ * @brief Context::containsCharacter
+ * @param name
+ * @return
+ */
+bool Context::containsCharacter(const key_t& name) const noexcept
+{
+    return this->characters.contains(name);
+}
+
+/**
+ * @brief Context::empty
+ * @return
+ */
+bool Context::empty() const noexcept
+{
+    return this->size() == 0;
+}
+
+void Context::clear() noexcept
+{
+    this->variables.clear();
+    this->characters.clear();
+}
+
+/**
+ * @brief Context::size
+ * @return
+ */
+qsizetype Context::size() const noexcept
+{
+    return this->characters.size() + this->variables.size();
+}
+
+/**
+ * @brief Context::equals
+ * @param name
+ * @param value
+ * @return
+ */
+bool Context::equals(const QString &name, value_types value) const
+{
+    auto it = variables.find(name);
+    if (it == variables.end())
+        return false;
+
+    return it->second->getValue() == value;
+}
+
+/**
+ * @brief Context::set
+ * @param name
+ * @param value
+ */
+void Context::set(const QString &name, value_types value)
+{
+    if(!this->containsVariable(name))
+        return;
+
+    this->variables[name]->setValue(value);
+}
+
+/**
+ * @brief Context::getValue
+ * @param name
+ * @return
+ */
+const Context::value_types Context::getValue(const QString &name) const noexcept
+{
+    auto it = variables.find(name);
+    if (it == variables.end())
+        return false;
+
+    return it->second->getValue();
 }

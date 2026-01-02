@@ -44,6 +44,7 @@ public:
     constexpr hash_type hash() const;
 
     id_type getId() const;
+    bool operator==(const Entity& other) const;
 };
 
 #include "entity.ser"
