@@ -7,7 +7,7 @@
 #define CONTEXT_SER
 
 #include "Entities/context.h"
-#include "characters"
+#include "Entities/nonplayercharacter.h"
 #include "contextvarfabric.h"
 
 inline void writeContextVariable(QDataStream& out, const ContextVar* var) {
@@ -24,7 +24,7 @@ inline void writeContextVariable(QDataStream& out, const ContextVar* var) {
         abi::write<Trigger, abi::Version::Act_1_0>(out, *reinterpret_cast<const Trigger*>(var));
         break;
     default:
-        qWarning() << "Act_1_0::context.ser::write: undefined variable type:" << static_cast<int>(type);
+        qWarning() << "Act_1_0::context.ser::writeContextVariable: undefined variable type:" << static_cast<int>(type);
         return;
     }
 }
@@ -43,7 +43,7 @@ inline void writeContextVariable(StringListCursor& out, const ContextVar* var) {
         abi::write<Trigger, abi::Version::Act_1_0>(out, *reinterpret_cast<const Trigger*>(var));
         break;
     default:
-        qWarning() << "Act_1_0::context.ser::write: undefined variable type:" << static_cast<int>(type);
+        qWarning() << "Act_1_0::context.ser::writeContextVariable: undefined variable type:" << static_cast<int>(type);
         return;
     }
 }
@@ -62,7 +62,7 @@ inline void readContextVariable(QDataStream& in, ContextVar* var) {
         abi::read<Trigger, abi::Version::Act_1_0>(in, *reinterpret_cast<Trigger*>(var));
         break;
     default:
-        qWarning() << "Act_1_0::context.ser::read: undefined variable type:" << static_cast<int>(type);
+        qWarning() << "Act_1_0::context.ser::readContextVariable: undefined variable type:" << static_cast<int>(type);
         return;
     }
 }
@@ -81,7 +81,7 @@ inline void readContextVariable(StringListCursor& in, ContextVar* var) {
         abi::read<Trigger, abi::Version::Act_1_0>(in, *reinterpret_cast<Trigger*>(var));
         break;
     default:
-        qWarning() << "Act_1_0::context.ser::read: undefined variable type:" << static_cast<int>(type);
+        qWarning() << "Act_1_0::context.ser::readContextVariable: undefined variable type:" << static_cast<int>(type);
         return;
     }
 }

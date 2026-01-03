@@ -9,6 +9,8 @@ class Player final : public Character
     ACT_SERIALIZABLE
 
 public:
+    using base_t = Character;
+
     static Player& instance();
 
     static Context experience;

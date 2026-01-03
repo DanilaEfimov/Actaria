@@ -1,5 +1,8 @@
 #include "Entities/player.h"
 
+
+Context Player::experience{};
+
 /**
  * @brief Player::instance
  * @return singleton reference

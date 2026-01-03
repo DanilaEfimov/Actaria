@@ -1,5 +1,6 @@
 #include "enginetest.h"
 #include "contextvarfabric.h"
+#include "characters"
 #include <variant>
 
 
