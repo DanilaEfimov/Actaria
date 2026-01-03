@@ -4,39 +4,21 @@
 #include "Entities/character.h"
 #include "Entities/context.h"
 
-class Builder;
-
-class Player : public Character
+class Player final : public Character
 {
-protected:
-    Player(const QString& name, Mood mood=Mood::Normal);
-    Player(const QByteArray& data);
-    Player(const QStringList& data);
-
-    static Player instance;
-    static bool built;
-    static bool init();
+    ACT_SERIALIZABLE
 
 public:
-    friend class Builder;
+    static Player& instance();
 
-    template<typename... Args>
-    [[nodiscard]] static Player build(Args... args){
-        return Player(std::forward<Args>(args)...);
-    }
+    static Context experience;
 
-    static Context inventory;
+private:
+    explicit Player(const QString& name = {},
+                    Mood mood = Mood::Normal);
 
-    Player();
-    virtual ~Player() = default;
-
-    static Player& getInstance();
-
-    void setName(const QString& name);
-    QString getName() const noexcept;
-
-    void setMood(Mood mood);
-    Mood getMood() const noexcept;
+    Player(const Player&) = delete;
+    Player& operator=(const Player&) = delete;
 };
 
 #include "player.ser"

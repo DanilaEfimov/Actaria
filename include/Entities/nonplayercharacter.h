@@ -11,7 +11,7 @@ private:
     QString description;
 
 public:
-    explicit NonPlayerCharacter();
+    NonPlayerCharacter();
     NonPlayerCharacter(const QString& name, Mood mood = Mood::Normal);
     NonPlayerCharacter(const QByteArray& data);
     NonPlayerCharacter(StringListCursor& data);

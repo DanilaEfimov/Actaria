@@ -29,7 +29,10 @@ protected:
 
 public:
     QString getName() const noexcept;
-    void setName(QString name);
+    void setName(const QString& name);
+
+    Mood getMood() const noexcept;
+    void setMood(Mood mood);
 };
 
 #include "character.ser"

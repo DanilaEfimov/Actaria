@@ -3,4 +3,61 @@
 
 #include "Entities/player.h"
 
+namespace abi {
+
+/**
+ * @brief The entity_traits class
+ * byte and words measuring traits for Entity
+ */
+template<>
+struct entity_traits<Player, abi::Version::Act_1_0> {
+    static constexpr bool is_fixed = false;
+    static constexpr int minimum_bytes = sizeof(qsizetype)*2;
+    static constexpr int maximum_bytes = minimum_bytes;
+
+    static constexpr const char* name = "Player";
+    static constexpr int minimum_words = 3;
+    static constexpr int maximum_words = minimum_words;
+};
+
+/**
+ * @brief The Writer class
+ * version generalized write interface
+ */
+template<>
+struct Writer<Player, abi::Version::Act_1_0> {
+    static void write(QDataStream& out, const Player& c = Player::instance()) {
+        abi::write<Context, abi::Version::Act_1_0>(out, c.experience);
+    }
+
+    static void write(StringListCursor& out, const Player& c = Player::instance()) {
+        out.append(entity_traits<Player, abi::Version::Act_1_0>::name);
+        abi::write<Context, abi::Version::Act_1_0>(out, c.experience);
+    }
+};
+
+/**
+ * @brief The Reader class
+ * version generalized read interface
+ */
+template<>
+struct Reader<Player, abi::Version::Act_1_0> {
+    static void read(QDataStream& in, Player& c = Player::instance()) {
+        abi::read<Context, abi::Version::Act_1_0>(in, c.experience);
+    }
+
+    static void read(StringListCursor& in, Player& c = Player::instance()) {
+        if(in.remaining() < entity_traits<Context, abi::Version::Act_1_0>::minimum_words){
+            qWarning() << "Reader<Player, Atc_1_0>::read: not enought words to parse";
+            return;
+        }
+
+        in.skip();  // skip typename
+
+        abi::read<Context, abi::Version::Act_1_0>(in, c.experience);
+    }
+};
+
+}   // namespace abi
+
 #endif // PLAYER_SER

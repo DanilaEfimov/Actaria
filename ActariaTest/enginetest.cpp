@@ -124,10 +124,31 @@ void EngineTest::context_variable_serializing()
 
 void EngineTest::player_serializing()
 {
-    Player player;
+    Player& player = Player::instance();
     player.setName("Danila");
     player.setMood(Mood::Excited);
+
+    QByteArray data;
+    QDataStream out(&data, QIODevice::WriteOnly);
+    abi::write<Player, currentVersion>(out, player);
+
+    Player restored;
+    QDataStream in(&data, QIODevice::ReadOnly);
+    abi::read<Player, currentVersion>(in, restored);
+
+    QCOMPARE(restored.getName(), player.getName());
+    QCOMPARE(restored.getMood(), player.getMood());
+
+    StringListCursor list;
+    abi::write<Player, currentVersion>(list, player);
+
+    Player restored2;
+    abi::read<Player, currentVersion>(list, restored2);
+
+    QCOMPARE(restored2.getName(), player.getName());
+    QCOMPARE(restored2.getMood(), player.getMood());
 }
+
 
 void EngineTest::character_serializing()
 {
@@ -272,6 +293,7 @@ void EngineTest::context_serializing()
 void EngineTest::test_serializing()
 {
     context_variable_serializing();
+    character_serializing();
     dialog_serializing();
     context_serializing();
 }

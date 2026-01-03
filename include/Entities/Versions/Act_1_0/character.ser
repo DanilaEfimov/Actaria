@@ -17,11 +17,11 @@ namespace abi {
 template<>
 struct entity_traits<Character, abi::Version::Act_1_0> {
     static constexpr bool is_fixed = false;
-    static constexpr int minimum_bytes = sizeof(Entity::id_type)*3 + sizeof(qsizetype)*2;
+    static constexpr int minimum_bytes = sizeof(int) + sizeof(qsizetype);
     static constexpr int maximum_bytes = minimum_bytes;
 
     static constexpr const char* name = "Character";
-    static constexpr int minimum_words = 5;
+    static constexpr int minimum_words = 3;
     static constexpr int maximum_words = unlimited;
 };
 
@@ -53,20 +53,20 @@ struct Reader<Character, abi::Version::Act_1_0> {
     }
 
     static void read(StringListCursor& in, Character& c) {
-        c.name = "";
-        c.mood = Mood::Normal;
-
         if(in.remaining() < entity_traits<Character, abi::Version::Act_1_0>::minimum_words){
-            qWarning() << "Reader<Character, V>::read: not enought words at cursor";
+            qWarning() << "Reader<Character, Act_1_0>::read: not enought words at cursor";
             return;
         }
+
+        c.name = "";
+        c.mood = Mood::Normal;
 
         bool ok = true;
         c.name = in.next();
         c.mood = static_cast<Mood>(in.next().toInt(&ok));
 
         if(!ok){
-            qWarning() << "Reader<Character, V>::read: can not parse mood from: " << in.peek();
+            qWarning() << "Reader<Character, Act_1_0>::read: can not parse mood from: " << in.peek();
         }
 
         in.skip();

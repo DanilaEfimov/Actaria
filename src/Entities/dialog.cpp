@@ -19,7 +19,7 @@ bool Dialog::action(id_type eventId, Context* context)
     Event* event = this->events.getObj(eventId);
     if(!event)
         return false;
-    return event->exec(context);
+    return true; //event->exec(context);
 }
 
 /**

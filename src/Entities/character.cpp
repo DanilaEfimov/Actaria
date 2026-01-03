@@ -29,8 +29,27 @@ QString Character::getName() const noexcept
 
 /**
  * @brief Character::setName
+ * @param name
  */
-void Character::setName(QString name)
+void Character::setName(const QString &name)
 {
     this->name = name;
+}
+
+/**
+ * @brief Character::getMood
+ * @return actual mood of a person
+ */
+Mood Character::getMood() const noexcept
+{
+    return this->mood;
+}
+
+/**
+ * @brief Character::setMood
+ * @param mood
+ */
+void Character::setMood(Mood mood)
+{
+    this->mood = mood;
 }

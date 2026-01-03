@@ -26,6 +26,10 @@ NonPlayerCharacter::NonPlayerCharacter(const QByteArray &data)
     abi::read<NonPlayerCharacter, EngineInfo::defaultVersion>(in, *this);
 }
 
+/**
+ * @brief NonPlayerCharacter::NonPlayerCharacter
+ * @param data
+ */
 NonPlayerCharacter::NonPlayerCharacter(StringListCursor &data)
     : Character(), description()
 {

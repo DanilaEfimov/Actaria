@@ -47,12 +47,12 @@ struct Reader<NonPlayerCharacter, abi::Version::Act_1_0> {
     }
 
     static void read(StringListCursor& in, NonPlayerCharacter& c) {
-        c.description = "";
-
         if(in.remaining() < entity_traits<NonPlayerCharacter, abi::Version::Act_1_0>::minimum_words){
-            qWarning() << "Reader<NonPlayerCharacter, V>::read: not enought words to parse";
+            qWarning() << "Reader<NonPlayerCharacter, Atc_1_0>::read: not enought words to parse";
             return;
         }
+
+         c.description = "";
 
         c.description = in.next();
 
