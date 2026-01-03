@@ -46,6 +46,4 @@ public:
     id_type getChild(int variant) const noexcept;
 };
 
-#include "dialognode.ser"
-
 #endif // DIALOGNODE_H

@@ -6,6 +6,7 @@
 #ifndef COUNTER_SER
 #define COUNTER_SER
 
+#include "contextvar.ser"
 #include "Entities/counter.h"
 
 namespace abi {
@@ -55,18 +56,18 @@ struct Reader<Counter, abi::Version::Act_1_0> {
 
     static void read(StringListCursor& in, Counter& c) {
         if(in.remaining() < entity_traits<ContextVar, abi::Version::Act_1_0>::minimum_words){
-            qWarning() << "Reader<Counter, V>: not enought words in list";
+            qWarning() << "Reader<Counter, Act_1_0>: not enought words in list";
             c.value = 0;
             return;
         }
 
-        in.skip();  // skip Counter::contains
+        in.skip(2);     // skip typename + int casted mood
 
         bool ok = true;
-        c.value = static_cast<Counter::value_type>(in.next().toLongLong(&ok));
+        c.value = static_cast<Counter::value_type>(in.peek().toLongLong(&ok));
 
         if(!ok){
-            qWarning() << "Reader<Counter, V>: failed to parse value from: " << in.peek();
+            qWarning() << "Reader<Counter, Act_1_0>: failed to parse value from: " << in.peek();
         }
 
         in.skip();    // skipping this->value field

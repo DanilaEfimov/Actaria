@@ -2,6 +2,7 @@
 #define PLAYER_SER
 
 #include "Entities/player.h"
+#include "context.ser"
 
 namespace abi {
 

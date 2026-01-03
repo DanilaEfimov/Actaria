@@ -6,6 +6,7 @@
 #ifndef TRIGGER_SER
 #define TRIGGER_SER
 
+#include "contextvar.ser"
 #include "Entities/trigger.h"
 
 namespace abi {
@@ -55,13 +56,13 @@ struct Reader<Trigger, abi::Version::Act_1_0> {
 
     static void read(StringListCursor& in, Trigger& t) {
         if(in.remaining() < entity_traits<Trigger, abi::Version::Act_1_0>::minimum_words){
-            qWarning() << "Reader<Trigger, V>: not enought words in list";
+            qWarning() << "Reader<Trigger, Act_1_0>: not enought words in list";
             t.value = false;
             return;
         }
 
-        in.skip();      // Trigger::contains
-        t.value = in.next() == TRUE_S;
+        in.skip(2);     // skip typename + int casted mood
+        t.value = in.peek() == TRUE_S;
         in.skip();      // skipping this->value field
     }
 };

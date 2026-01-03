@@ -1,10 +1,16 @@
 #ifndef CONTEXTVARFABRIC_H
 #define CONTEXTVARFABRIC_H
 
-#include "utils.h"
-#include "variables"
 #include <memory>
+#include <QString>
 #include <variant>
+
+enum class VarType;
+
+class ContextVar;
+class Counter;
+class NameVar;
+class Trigger;
 
 /**
  * @brief   The ContextVariableFabric struct

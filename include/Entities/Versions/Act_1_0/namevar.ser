@@ -6,6 +6,7 @@
 #ifndef NAMEVAR_SER
 #define NAMEVAR_SER
 
+#include "contextvar.ser"
 #include "Entities/namevar.h"
 
 namespace abi {
@@ -55,13 +56,13 @@ struct Reader<NameVar, abi::Version::Act_1_0> {
 
     static void read(StringListCursor& in, NameVar& n) {
         if(in.remaining() < entity_traits<NameVar, abi::Version::Act_1_0>::minimum_words){
-            qWarning() << "Reader<NameVar, V>: not enought words in list";
+            qWarning() << "Reader<NameVar, Act_1_0>: not enought words in list";
             n.value = "unknown";
             return;
         }
 
-        in.skip();      // NameVar::contains
-        n.value = in.next();
+        in.skip(2);     // skip typename + int casted mood
+        n.value = in.peek();
         in.skip();      // skipping this->value field
     }
 };

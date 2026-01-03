@@ -7,8 +7,13 @@
 #define CONTEXT_SER
 
 #include "Entities/context.h"
-#include "Entities/nonplayercharacter.h"
+#include "Entities/character.h"
 #include "contextvarfabric.h"
+#include "entity.ser"
+#include "counter.ser"
+#include "trigger.ser"
+#include "namevar.ser"
+
 
 inline void writeContextVariable(QDataStream& out, const ContextVar* var) {
     if(!var) return;
@@ -117,8 +122,8 @@ struct Writer<Context, abi::Version::Act_1_0> {
         }
         out << static_cast<qsizetype>(c.characters.size());
         for(auto& character : c.characters){
-            abi::write<NonPlayerCharacter, abi::Version::Act_1_0>(
-                out, *reinterpret_cast<const NonPlayerCharacter*>(&character.second)
+            abi::write<Character, abi::Version::Act_1_0>(
+                out, *reinterpret_cast<const Character*>(&character.second)
             );
         }
     }
@@ -131,8 +136,8 @@ struct Writer<Context, abi::Version::Act_1_0> {
         }
         out.append(QString::number(c.characters.size()));
         for(auto& character : c.characters){
-            abi::write<NonPlayerCharacter, abi::Version::Act_1_0>(
-                out, *reinterpret_cast<const NonPlayerCharacter*>(&character.second)
+            abi::write<Character, abi::Version::Act_1_0>(
+                out, *reinterpret_cast<const Character*>(&character.second)
             );
         }
     }
@@ -163,8 +168,8 @@ struct Reader<Context, abi::Version::Act_1_0> {
         }
         in >> size;
         for(int i = 0; i < size; i++){
-            std::unique_ptr<NonPlayerCharacter> character(new NonPlayerCharacter());
-            abi::read<NonPlayerCharacter, abi::Version::Act_1_0>(in, *character.get());
+            std::unique_ptr<Character> character(new Character());
+            abi::read<Character, abi::Version::Act_1_0>(in, *character.get());
             c.addCharacter(*character.release());
         }
     }
@@ -198,17 +203,16 @@ struct Reader<Context, abi::Version::Act_1_0> {
         }
 
         size = in.peek().toInt(&ok);
+        in.skip();  // skip count of characters
         if(!ok){
             qWarning() << "Reader<Context, Act_1_0>::read: not enought words to parse context";
             return;
         }
         for(int i = 0; i < size; i++){
-            std::unique_ptr<NonPlayerCharacter> character(new NonPlayerCharacter());
-            abi::read<NonPlayerCharacter, abi::Version::Act_1_0>(in, *character.get());
+            std::unique_ptr<Character> character(new Character());
+            abi::read<Character, abi::Version::Act_1_0>(in, *character.get());
             c.addCharacter(*character.release());
         }
-
-        in.skip();
     }
 };
 

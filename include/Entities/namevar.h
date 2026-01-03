@@ -22,6 +22,7 @@ public:
     NameVar() = default;
 #endif
     NameVar(value_type value, const QString& name);
+    virtual ~NameVar() = default;
 
     virtual VarType type() const override;
 
@@ -30,7 +31,5 @@ public:
 
     operator QString() const noexcept;
 };
-
-#include "namevar.ser"
 
 #endif // NAMEVAR_H

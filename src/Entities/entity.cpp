@@ -1,3 +1,4 @@
+#include "entity.ser"
 #include "Entities/entity.h"
 #include "utils.h"
 #include "engineinfo.h"

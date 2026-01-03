@@ -47,6 +47,4 @@ public:
     const value_types getValue(const QString& name) const noexcept;
 };
 
-#include "context.ser"
-
 #endif // CONTEXT_H

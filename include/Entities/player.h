@@ -23,6 +23,4 @@ private:
     Player& operator=(const Player&) = delete;
 };
 
-#include "player.ser"
-
 #endif // PLAYER_H

@@ -25,16 +25,15 @@ protected:
     Mood mood;
 
     Character();
-    Character(const QString& name, Mood mood = Mood::Normal);
 
 public:
+    Character(const QString& name, Mood mood = Mood::Normal);
+
     QString getName() const noexcept;
     void setName(const QString& name);
 
     Mood getMood() const noexcept;
     void setMood(Mood mood);
 };
-
-#include "character.ser"
 
 #endif // CHARACTER_H

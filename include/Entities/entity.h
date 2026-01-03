@@ -47,6 +47,4 @@ public:
     bool operator==(const Entity& other) const;
 };
 
-#include "entity.ser"
-
 #endif // ENTITY_H

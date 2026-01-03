@@ -1,4 +1,6 @@
 #include "Entities/dialognode.h"
+#include "entity.ser"
+#include "dialognode.ser"
 #include <QBuffer>
 #include <QDataStream>
 

@@ -14,8 +14,7 @@ INCLUDEPATH += include \
 
 SOURCES += $$files(src/Entities/*.cpp) \
            $$files(src/GUI/*.cpp) \
-           $$files(src/*.cpp) \
-           src/contextvarfabric.cpp
+           $$files(src/*.cpp)
 
 HEADERS += $$files(include/Entities/*.h) \
            $$files(include/GUI/*.h) \

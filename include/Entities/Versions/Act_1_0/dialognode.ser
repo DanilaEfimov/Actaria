@@ -84,7 +84,7 @@ struct Reader<DialogNode, abi::Version::Act_1_0> {
         d.variants.clear();
 
         qsizetype size = 0;
-        if(in.remaining() < entity_traits<Entity, abi::Version::Act_1_0>::minimum_words){
+        if(in.remaining() < entity_traits<DialogNode, abi::Version::Act_1_0>::minimum_words){
             ok = false;
         }
         else {
@@ -96,7 +96,7 @@ struct Reader<DialogNode, abi::Version::Act_1_0> {
         }
 
         if(!ok){
-            qWarning() << "Reader<DialogNode, V>::read: can not parse id from: " << in.peek();
+            qWarning() << "Reader<DialogNode, Act_1_0>::read: can not parse id from: " << in.peek();
         }
 
         for(qsizetype i = 0; ok && i < size; i++){
@@ -107,7 +107,7 @@ struct Reader<DialogNode, abi::Version::Act_1_0> {
         }
 
         if(!ok){
-            qWarning() << "Reader<DialogNode, V>::read: can not parse id from: " << in.peek();
+            qWarning() << "Reader<DialogNode, Act_1_0>::read: can not parse id from: " << in.peek();
         }
 
         in.skip();

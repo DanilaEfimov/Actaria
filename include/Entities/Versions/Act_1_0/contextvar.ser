@@ -53,7 +53,7 @@ struct Reader<ContextVar, abi::Version::Act_1_0> {
 
     static void read(StringListCursor& in, ContextVar& c) {
         if(in.remaining() < entity_traits<ContextVar, abi::Version::Act_1_0>::minimum_words){
-            qWarning() << "Reader<ContextVar, V>: not enought words in list";
+            qWarning() << "Reader<ContextVar, Act_1_0>: not enought words in list";
             c.name = "unknown";
             return;
         }

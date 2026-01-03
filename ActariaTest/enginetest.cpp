@@ -1,6 +1,8 @@
 #include "enginetest.h"
 #include "contextvarfabric.h"
 #include "characters"
+#include "serializecharacters"
+#include "dialognode.ser"
 #include <variant>
 
 
@@ -126,8 +128,29 @@ void EngineTest::context_variable_serializing()
 void EngineTest::player_serializing()
 {
     Player& player = Player::instance();
+
+    Context& exp = player.experience;
+    exp.clear();
+
+    for(int i = 0; i < 50; ++i){
+        QString name = QString("NameVar%1").arg(i);
+        exp.addVariable(ContextVariableFabric::make_namevar(name, randomString(10)));
+
+        name = QString("Counter%1").arg(i);
+        exp.addVariable(ContextVariableFabric::make_counter(name, i));
+
+        name = QString("Trigger%1").arg(i);
+        exp.addVariable(ContextVariableFabric::make_trigger(name, i % 2 == 0));
+    }
+
     player.setName("Danila");
     player.setMood(Mood::Excited);
+
+    for(int i = 0; i < 10; ++i){
+        QString charName = QString("Character%1").arg(i);
+        Character c(charName, static_cast<Mood>(i % 4));
+        player.experience.addCharacter(c);
+    }
 
     QByteArray data;
     QDataStream out(&data, QIODevice::WriteOnly);
@@ -140,6 +163,23 @@ void EngineTest::player_serializing()
     QCOMPARE(restored.getName(), player.getName());
     QCOMPARE(restored.getMood(), player.getMood());
 
+    const Context& restoredExp = restored.experience;
+    QCOMPARE(restoredExp.size(), exp.size());
+
+    for(int i = 0; i < 50; ++i){
+        auto nameVarOrig = exp.getValue(QString("NameVar%1").arg(i));
+        auto nameVarRest = restoredExp.getValue(QString("NameVar%1").arg(i));
+        QCOMPARE(std::get<QString>(nameVarRest), std::get<QString>(nameVarOrig));
+
+        auto counterOrig = exp.getValue(QString("Counter%1").arg(i));
+        auto counterRest = restoredExp.getValue(QString("Counter%1").arg(i));
+        QCOMPARE(std::get<int>(counterRest), std::get<int>(counterOrig));
+
+        auto triggerOrig = exp.getValue(QString("Trigger%1").arg(i));
+        auto triggerRest = restoredExp.getValue(QString("Trigger%1").arg(i));
+        QCOMPARE(std::get<bool>(triggerRest), std::get<bool>(triggerOrig));
+    }
+
     StringListCursor list;
     abi::write<Player, currentVersion>(list, player);
 
@@ -148,8 +188,8 @@ void EngineTest::player_serializing()
 
     QCOMPARE(restored2.getName(), player.getName());
     QCOMPARE(restored2.getMood(), player.getMood());
+    QCOMPARE(restored2.experience.size(), exp.size());
 }
-
 
 void EngineTest::character_serializing()
 {

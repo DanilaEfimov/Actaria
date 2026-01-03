@@ -31,6 +31,4 @@ public:
     operator int() const noexcept;
 };
 
-#include "counter.ser"
-
 #endif // COUNTER_H

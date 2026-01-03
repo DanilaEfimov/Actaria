@@ -41,6 +41,4 @@ public:
     virtual void setValue(ContextValue value) = 0;
 };
 
-#include "contextvar.ser"
-
 #endif // CONTEXTVAR_H

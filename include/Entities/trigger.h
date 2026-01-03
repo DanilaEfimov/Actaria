@@ -36,6 +36,4 @@ public:
     operator bool() const noexcept;
 };
 
-#include "trigger.ser"
-
 #endif // TRIGGER_H

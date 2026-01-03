@@ -27,6 +27,4 @@ public:
     void switchBranch(int variant);
 };
 
-#include "dialog.ser"
-
 #endif // DIALOG_H
