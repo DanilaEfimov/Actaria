@@ -3,7 +3,7 @@
 
 #include "Entities/entity.h"
 #include "Entities/Operators/operator.h"
-#include <QVector>
+#include <vector>
 #include <memory>
 
 class Context;
@@ -16,7 +16,7 @@ class Event : public Entity
 protected:
     using operator_p = std::unique_ptr<Operator>;
 
-    QVector<operator_p> operators;
+    std::vector<operator_p> operators;
 
 public:
     using base_t = Entity;
@@ -30,6 +30,9 @@ public:
     void clear() noexcept;
 
     qsizetype operatorCount() const;
+
+    void addOpertor(operator_p&& op);
+    void removeOperator(qsizetype idx);
 
     virtual bool exec(Context& context, Scene& scene) = 0;
 };

@@ -1,5 +1,8 @@
 /**
- *  Entity manager is same entity type container
+ * @file entitymanager.h
+ * This header defines id based container for game entities.
+ * EntityManager doesn't control storage duration of
+ * variables, only have straight access.
 */
 
 #ifndef ENTITYMANAGER_H
@@ -9,6 +12,7 @@
 #include "Entities/entity.h"
 #include <QHash>
 #include <QBuffer>
+
 
 template<utils::GameEntity T>
 class EntityManager
@@ -43,8 +47,8 @@ public:
      * @brief setObj
      * @param obj
      */
-    void addObj(const T& obj) {
-        this->objs[obj.getId()] = obj;
+    void addObj(T* obj) {
+        this->objs[obj->getId()] = obj;
     }
 
     /**
@@ -56,6 +60,7 @@ public:
         if(this->contains(id)){
             return this->objs.value(id);
         }
+
         throw std::invalid_argument("EntityManager<T>::getObj: no such id: " + std::to_string(id));
     }
 
