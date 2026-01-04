@@ -13,14 +13,18 @@ INCLUDEPATH += include \
             $$ALIASES
 
 SOURCES += $$files(src/Entities/*.cpp) \
+           $$files(include/Entities/Operators/*.cpp) \
            $$files(src/GUI/*.cpp) \
-           $$files(src/*.cpp)
+           $$files(src/*.cpp) \
+           src/Entities/Operators/operator.cpp
 
 HEADERS += $$files(include/Entities/*.h) \
+           $$files(include/Entities/Operators/*.h) \
            $$files(include/GUI/*.h) \
            $$files(include/Aliases/*.h) \
            $$files($$DEFAULT_ENGINE_VERSION_PATH/*.ser) \
-           $$files(include/*.h)
+           $$files(include/*.h) \
+           include/Entities/Operators/operator.h
 
 FORMS += \
     mainwindow.ui
@@ -35,4 +39,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 DISTFILES += \
     abi \
     api \
+    include/Entities/Versions/Act_1_0/operator.ser \
     target

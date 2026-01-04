@@ -1,0 +1,69 @@
+/**
+ *  @file operator.ser
+ *  @version Act_1_0
+ *
+ *  This header defines a pseudo-serialization interface
+ *  to simplify saving classes derived from Operator using the base_t style.
+ *
+ *  Usage:
+ *
+ *  class MyClass : public Operator {
+ *      ACT_SERIALIZABLE
+ *      ...
+ *      using base_t = Operator;
+ *      ...
+ *  }
+ *
+ *  This avoids having to manually track which base classes in the inheritance
+ *  chain are involved in the ABI serialization. In short, it preserves
+ *  a consistent interface for all derived classes.
+ */
+
+
+#ifndef OPERATOR_SER
+#define OPERATOR_SER
+
+#include "Entities/Operators/operator.h"
+
+namespace abi {
+
+/**
+ * @brief The entity_traits class
+ * byte and words measuring traits for Entity
+ */
+template<>
+struct entity_traits<Operator, abi::Version::Act_1_0> {
+    static constexpr bool is_fixed = true;
+    static constexpr int minimum_bytes = 0;
+    static constexpr int maximum_bytes = minimum_bytes;
+
+    static constexpr const char* name = "Operator";
+    static constexpr int minimum_words = 0;
+    static constexpr int maximum_words = minimum_words;
+};
+
+/**
+ * @brief The Writer class
+ * version generalized write interface
+ */
+template<>
+struct Writer<Operator, abi::Version::Act_1_0> {
+    static void write(QDataStream&, const Operator&) {}
+
+    static void write(StringListCursor&, const Operator&) {}
+};
+
+/**
+ * @brief The Reader class
+ * version generalized read interface
+ */
+template<>
+struct Reader<Operator, abi::Version::Act_1_0> {
+    static void read(QDataStream&, Operator&) {}
+
+    static void read(StringListCursor&, Operator&) {}
+};
+
+}   // namespace abi
+
+#endif  // OPERATOR_SER

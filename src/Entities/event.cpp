@@ -1,6 +1,26 @@
 #include "Entities/event.h"
 
-namespace {
-    constexpr const char* typeName = "Event";
-    constexpr int fieldCount = 1;
-};
+
+/**
+ * @brief Event::Event
+ */
+Event::Event()
+    : Entity(), operators()
+{}
+
+/**
+ * @brief Event::clear
+ */
+void Event::clear() noexcept
+{
+    this->operators.clear();
+}
+
+/**
+ * @brief Event::operatorCount
+ * @return actual count of operators
+ */
+qsizetype Event::operatorCount() const
+{
+    return this->operators.count();
+}

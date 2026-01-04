@@ -46,8 +46,8 @@ struct Writer<Entity, abi::Version::Act_1_0> {
  * @brief The Reader class
  * version generalized read interface
  */
-template<abi::Version V>
-struct Reader<Entity, V> {
+template<>
+struct Reader<Entity, abi::Version::Act_1_0> {
     static void read(QDataStream& in, Entity& e) {
         in >> e.id;
     }
@@ -55,7 +55,7 @@ struct Reader<Entity, V> {
     static void read(StringListCursor& in, Entity& e) {
         bool ok = true;
 
-        if(in.remaining() < entity_traits<Entity, V>::minimum_words){
+        if(in.remaining() < entity_traits<Entity, abi::Version::Act_1_0>::minimum_words){
             ok = false;
             e.id = UNDEFINED_ID;
         }
