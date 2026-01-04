@@ -24,6 +24,8 @@ public:
     NameVar(value_type value, const QString& name);
     virtual ~NameVar() = default;
 
+    virtual hash_type hash() const override;
+
     virtual VarType type() const override;
 
     virtual ContextValue getValue() const override;

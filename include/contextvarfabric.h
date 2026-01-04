@@ -21,7 +21,7 @@ struct ContextVariableFabric {
 
     using value_types = std::variant<int, bool, QString>;
 
-    static std::unique_ptr<ContextVar> make_default(VarType type, const QString& name = "");
+    static std::unique_ptr<ContextVar> make_default(VarType type);
 
     static std::unique_ptr<Counter> make_counter(const QString& name, const QString& value);
 

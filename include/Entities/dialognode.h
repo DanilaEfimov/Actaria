@@ -28,6 +28,8 @@ public:
                id_type fromCharacter= UNDEFINED_ID, QString message = "");
     virtual ~DialogNode() = default;
 
+    virtual hash_type hash() const override;
+
     QString getMessage() const noexcept;
     void setMessage(const QString& msg);
 

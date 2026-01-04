@@ -41,7 +41,7 @@ protected:
 public:
     virtual ~Entity() = default;
 
-    constexpr hash_type hash() const;
+    virtual hash_type hash() const = 0;
 
     id_type getId() const;
     bool operator==(const Entity& other) const;

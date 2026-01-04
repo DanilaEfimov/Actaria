@@ -32,6 +32,8 @@ public:
     QString getName() const noexcept;
     void setName(const QString& name);
 
+    virtual hash_type hash() const override;
+
     Mood getMood() const noexcept;
     void setMood(Mood mood);
 };

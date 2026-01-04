@@ -10,6 +10,7 @@
 #include "Entities/character.h"
 #include "contextvarfabric.h"
 #include "entity.ser"
+#include "character.ser"
 #include "counter.ser"
 #include "trigger.ser"
 #include "namevar.ser"

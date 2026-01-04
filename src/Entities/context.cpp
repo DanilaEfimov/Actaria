@@ -1,4 +1,4 @@
-#include "Entities/context.h"
+#include "context.ser"
 
 /**
  * @brief Context::Context
@@ -14,6 +14,19 @@ Context::Context()
 Context::Context(Context &&other)
 {
     this->merge(std::move(other));
+}
+
+/**
+ * @brief Context::hash
+ * @return fnv-1A 64 bits hash by class name
+ * Uses for identify object type by Actaria VM e.g.
+ */
+Context::hash_type Context::hash() const
+{
+    using entity_t = std::remove_cvref_t<decltype(*this)>;
+    constexpr auto version = EngineInfo::defaultVersion;
+
+    return utils::fnv1a_64(entity_traits<entity_t, version>::name);
 }
 
 /**

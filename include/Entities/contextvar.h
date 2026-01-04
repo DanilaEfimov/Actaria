@@ -32,6 +32,8 @@ public:
     ContextVar();
     virtual ~ContextVar() = default;
 
+    virtual hash_type hash() const override;
+
     virtual VarType type() const = 0;
 
     QString getName() const;

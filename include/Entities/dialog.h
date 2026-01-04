@@ -23,6 +23,8 @@ public:
     Dialog();
     virtual ~Dialog() = default;
 
+    virtual hash_type hash() const override;
+
     bool action(id_type eventId, Context* context);
     void switchBranch(int variant);
 };

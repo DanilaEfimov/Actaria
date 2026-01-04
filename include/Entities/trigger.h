@@ -28,6 +28,8 @@ public:
 
     virtual ~Trigger() = default;
 
+    virtual hash_type hash() const override;
+
     virtual VarType type() const override;
 
     virtual ContextValue getValue() const override;

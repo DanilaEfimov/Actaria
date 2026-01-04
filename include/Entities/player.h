@@ -8,6 +8,13 @@ class Player final : public Character
 {
     ACT_SERIALIZABLE
 
+private:
+    explicit Player(const QString& name = {},
+                    Mood mood = Mood::Normal);
+
+    Player(const Player&) = delete;
+    Player& operator=(const Player&) = delete;
+
 public:
     using base_t = Character;
 
@@ -15,12 +22,7 @@ public:
 
     static Context experience;
 
-private:
-    explicit Player(const QString& name = {},
-                    Mood mood = Mood::Normal);
-
-    Player(const Player&) = delete;
-    Player& operator=(const Player&) = delete;
+    virtual hash_type hash() const override;
 };
 
 #endif // PLAYER_H

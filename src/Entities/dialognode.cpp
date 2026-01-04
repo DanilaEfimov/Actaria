@@ -43,6 +43,19 @@ DialogNode::DialogNode(StringListCursor &data)
 }
 
 /**
+ * @brief DialogNode::hash
+ * @return fnv-1A 64 bits hash by class name
+ * Uses for identify object type by Actaria VM e.g.
+ */
+DialogNode::hash_type DialogNode::hash() const
+{
+    using entity_t = std::remove_cvref_t<decltype(*this)>;
+    constexpr auto version = EngineInfo::defaultVersion;
+
+    return utils::fnv1a_64(entity_traits<entity_t, version>::name);
+}
+
+/**
  * @brief DialogNode::getMessage
  * @return
  */

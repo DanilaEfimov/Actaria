@@ -42,10 +42,10 @@ std::unique_ptr<NameVar> ContextVariableFabric::make_namevar(const QString &name
 /**
  * @brief ContextVariableFabric::make_default
  * @param type
- * @param name
- * @return
+ * @return  a std unique pointer to default constructed
+ *          context variable of type 'type'
  */
-std::unique_ptr<ContextVar> ContextVariableFabric::make_default(VarType type, const QString &name)
+std::unique_ptr<ContextVar> ContextVariableFabric::make_default(VarType type)
 {
     switch(type){
     case VarType::Counter:  return std::make_unique<Counter>(Counter({},{}));

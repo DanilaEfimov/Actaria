@@ -27,6 +27,8 @@ public:
     Context(Context&& other);
     ~Context() = default;
 
+    virtual hash_type hash() const override;
+
     void merge(Context&& context);
 
     void addVariable(contextvar_p contextvar);

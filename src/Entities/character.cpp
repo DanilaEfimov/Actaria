@@ -1,4 +1,4 @@
-#include "Entities/character.h"
+#include "character.ser"
 #include <QBuffer>
 
 
@@ -34,6 +34,19 @@ QString Character::getName() const noexcept
 void Character::setName(const QString &name)
 {
     this->name = name;
+}
+
+/**
+ * @brief Character::hash
+ * @return fnv-1A 64 bits hash by class name
+ * Uses for identify object type by Actaria VM e.g.
+ */
+Character::hash_type Character::hash() const
+{
+    using entity_t = std::remove_cvref_t<decltype(*this)>;
+    constexpr auto version = EngineInfo::defaultVersion;
+
+    return utils::fnv1a_64(entity_traits<entity_t, version>::name);
 }
 
 /**

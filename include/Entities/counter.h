@@ -23,6 +23,8 @@ public:
 #endif
     Counter(value_type value, const QString& name);
 
+    virtual hash_type hash() const override;
+
     virtual VarType type() const override;
 
     virtual ContextValue getValue() const override;
