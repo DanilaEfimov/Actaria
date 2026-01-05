@@ -9,9 +9,9 @@
 
 enum class VarType {
     Unknown = -1,
-    Counter,
-    Trigger,
-    Name
+    Counter,        // int
+    Trigger,        // bool
+    Name            // QString
 };
 
 class ContextVar : public Entity

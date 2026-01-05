@@ -1,4 +1,7 @@
 #include "Entities/Operators/assignmentoperator.h"
+#include "utils.h"
+#include "Entities/context.h"
+#include "Errors/nosuchvariable.h"
 
 
 /**
@@ -6,6 +9,30 @@
  * @param lvalue
  * @param rvalue
  */
-AssignmentOperator::AssignmentOperator(ContextVar *lvalue, AlgebraExpression &&rvalue)
-    : Operator(), lvalue(lvalue), rvalue(std::move(rvalue))
+AssignmentOperator::AssignmentOperator(id_type lvalue, ContextValue rvalue)
+    : Operator(), lvalue(lvalue), rvalue(rvalue)
 {}
+
+/**
+ * @brief AssignmentOperator::hash
+ * @return
+ */
+hash_type AssignmentOperator::hash() const
+{
+    return 1;
+}
+
+/**
+ * @brief AssignmentOperator::apply
+ * @param context
+ * @param scene
+ * @return  True if context sucessfully updated
+ */
+bool AssignmentOperator::apply(Context &context, [[gnu::unused]] Scene &scene)
+{
+    if(!context.containsVariable(this->lvalue))
+        throw NoSuchVariable(this->lvalue);
+
+    context.set(this->lvalue, this->rvalue);
+    return true;
+}

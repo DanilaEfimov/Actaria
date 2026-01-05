@@ -45,7 +45,7 @@ void Context::merge(Context&& context)
  */
 void Context::addVariable(contextvar_p contextvar)
 {
-    this->variables.insert(std::make_pair(contextvar->getName(), std::move(contextvar)));
+    this->variables.insert(std::make_pair(contextvar->getId(), std::move(contextvar)));
 }
 
 /**
@@ -54,25 +54,25 @@ void Context::addVariable(contextvar_p contextvar)
  */
 void Context::addCharacter(const Character &character)
 {
-    this->characters.insert(std::make_pair(character.getName(), character));
+    this->characters.insert(std::make_pair(character.getId(), character));
 }
 
 /**
  * @brief Context::removeVariable
- * @param name
+ * @param key
  */
-void Context::removeVariable(const QString& name)
+void Context::removeVariable(const Entity::id_type& key)
 {
-    this->variables.erase(name);
+    this->variables.erase(key);
 }
 
 /**
  * @brief Context::removeCharacter
  * @param name
  */
-void Context::removeCharacter(const key_t& name)
+void Context::removeCharacter(const key_t& key)
 {
-    this->characters.erase(name);
+    this->characters.erase(key);
 }
 
 /**
@@ -80,9 +80,9 @@ void Context::removeCharacter(const key_t& name)
  * @param name
  * @return
  */
-bool Context::containsVariable(const key_t& name) const noexcept
+bool Context::containsVariable(const key_t& key) const noexcept
 {
-    return this->variables.contains(name);
+    return this->variables.contains(key);
 }
 
 /**
@@ -125,9 +125,9 @@ qsizetype Context::size() const noexcept
  * @param value
  * @return
  */
-bool Context::equals(const QString &name, value_types value) const
+bool Context::equals(const key_t& key, value_types value) const
 {
-    auto it = variables.find(name);
+    auto it = variables.find(key);
     if (it == variables.end())
         return false;
 
@@ -139,12 +139,12 @@ bool Context::equals(const QString &name, value_types value) const
  * @param name
  * @param value
  */
-void Context::set(const QString &name, value_types value)
+void Context::set(const key_t& key, value_types value)
 {
-    if(!this->containsVariable(name))
+    if(!this->containsVariable(key))
         return;
 
-    this->variables[name]->setValue(value);
+    this->variables[key]->setValue(value);
 }
 
 /**
@@ -152,9 +152,9 @@ void Context::set(const QString &name, value_types value)
  * @param name
  * @return
  */
-const Context::value_types Context::getValue(const QString &name) const noexcept
+const Context::value_types Context::getValue(const key_t& key) const noexcept
 {
-    auto it = variables.find(name);
+    auto it = variables.find(key);
     if (it == variables.end())
         return false;
 

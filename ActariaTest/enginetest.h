@@ -3,12 +3,7 @@
 
 #include <QObject>
 #include <QtTest/QtTest>
-#include "dialognode.h"
-#include "namevar.h"
-#include "counter.h"
-#include "trigger.h"
-#include "player.h"
-#include "testutils.h"
+#include "engineinfo.h"
 
 class EngineTest : public QObject
 {
@@ -20,10 +15,11 @@ public:
 private slots:
     void test_serializing();
     void test_id_counting();
+    void test_context_algebra();
     void test_OSG();
 
 private:
-    static constexpr abi::Version currentVersion = EngineInfo::defaultVersion;
+    static constexpr abi::Version currentVersion = abi::EngineInfo::defaultVersion;
 
     // Context Variables
     void namedvar_serializing();

@@ -20,7 +20,10 @@ INCLUDEPATH += $$DEFAULT_ENGINE_VERSION_PATH
 SOURCES += $$files($$ACTARIA_PATH/src/Entities/*.cpp)
 SOURCES += $$files($$ACTARIA_PATH/src/Compiler/*.cpp)
 SOURCES += $$files($$ACTARIA_PATH/src/VM/*.cpp)
+SOURCES += $$files($$ACTARIA_PATH/src/Entities/Operators/*.cpp)
+SOURCES += $$files($$ACTARIA_PATH/src/Errors/*.cpp)
 SOURCES += $$files($$PWD/*.cpp)
+
 SOURCES += $$files($$ACTARIA_PATH/src/*.cpp)
 
 SOURCES -= $$ACTARIA_PATH/src/main.cpp

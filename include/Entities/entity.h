@@ -8,7 +8,6 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include "utils.h"
 #include "readwrite.h"
 #include <QString>
 #include <QByteArray>
@@ -25,8 +24,8 @@ class Entity
 
 public:
     using base_t = void;  // absolute base type pattern
-    using hash_type = utils::hash_type;
-    using id_type = utils::id_type;
+    using id_type = quint32;
+    using hash_type = uint64_t;
 
 protected:
     id_type id;

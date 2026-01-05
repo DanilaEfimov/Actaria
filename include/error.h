@@ -8,6 +8,7 @@ class Error : public std::exception
 {
 protected:
     QString message;
+    mutable std::string cachedWhat;
 
 public:
     Error(const char* msg);

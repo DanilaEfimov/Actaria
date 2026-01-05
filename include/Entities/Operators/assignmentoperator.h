@@ -2,20 +2,27 @@
 #define ASSIGNMENTOPERATOR_H
 
 #include "operator.h"
-#include "contextalgebra.h"
+#include "Entities/contextvar.h"
 
 
 class AssignmentOperator : public Operator
 {
     ACT_SERIALIZABLE
 
-    ContextVar* lvalue;
-    AlgebraExpression rvalue;
+public:
+    using ContextValue = ContextVar::ContextValue;
+
+    id_type lvalue;
+    ContextValue rvalue;
 
 public:
     using base_t = Operator;
 
-    AssignmentOperator(ContextVar* lvalue, AlgebraExpression&& rvalue);;
+    AssignmentOperator(id_type lvalue, ContextValue rvalue);
+
+    hash_type hash() const override;
+
+    bool apply(Context &context, Scene &scene) override;
 };
 
 #endif // ASSIGNMENTOPERATOR_H

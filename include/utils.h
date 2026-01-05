@@ -18,6 +18,8 @@
 class Entity;
 class ContextVar;
 
+enum class VarType;
+
 namespace {
     using hash_type = uint64_t;
 

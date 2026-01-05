@@ -2,7 +2,6 @@
 #define CONTEXTALGEBRA_H
 
 #include "Entities/contextvar.h"
-#include <variant>
 #include <memory>
 
 enum class ContextAlgebra {
@@ -16,40 +15,42 @@ enum class ContextAlgebra {
     Not,        // x: bool                          -> !x
 };
 
+static constexpr size_t argRequired(ContextAlgebra);
+static constexpr bool isValidSignature(ContextAlgebra, std::initializer_list<VarType>);
+
 using Constant = ContextVar::ContextValue;
 
-struct BinaryOp;
-struct UnaryOp;
+struct AlgebraExpression {
+    using Evaluable = std::unique_ptr<AlgebraExpression>;
 
-class AlgebraExpression {
-    using Evaluable = std::variant<
-        std::unique_ptr<UnaryOp>, std::unique_ptr<BinaryOp>>;
-
-    Evaluable value;
-
-public:
-    AlgebraExpression(const AlgebraExpression&) = delete;
-    AlgebraExpression& operator=(const AlgebraExpression&) = delete;
-
-    AlgebraExpression(AlgebraExpression&&) noexcept = default;
-    AlgebraExpression& operator=(AlgebraExpression&&) noexcept = default;
-
-    Constant evaluate() const;
+    virtual ~AlgebraExpression() = default;
+    virtual Constant evaluate() const = 0;
 };
 
-struct UnaryOp {
+struct UnaryOp final : AlgebraExpression {
     ContextAlgebra op;
-    AlgebraExpression operand;
+    Evaluable operand;
 
-    Constant evaluate() const;
+    Constant evaluate() const override;
 };
 
-struct BinaryOp {
+struct BinaryOp final : AlgebraExpression {
     ContextAlgebra op;
-    AlgebraExpression left;
-    AlgebraExpression right;
+    Evaluable left;
+    Evaluable right;
 
-    Constant evaluate() const;
+    Constant evaluate() const override;
+};
+
+struct Literal final : AlgebraExpression {
+    Literal(Constant val)
+        : AlgebraExpression(), value(val)
+    {};
+
+    Constant value;
+    Constant evaluate() const override {
+        return value;
+    }
 };
 
 #endif // CONTEXTALGEBRA_H

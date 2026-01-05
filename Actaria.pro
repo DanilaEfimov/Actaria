@@ -13,9 +13,9 @@ INCLUDEPATH += include \
             $$ALIASES
 
 SOURCES += $$files(src/Entities/*.cpp) \
-           $$files(include/Entities/Operators/*.cpp) \
+           $$files(src/Entities/Operators/*.cpp) \
            $$files(src/GUI/*.cpp) \
-           $$files(include/Errors/*.cpp) \
+           $$files(src/Errors/*.cpp) \
            $$files(src/*.cpp)
 
 HEADERS += $$files(include/Entities/*.h) \

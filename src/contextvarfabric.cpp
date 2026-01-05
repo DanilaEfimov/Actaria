@@ -1,4 +1,6 @@
-#include "variables"
+#include "counter.ser"
+#include "trigger.ser"
+#include "namevar.ser"
 #include "contextvarfabric.h"
 
 
@@ -135,7 +137,7 @@ std::unique_ptr<Counter> ContextVariableFabric::make_counter(const QString& name
  * @brief ContextVariableFabric::make_namevar
  * @param name
  * @param value
- * @return
+ * @return std unique pointer to NameVar variable
  */
 std::unique_ptr<NameVar> ContextVariableFabric::make_namevar(const QString& name, const QString& value)
 {
@@ -154,10 +156,10 @@ std::unique_ptr<Trigger> ContextVariableFabric::make_trigger(const QString& name
 }
 
 /**
- * @brief ContextVariableFabric::make_namevar
- * @param name
+ * @brief ContextVariableFabric::getValue
+ * @param type
  * @param value
- * @return std unique pointer to NameVar variable
+ * @return  Constant context value parsed from string.
  */
 ContextVariableFabric::value_types ContextVariableFabric::getValue(VarType type, const QString &value)
 {
@@ -176,8 +178,37 @@ ContextVariableFabric::value_types ContextVariableFabric::getValue(VarType type,
     case VarType::Name:
         return value;
     default:
+        qWarning() << "ContextVariableFabric::getValue: unknown context variable type: " << static_cast<int>(type);
         return false;
     }
 
     return false;
+}
+
+QString ContextValueTypeString(VarType type) {
+    switch(type){
+    case VarType::Counter:  return abi::entity_traits<Counter, EngineInfo::defaultVersion>::name;
+    case VarType::Trigger:  return abi::entity_traits<Trigger, EngineInfo::defaultVersion>::name;
+    case VarType::Name:     return abi::entity_traits<NameVar, EngineInfo::defaultVersion>::name;
+    default:
+        return "Unknown";
+    }
+}
+
+VarType typeOf(ContextVar::ContextValue value) {
+    return static_cast<VarType>(value.index());
+}
+
+void print(ContextValue&& val, QString message)
+{
+    std::visit([&](auto&& arg){
+        qDebug() << message << arg;
+    }, val);
+}
+
+void print(const ContextValue &val, QString message)
+{
+    std::visit([&](auto&& arg){
+        qDebug() << message << arg;
+    }, val);
 }

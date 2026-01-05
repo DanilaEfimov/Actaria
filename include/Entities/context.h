@@ -14,7 +14,7 @@ class Context : public Entity
 public:
     using base_t = Entity;
     using contextvar_p = std::unique_ptr<ContextVar>;
-    using key_t = QString;
+    using key_t = Entity::id_type;
     using value_t = contextvar_p;
     using value_types = ContextVar::ContextValue;
 
@@ -44,9 +44,9 @@ public:
     void clear() noexcept;
     qsizetype size() const noexcept;
 
-    bool equals(const QString& name, value_types value) const;
-    void set(const QString& name, value_types value);
-    const value_types getValue(const QString& name) const noexcept;
+    bool equals(const key_t& name, value_types value) const;
+    void set(const key_t& name, value_types value);
+    const value_types getValue(const key_t& name) const noexcept;
 };
 
 #endif // CONTEXT_H
