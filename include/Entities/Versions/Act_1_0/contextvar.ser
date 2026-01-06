@@ -1,0 +1,68 @@
+/**
+ * @file contextvar.ser
+ * @version Act_1_0
+*/
+
+#ifndef CONTEXTVAR_SER
+#define CONTEXTVAR_SER
+
+#include "Entities/contextvar.h"
+
+namespace abi {
+
+/**
+ * @brief The entity_traits class
+ * byte and words measuring traits for Entity
+ */
+template<>
+struct entity_traits<ContextVar, abi::Version::Act_1_0>  {
+    static constexpr bool is_fixed = false;
+    static constexpr int minimum_bytes = minimumQStringSize;
+    static constexpr int maximum_bytes = unlimited;
+
+    static constexpr const char* name = "ContextVar";
+    static constexpr int minimum_words = 2;
+    static constexpr int maximum_words = minimum_words;
+};
+
+/**
+ * @brief The Writer class
+ * version generalized conetext var write interface
+ */
+template<>
+struct Writer<ContextVar, abi::Version::Act_1_0> {
+    static void write(QDataStream& out, const ContextVar& c) {
+        out << c.name;
+    }
+
+    static void write(StringListCursor& out, const ContextVar& c) {
+        out.append(entity_traits<ContextVar, abi::Version::Act_1_0>::name);
+        out.append(c.name);
+    }
+};
+
+/**
+ * @brief The Reader class
+ * version generalized read interface
+ */
+template<>
+struct Reader<ContextVar, abi::Version::Act_1_0> {
+    static void read(QDataStream& in, ContextVar& c) {
+        in >> c.name;
+    }
+
+    static void read(StringListCursor& in, ContextVar& c) {
+        if(in.remaining() < entity_traits<ContextVar, abi::Version::Act_1_0>::minimum_words){
+            qWarning() << "Reader<ContextVar, Act_1_0>: not enought words in list";
+            c.name = "unknown";
+            return;
+        }
+
+        c.name = in.next();
+        in.skip();    // skipping this->name field
+    }
+};
+
+}   // namespace abi
+
+#endif // CONTEXTVAR_SER

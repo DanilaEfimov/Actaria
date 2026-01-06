@@ -1,0 +1,72 @@
+/**
+ * @file namevar.ser
+ * @version Act_1_0
+ */
+
+#ifndef NAMEVAR_SER
+#define NAMEVAR_SER
+
+#include "contextvar.ser"
+#include "Entities/namevar.h"
+
+namespace abi {
+
+/**
+ * @brief The entity_traits class
+ * byte and words measuring traits for Entity
+ */
+template<>
+struct entity_traits<NameVar, abi::Version::Act_1_0> {
+    static constexpr bool is_fixed = entity_traits<ContextVar, abi::Version::Act_1_0>::is_fixed;
+    static constexpr int minimum_bytes = minimumQStringSize;
+    static constexpr int maximum_bytes = unlimited;
+
+    static constexpr const char* name = "NameVar";
+    static constexpr int minimum_words = 3;
+    static constexpr int maximum_words = minimum_words;
+};
+
+/**
+ * @brief The Writer class
+ * version generalized conetext var write interface
+ */
+template<>
+struct Writer<NameVar, abi::Version::Act_1_0> {
+    static void write(QDataStream& out, const NameVar& n) {
+        out << static_cast<int>(NameVar::contains) << n.value;
+    }
+
+    static void write(StringListCursor& out, const NameVar& n) {
+        out.append(entity_traits<NameVar, abi::Version::Act_1_0>::name);
+        out.append(QString::number(static_cast<int>(NameVar::contains)));
+        out.append(n.value);
+    }
+};
+
+/**
+ * @brief The Reader class
+ * version generalized read interface
+ */
+template<>
+struct Reader<NameVar, abi::Version::Act_1_0> {
+    static void read(QDataStream& in, NameVar& n) {
+        in.skipRawData(sizeof(int));    // enum value-type hint
+        in >> n.value;
+    }
+
+    static void read(StringListCursor& in, NameVar& n) {
+        if(in.remaining() < entity_traits<NameVar, abi::Version::Act_1_0>::minimum_words){
+            qWarning() << "Reader<NameVar, Act_1_0>: not enought words in list";
+            n.value = "unknown";
+            return;
+        }
+
+        in.skip(2);     // skip typename + int casted mood
+        n.value = in.peek();
+        in.skip();      // skipping this->value field
+    }
+};
+
+}   // namespace abi
+
+#endif // NAMEVAR_SER

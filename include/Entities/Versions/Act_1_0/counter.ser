@@ -1,0 +1,79 @@
+/**
+ * @file counter.ser
+ * @version Act_1_0
+ */
+
+#ifndef COUNTER_SER
+#define COUNTER_SER
+
+#include "contextvar.ser"
+#include "Entities/counter.h"
+
+namespace abi {
+
+/**
+ * @brief The entity_traits class
+ * byte and words measuring traits for Entity
+ */
+template<>
+struct entity_traits<Counter, abi::Version::Act_1_0> {
+    static constexpr bool is_fixed = entity_traits<ContextVar, abi::Version::Act_1_0>::is_fixed;
+    static constexpr int minimum_bytes = minimumQStringSize;
+    static constexpr int maximum_bytes = unlimited;
+
+    static constexpr const char* name = "Counter";
+    static constexpr int minimum_words = 3;
+    static constexpr int maximum_words = minimum_words;
+};
+
+/**
+ * @brief The Writer class
+ * version generalized conetext var write interface
+ */
+template<>
+struct Writer<Counter, abi::Version::Act_1_0> {
+    static void write(QDataStream& out, const Counter& c) {
+        out << static_cast<int>(Counter::contains) << c.value;
+    }
+
+    static void write(StringListCursor& out, const Counter& c) {
+        out.append(entity_traits<Counter, abi::Version::Act_1_0>::name);
+        out.append(QString::number(static_cast<int>(Counter::contains)));
+        out.append(QString::number(c.value));
+    }
+};
+
+/**
+ * @brief The Reader class
+ * version generalized read interface
+ */
+template<>
+struct Reader<Counter, abi::Version::Act_1_0> {
+    static void read(QDataStream& in, Counter& c) {
+        in.skipRawData(sizeof(int));    // Counter::contains
+        in >> c.value;
+    }
+
+    static void read(StringListCursor& in, Counter& c) {
+        if(in.remaining() < entity_traits<Counter, abi::Version::Act_1_0>::minimum_words){
+            qWarning() << "Reader<Counter, Act_1_0>: not enought words in list";
+            c.value = 0;
+            return;
+        }
+
+        in.skip(2);     // skip typename + int casted mood
+
+        bool ok = true;
+        c.value = static_cast<Counter::value_type>(in.peek().toLongLong(&ok));
+
+        if(!ok){
+            qWarning() << "Reader<Counter, Act_1_0>: failed to parse value from: " << in.peek();
+        }
+
+        in.skip();    // skipping this->value field
+    }
+};
+
+}   // namespace abi
+
+#endif // COUNTER_SER

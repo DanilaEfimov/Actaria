@@ -1,0 +1,56 @@
+#ifndef DIALOG_SER
+#define DIALOG_SER
+
+#include "Entities/dialog.h"
+
+namespace abi {
+
+/**
+ * @brief The entity_traits class
+ * byte and words measuring traits for Entity
+ */
+template<>
+struct entity_traits<Dialog, abi::Version::Act_1_0> {
+    static constexpr bool is_fixed = false;
+    static constexpr int minimum_bytes = minimumQStringSize;
+    static constexpr int maximum_bytes = unlimited;
+
+    static constexpr const char* name = "Dialog";
+    static constexpr int minimum_words = 3;
+    static constexpr int maximum_words = minimum_words;
+};
+
+/**
+ * @brief The Writer class
+ * version generalized conetext var write interface
+ */
+template<>
+struct Writer<Dialog, abi::Version::Act_1_0> {
+    static void write(QDataStream& out, const Dialog& c) {
+    }
+
+    static void write(StringListCursor& out, const Dialog& c) {
+        out.append(entity_traits<Dialog, abi::Version::Act_1_0>::name);
+    }
+};
+
+/**
+ * @brief The Reader class
+ * version generalized read interface
+ */
+template<>
+struct Reader<Dialog, abi::Version::Act_1_0> {
+    static void read(QDataStream& in, Dialog& c) {
+    }
+
+    static void read(StringListCursor& in, Dialog& c) {
+        if(in.remaining() < entity_traits<Dialog, abi::Version::Act_1_0>::minimum_words){
+            qWarning() << "Reader<Counter, Act_1_0>: not enought words in list";
+            return;
+        }
+    }
+};
+
+}   // namespace abi
+
+#endif // DIALOG_SER

@@ -1,0 +1,72 @@
+/**
+ * @file triggerser
+ * @version Act_1_0
+ */
+
+#ifndef TRIGGER_SER
+#define TRIGGER_SER
+
+#include "contextvar.ser"
+#include "Entities/trigger.h"
+
+namespace abi {
+
+/**
+ * @brief The entity_traits class
+ * byte and words measuring traits for Entity
+ */
+template<>
+struct entity_traits<Trigger, abi::Version::Act_1_0> {
+    static constexpr bool is_fixed = entity_traits<ContextVar, abi::Version::Act_1_0>::is_fixed;
+    static constexpr int minimum_bytes = minimumQStringSize;
+    static constexpr int maximum_bytes = unlimited;
+
+    static constexpr const char* name = "Trigger";
+    static constexpr int minimum_words = 3;
+    static constexpr int maximum_words = minimum_words;
+};
+
+/**
+ * @brief The Writer class
+ * version generalized conetext var write interface
+ */
+template<>
+struct Writer<Trigger, abi::Version::Act_1_0> {
+    static void write(QDataStream& out, const Trigger& t) {
+        out << static_cast<int>(Trigger::contains) << (t.value ? true : false);
+    }
+
+    static void write(StringListCursor& out, const Trigger& t) {
+        out.append(entity_traits<Trigger>::name);
+        out.append(QString::number(static_cast<int>(Trigger::contains)));
+        out.append(t.value ? TRUE_S : FALSE_S);
+    }
+};
+
+/**
+ * @brief The Reader class
+ * version generalized read interface
+ */
+template<>
+struct Reader<Trigger, abi::Version::Act_1_0> {
+    static void read(QDataStream& in, Trigger& t) {
+        in.skipRawData(sizeof(int));
+        in >> t.value;
+    }
+
+    static void read(StringListCursor& in, Trigger& t) {
+        if(in.remaining() < entity_traits<Trigger, abi::Version::Act_1_0>::minimum_words){
+            qWarning() << "Reader<Trigger, Act_1_0>: not enought words in list";
+            t.value = false;
+            return;
+        }
+
+        in.skip(2);     // skip typename + int casted mood
+        t.value = in.peek() == TRUE_S;
+        in.skip();      // skipping this->value field
+    }
+};
+
+}   // namespace abi
+
+#endif // TRIGGER_SER

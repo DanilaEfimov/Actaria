@@ -1,37 +1,46 @@
-QT       += core gui
+QT += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++17
+CONFIG += c++20
 
-# You can make your code fail to compile if it uses deprecated APIs.
-# In order to do so, uncomment the following line.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+DEFAULT_ENGINE_VERSION_PATH = include/Entities/Versions/Act_1_0
+ALIASES = include/Aliases
 
-INCLUDEPATH += include/GUI
-SOURCES += \
-    src/GUI/entity.cpp \
-    src/GUI/gamecontext.cpp \
-    src/GUI/main.cpp \
-    src/GUI/mainwindow.cpp \
-    src/GUI/playerinfo.cpp \
-    src/GUI/scene.cpp \
-    src/GUI/scenecontext.cpp \
-    src/GUI/trigger.cpp
+INCLUDEPATH += include \
+            include/Aliases \
+            $$DEFAULT_ENGINE_VERSION_PATH \
+            $$ALIASES
 
-HEADERS += \
-    include/GUI/entity.h \
-    include/GUI/gamecontext.h \
-    include/GUI/mainwindow.h \
-    include/GUI/playerinfo.h \
-    include/GUI/scene.h \
-    include/GUI/scenecontext.h \
-    include/GUI/trigger.h
+SOURCES += $$files(src/Entities/*.cpp) \
+           $$files(src/Entities/Operators/*.cpp) \
+           $$files(src/Compiler/*.cpp) \
+           $$files(src/GUI/*.cpp) \
+           $$files(src/Errors/*.cpp) \
+           $$files(src/*.cpp) \
+           src/Entities/Operators/nextoperator.cpp
+
+HEADERS += $$files(include/Entities/*.h) \
+           $$files(include/Entities/Operators/*.h) \
+           $$files(include/Compiler/*.h) \
+           $$files(include/GUI/*.h) \
+           $$files(include/Aliases/*.h) \
+           $$files(include/Errors/*.h) \
+           $$files($$DEFAULT_ENGINE_VERSION_PATH/*.ser) \
+           $$files(include/*.h) \
+           include/Entities/Operators/nextoperator.h
 
 FORMS += \
     mainwindow.ui
+
+DEFINES += PRE_ORDER
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+DISTFILES += \
+    abi \
+    api \
+    target

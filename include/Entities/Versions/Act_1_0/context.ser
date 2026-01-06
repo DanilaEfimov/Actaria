@@ -1,0 +1,222 @@
+/**
+ * @file context.ser
+ * @version Act_1_0
+ */
+
+#ifndef CONTEXT_SER
+#define CONTEXT_SER
+
+#include "Entities/context.h"
+#include "Entities/character.h"
+#include "contextvarfabric.h"
+#include "entity.ser"
+#include "character.ser"
+#include "counter.ser"
+#include "trigger.ser"
+#include "namevar.ser"
+
+
+inline void writeContextVariable(QDataStream& out, const ContextVar* var) {
+    if(!var) return;
+    VarType type = var->type();
+    switch(type) {
+    case VarType::Counter:
+        abi::write<Counter, abi::Version::Act_1_0>(out, *reinterpret_cast<const Counter*>(var));
+        break;
+    case VarType::Name:
+        abi::write<NameVar, abi::Version::Act_1_0>(out, *reinterpret_cast<const NameVar*>(var));
+        break;
+    case VarType::Trigger:
+        abi::write<Trigger, abi::Version::Act_1_0>(out, *reinterpret_cast<const Trigger*>(var));
+        break;
+    default:
+        qWarning() << "Act_1_0::context.ser::writeContextVariable: undefined variable type:" << static_cast<int>(type);
+        return;
+    }
+}
+
+inline void writeContextVariable(StringListCursor& out, const ContextVar* var) {
+    if(!var) return;
+    VarType type = var->type();
+    switch(type) {
+    case VarType::Counter:
+        abi::write<Counter, abi::Version::Act_1_0>(out, *reinterpret_cast<const Counter*>(var));
+        break;
+    case VarType::Name:
+        abi::write<NameVar, abi::Version::Act_1_0>(out, *reinterpret_cast<const NameVar*>(var));
+        break;
+    case VarType::Trigger:
+        abi::write<Trigger, abi::Version::Act_1_0>(out, *reinterpret_cast<const Trigger*>(var));
+        break;
+    default:
+        qWarning() << "Act_1_0::context.ser::writeContextVariable: undefined variable type:" << static_cast<int>(type);
+        return;
+    }
+}
+
+inline void readContextVariable(QDataStream& in, ContextVar* var) {
+    if(!var) return;
+    VarType type = var->type();
+    switch(type) {
+    case VarType::Counter:
+        abi::read<Counter, abi::Version::Act_1_0>(in, *reinterpret_cast<Counter*>(var));
+        break;
+    case VarType::Name:
+        abi::read<NameVar, abi::Version::Act_1_0>(in, *reinterpret_cast<NameVar*>(var));
+        break;
+    case VarType::Trigger:
+        abi::read<Trigger, abi::Version::Act_1_0>(in, *reinterpret_cast<Trigger*>(var));
+        break;
+    default:
+        qWarning() << "Act_1_0::context.ser::readContextVariable: undefined variable type:" << static_cast<int>(type);
+        return;
+    }
+}
+
+inline void readContextVariable(StringListCursor& in, ContextVar* var) {
+    if(!var) return;
+    VarType type = var->type();
+    switch(type) {
+    case VarType::Counter:
+        abi::read<Counter, abi::Version::Act_1_0>(in, *reinterpret_cast<Counter*>(var));
+        break;
+    case VarType::Name:
+        abi::read<NameVar, abi::Version::Act_1_0>(in, *reinterpret_cast<NameVar*>(var));
+        break;
+    case VarType::Trigger:
+        abi::read<Trigger, abi::Version::Act_1_0>(in, *reinterpret_cast<Trigger*>(var));
+        break;
+    default:
+        qWarning() << "Act_1_0::context.ser::readContextVariable: undefined variable type:" << static_cast<int>(type);
+        return;
+    }
+}
+
+
+namespace abi {
+
+/**
+ * @brief The entity_traits class
+ * byte and words measuring traits for Entity
+ */
+template<>
+struct entity_traits<Context, abi::Version::Act_1_0> {
+    static constexpr bool is_fixed = false;
+    static constexpr int minimum_bytes = minimumQStringSize;
+    static constexpr int maximum_bytes = unlimited;
+
+    static constexpr const char* name = "Context";
+    static constexpr int minimum_words = 2;
+    static constexpr int maximum_words = minimum_words;
+};
+
+/**
+ * @brief The Writer class
+ * version generalized conetext var write interface
+ */
+template<>
+struct Writer<Context, abi::Version::Act_1_0> {
+    static void write(QDataStream& out, const Context& c) {
+        out << static_cast<qsizetype>(c.variables.size());
+        for(auto& var : c.variables){
+            writeContextVariable(out, var.second.get());
+        }
+        out << static_cast<qsizetype>(c.characters.size());
+        for(auto& character : c.characters){
+            abi::write<Character, abi::Version::Act_1_0>(
+                out, *reinterpret_cast<const Character*>(&character.second)
+            );
+        }
+    }
+
+    static void write(StringListCursor& out, const Context& c) {
+        out.append(entity_traits<Context, abi::Version::Act_1_0>::name);
+        out.append(QString::number(c.variables.size()));
+        for(auto& var : c.variables){
+            writeContextVariable(out, var.second.get());
+        }
+        out.append(QString::number(c.characters.size()));
+        for(auto& character : c.characters){
+            abi::write<Character, abi::Version::Act_1_0>(
+                out, *reinterpret_cast<const Character*>(&character.second)
+            );
+        }
+    }
+};
+
+/**
+ * @brief The Reader class
+ * version generalized read interface
+ */
+template<>
+struct Reader<Context, abi::Version::Act_1_0> {
+    static void read(QDataStream& in, Context& c) {
+        auto getType = [&in]() -> VarType {
+            int type = -1;
+            in.startTransaction();
+            in >> type;
+            in.rollbackTransaction();
+            return static_cast<VarType>(type);
+        };
+
+        qsizetype size = 0;
+        in >> size;
+        for(int i = 0; i < size; i++){
+            auto type = getType();
+            std::unique_ptr<ContextVar> var = ContextVariableFabric::make_default(type);
+            readContextVariable(in, var.get());
+            c.addVariable(std::move(var));
+        }
+        in >> size;
+        for(int i = 0; i < size; i++){
+            std::unique_ptr<Character> character(new Character());
+            abi::read<Character, abi::Version::Act_1_0>(in, *character.get());
+            c.addCharacter(*character.release());
+        }
+    }
+
+    static void read(StringListCursor& in, Context& c) {
+        if(in.remaining() < entity_traits<Context>::minimum_words){
+            qWarning() << "Reader<Context, Act_1_0>::read: not enought words to parse context";
+            return;
+        }
+        c.clear();
+
+        bool ok = true;
+        auto getType = [&in, &ok]() -> VarType {
+            int type = in.next().toInt(&ok);
+            in.skip(-1);    // rollback
+            if(!ok) return VarType::Unknown;
+            return static_cast<VarType>(type);
+        };
+
+        qsizetype size = in.next().toInt(&ok);
+        in.skip();     // skip count of variables
+        if(!ok){
+            qWarning() << "Reader<Context, Act_1_0>::read: not enought words to parse context";
+            return;
+        }
+        for(int i = 0; i < size; i++){
+            auto type = getType();
+            std::unique_ptr<ContextVar> var = ContextVariableFabric::make_default(type);
+            readContextVariable(in, var.get());
+            c.addVariable(std::move(var));
+        }
+
+        size = in.peek().toInt(&ok);
+        in.skip();  // skip count of characters
+        if(!ok){
+            qWarning() << "Reader<Context, Act_1_0>::read: not enought words to parse context";
+            return;
+        }
+        for(int i = 0; i < size; i++){
+            std::unique_ptr<Character> character(new Character());
+            abi::read<Character, abi::Version::Act_1_0>(in, *character.get());
+            c.addCharacter(*character.release());
+        }
+    }
+};
+
+}   // namespace abi
+
+#endif // CONTEXT_SER
