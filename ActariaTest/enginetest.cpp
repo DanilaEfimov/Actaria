@@ -6,6 +6,9 @@
 #include "Operators/assignmentoperator.h"
 #include "Operators/jumpoperator.h"
 #include "Operators/nextoperator.h"
+#include "Operators/conditionoperator.h"
+#include "Operators/whileoperator.h"
+#include "Operators/returnoperator.h"
 #include "Entities/scene.h"
 #include <variant>
 
@@ -146,6 +149,7 @@ void EngineTest::player_serializing() {
         case 2: var = ContextVariableFabric::make_trigger(name, i % 2 == 0); break;
         }
 
+        var->id = id;
         exp.set(id, var->getValue());
         exp.addVariable(std::move(var));
     }
@@ -175,7 +179,7 @@ void EngineTest::player_serializing() {
 
     for(int i = 0; i < varCount; ++i) {
         auto id = static_cast<Context::key_t>(i);
-        auto valOrig = exp.getValue(id);
+        auto valOrig = exp.getValue(utils::id_type(id));
         auto valRest = restoredExp.getValue(id);
         QCOMPARE(valRest, valOrig);
     }
@@ -416,12 +420,16 @@ void EngineTest::test_context_algebra()
     JumpOperator jmp(UNDEFINED_ID);
     jmp.apply(context, dummyScene);
 
-    try{
-        NextOperator next(nullptr);
-        qDebug() << next.apply(context, dummyScene);
-    } catch(std::invalid_argument& e){
-        qDebug() << e.what();
-    }
+    Event event;
+    ReturnOperator returnOp(&event);
+    returnOp.apply(context, dummyScene);
+
+    ConditionOperator condition(true, std::make_unique<Event>(), nullptr);
+    condition.apply(context, dummyScene);
+
+    context.variables.find(2)->second->setValue(false);
+    WhileOperator whileOp(2, &event);
+    whileOp.apply(context, dummyScene);
 }
 
 void EngineTest::test_OSG()

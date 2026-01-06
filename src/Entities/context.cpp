@@ -1,4 +1,7 @@
 #include "context.ser"
+#include "trigger.ser"
+#include "Errors/nosuchid.h"
+
 
 /**
  * @brief Context::Context
@@ -150,13 +153,13 @@ void Context::set(const key_t& key, value_types value)
 /**
  * @brief Context::getValue
  * @param name
- * @return
+ * @return  Value of context variable with such id
  */
-const Context::value_types Context::getValue(const key_t& key) const noexcept
+const Context::value_types Context::getValue(const key_t& key) const
 {
     auto it = variables.find(key);
     if (it == variables.end())
-        return false;
+        throw NoSuchId(key, abi::entity_traits<Trigger, EngineInfo::defaultVersion>::name);
 
     return it->second->getValue();
 }

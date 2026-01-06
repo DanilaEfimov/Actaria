@@ -6,6 +6,10 @@
 
 class NextOperator : public Operator
 {
+    ACT_SERIALIZABLE
+
+    using base_t = Operator;
+
 protected:
     Scene* next;
 

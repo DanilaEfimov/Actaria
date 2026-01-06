@@ -6,7 +6,7 @@
  * @brief Event::Event
  */
 Event::Event()
-    : Entity(), operators()
+    : Entity(), operators(), returned(false)
 {}
 
 /**
@@ -43,4 +43,33 @@ void Event::removeOperator(qsizetype idx)
 {
     auto it = this->operators.cbegin();
     this->operators.erase(it + idx);
+}
+
+/**
+ * @brief Event::exec
+ * @param context
+ * @param scene
+ */
+bool Event::exec(Context &context, Scene &scene)
+{
+    if(this->operators.empty())
+        return true;
+
+    while(!this->returned) {
+        auto it = this->operators.begin();
+        it->get()->apply(context, scene);
+        this->removeOperator();
+        this->returned &= this->operators.empty();
+    }
+
+    return true;
+}
+
+/**
+ * @brief Event::hash
+ * @return
+ */
+Entity::hash_type Event::hash() const
+{
+    return 1;
 }

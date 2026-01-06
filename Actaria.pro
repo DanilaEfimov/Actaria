@@ -17,8 +17,7 @@ SOURCES += $$files(src/Entities/*.cpp) \
            $$files(src/Compiler/*.cpp) \
            $$files(src/GUI/*.cpp) \
            $$files(src/Errors/*.cpp) \
-           $$files(src/*.cpp) \
-           src/Entities/Operators/nextoperator.cpp
+           $$files(src/*.cpp)
 
 HEADERS += $$files(include/Entities/*.h) \
            $$files(include/Entities/Operators/*.h) \
@@ -27,8 +26,7 @@ HEADERS += $$files(include/Entities/*.h) \
            $$files(include/Aliases/*.h) \
            $$files(include/Errors/*.h) \
            $$files($$DEFAULT_ENGINE_VERSION_PATH/*.ser) \
-           $$files(include/*.h) \
-           include/Entities/Operators/nextoperator.h
+           $$files(include/*.h)
 
 FORMS += \
     mainwindow.ui

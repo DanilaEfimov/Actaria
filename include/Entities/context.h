@@ -46,7 +46,7 @@ public:
 
     bool equals(const key_t& name, value_types value) const;
     void set(const key_t& name, value_types value);
-    const value_types getValue(const key_t& name) const noexcept;
+    const value_types getValue(const key_t& name) const;
 };
 
 #endif // CONTEXT_H

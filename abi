@@ -58,7 +58,7 @@ while (!endOfGame) {
 
 * version        — bytecode format version
 * s              — number of sections
-* root_scene_id — starting scene identifier
+* root_scene_id  — starting scene identifier
 
 --------------------------------------------------
  Section Format

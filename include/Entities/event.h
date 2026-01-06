@@ -8,15 +8,19 @@
 
 class Context;
 class Scene;
+class ReturnOperator;
 
 class Event : public Entity
 {
     ACT_SERIALIZABLE
 
+    friend class ReturnOperator;
+
 protected:
     using operator_p = std::unique_ptr<Operator>;
 
     std::vector<operator_p> operators;
+    bool returned = false;
 
 public:
     using base_t = Entity;
@@ -32,9 +36,11 @@ public:
     qsizetype operatorCount() const;
 
     void addOpertor(operator_p&& op);
-    void removeOperator(qsizetype idx);
+    void removeOperator(qsizetype idx = 0);
 
-    virtual bool exec(Context& context, Scene& scene) = 0;
+    bool exec(Context& context, Scene& scene);
+
+    hash_type hash() const override;
 };
 
 #endif // EVENT_H
