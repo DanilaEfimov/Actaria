@@ -1,4 +1,6 @@
 #include "dialog.ser"
+#include "dialognode.ser"
+#include "Errors/nosuchid.h"
 
 
 Dialog::Dialog()
@@ -19,6 +21,19 @@ Dialog::hash_type Dialog::hash() const
     constexpr auto version = EngineInfo::defaultVersion;
 
     return utils::fnv1a_64(entity_traits<entity_t, version>::name);
+}
+
+/**
+ * @brief Dialog::setRoot
+ * @param newRoot
+ * @throw NoSuchId exception
+ */
+void Dialog::setRoot(id_type newRoot)
+{
+    if(!this->nodes.contains(newRoot))
+        throw NoSuchId(newRoot, abi::entity_traits<DialogNode, EngineInfo::defaultVersion>::name);
+
+    this->root = newRoot;
 }
 
 /**

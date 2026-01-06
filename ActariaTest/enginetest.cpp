@@ -4,6 +4,8 @@
 #include "dialognode.ser"
 #include "testutils.h"
 #include "Operators/assignmentoperator.h"
+#include "Operators/jumpoperator.h"
+#include "Operators/nextoperator.h"
 #include "Entities/scene.h"
 #include <variant>
 
@@ -197,9 +199,9 @@ void EngineTest::character_serializing()
 
 // ---------------- Dialog ----------------
 
+DialogNode root(UNDEFINED_ID, UNDEFINED_ID, UNDEFINED_ID, "Hello, World!");
 void EngineTest::dialognode_serializing()
 {
-    DialogNode root(UNDEFINED_ID, UNDEFINED_ID, UNDEFINED_ID, "Hello, World!");
     QVector<DialogNode> nodes = {root};
     QSet<Entity::id_type> parents = {UNDEFINED_ID};
 
@@ -350,7 +352,10 @@ void EngineTest::test_context_algebra()
     context.clear();
 
     const int varCount = 100;
-    Scene dummyScene;
+
+    std::unique_ptr<Dialog> dialog(new Dialog());
+    dialog->nodes.addObj(&root);
+    Scene dummyScene(std::move(dialog));
 
     struct VarInfo {
         ContextVar* var;
@@ -406,6 +411,16 @@ void EngineTest::test_context_algebra()
             using T = std::decay_t<decltype(v)>;
             QVERIFY(v == std::get<T>(info.newValue));
         }, val);
+    }
+
+    JumpOperator jmp(UNDEFINED_ID);
+    jmp.apply(context, dummyScene);
+
+    try{
+        NextOperator next(nullptr);
+        qDebug() << next.apply(context, dummyScene);
+    } catch(std::invalid_argument& e){
+        qDebug() << e.what();
     }
 }
 

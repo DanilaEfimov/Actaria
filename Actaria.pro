@@ -14,17 +14,21 @@ INCLUDEPATH += include \
 
 SOURCES += $$files(src/Entities/*.cpp) \
            $$files(src/Entities/Operators/*.cpp) \
+           $$files(src/Compiler/*.cpp) \
            $$files(src/GUI/*.cpp) \
            $$files(src/Errors/*.cpp) \
-           $$files(src/*.cpp)
+           $$files(src/*.cpp) \
+           src/Entities/Operators/nextoperator.cpp
 
 HEADERS += $$files(include/Entities/*.h) \
            $$files(include/Entities/Operators/*.h) \
+           $$files(include/Compiler/*.h) \
            $$files(include/GUI/*.h) \
            $$files(include/Aliases/*.h) \
            $$files(include/Errors/*.h) \
            $$files($$DEFAULT_ENGINE_VERSION_PATH/*.ser) \
-           $$files(include/*.h)
+           $$files(include/*.h) \
+           include/Entities/Operators/nextoperator.h
 
 FORMS += \
     mainwindow.ui

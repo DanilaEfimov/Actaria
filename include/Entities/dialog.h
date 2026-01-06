@@ -8,11 +8,13 @@
 #include "entitymanager.h"
 #include <QHash>
 
-using namespace abi;
+class JumpOperator;
 
 class Dialog : public Entity
 {
     ACT_SERIALIZABLE
+
+    friend class JumpOperator;
 
     EntityManager<DialogNode> nodes;
     EntityManager<Event> events;
@@ -24,6 +26,8 @@ public:
     virtual ~Dialog() = default;
 
     virtual hash_type hash() const override;
+
+    void setRoot(id_type newRoot);
 
     bool action(id_type eventId, Context* context);
     void switchBranch(int variant);

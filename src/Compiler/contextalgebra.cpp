@@ -1,4 +1,4 @@
-#include "Entities/Operators/contextalgebra.h"
+#include "Compiler/contextalgebra.h"
 #include "Errors/typemismatch.h"
 #include "Errors/invalidargumentcount.h"
 #include "Errors/invalidsignature.h"

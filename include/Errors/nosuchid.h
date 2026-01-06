@@ -1,17 +1,19 @@
-#ifndef NOSUCHVARIABLE_H
-#define NOSUCHVARIABLE_H
+#ifndef NOSUCHID_H
+#define NOSUCHID_H
 
 #include "error.h"
 #include "utils.h"
 
-class NoSuchVariable : public Error {
+class NoSuchId : public Error
+{
+protected:
+    using id_type = utils::id_type;
 
-    utils::id_type id;
+    id_type id;
 
 public:
-
-    NoSuchVariable(utils::id_type id)
-        : Error("No variable with such id: "), id(id)
+    NoSuchId(id_type id, QString entityName = "Entity")
+        :Error("No " + entityName + " with id: "), id(id)
     {};
 
     virtual const char* what() const noexcept override {
@@ -22,4 +24,4 @@ public:
 
 };
 
-#endif // NOSUCHVARIABLE_H
+#endif // NOSUCHID_H

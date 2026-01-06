@@ -25,8 +25,8 @@ SOURCES += $$files($$ACTARIA_PATH/src/Errors/*.cpp)
 SOURCES += $$files($$PWD/*.cpp)
 
 SOURCES += $$files($$ACTARIA_PATH/src/*.cpp)
-
 SOURCES -= $$ACTARIA_PATH/src/main.cpp
+
 DEFINES += ACTARIA_TEST
 
 qnx: target.path = /tmp/$${TARGET}/bin

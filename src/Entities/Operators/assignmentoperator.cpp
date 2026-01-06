@@ -1,7 +1,8 @@
 #include "Entities/Operators/assignmentoperator.h"
 #include "utils.h"
 #include "Entities/context.h"
-#include "Errors/nosuchvariable.h"
+#include "contextvar.ser"
+#include "Errors/nosuchid.h"
 
 
 /**
@@ -31,7 +32,7 @@ hash_type AssignmentOperator::hash() const
 bool AssignmentOperator::apply(Context &context, [[gnu::unused]] Scene &scene)
 {
     if(!context.containsVariable(this->lvalue))
-        throw NoSuchVariable(this->lvalue);
+        throw NoSuchId(this->lvalue, abi::entity_traits<ContextVar, EngineInfo::defaultVersion>::name);
 
     context.set(this->lvalue, this->rvalue);
     return true;
