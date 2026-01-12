@@ -3,10 +3,11 @@
 
 #include "operator.h"
 
+
 class JumpOperator : public Operator
 {
 protected:
-    id_type mark;   // dialog node id
+    id_type node;   // dialog node id
 
 public:
     JumpOperator(id_type node);

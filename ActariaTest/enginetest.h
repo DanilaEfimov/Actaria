@@ -38,6 +38,9 @@ private:
     void dialognode_serializing();
     void dialognode_variant_management();
     void dialog_serializing();
+
+    // Scene
+    void scene_serializing();
 };
 
 #endif // ENGINETEST_H

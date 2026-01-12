@@ -8,7 +8,7 @@
  * @param node
  */
 JumpOperator::JumpOperator(id_type node)
-    :Operator(), mark(node)
+    :Operator(), node(node)
 {}
 
 /**
@@ -29,7 +29,7 @@ Entity::hash_type JumpOperator::hash() const
 bool JumpOperator::apply([[gnu::unused]] Context &context, Scene &scene)
 {
     try{
-        scene.jump(this->mark);
+        scene.getDialog()->setRoot(this->node);
     } catch(NoSuchId& e){
         DEBUG_ONLY(
             qDebug() << e.what();

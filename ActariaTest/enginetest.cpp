@@ -42,7 +42,7 @@ void EngineTest::namedvar_serializing()
         QDataStream in(&data, QIODevice::ReadOnly);
         abi::read<NameVar, currentVersion>(in, restored);
 
-        QCOMPARE(restored.getValue(), variable.getValue());
+        QCOMPARE(std::get<QString>(restored.getValue()), std::get<QString>(variable.getValue()));
         QCOMPARE(restored.getName(), variable.getName());
         QCOMPARE(restored.getId(), variable.getId());
 
@@ -52,7 +52,7 @@ void EngineTest::namedvar_serializing()
         NameVar restored2;
         abi::read<NameVar, currentVersion>(list, restored2);
 
-        QCOMPARE(restored2.getValue(), variable.getValue());
+        QCOMPARE(std::get<QString>(restored2.getValue()), std::get<QString>(variable.getValue()));
         QCOMPARE(restored2.getName(), variable.getName());
         QCOMPARE(restored2.getId(), variable.getId());
     }
@@ -76,7 +76,7 @@ void EngineTest::counter_serializing()
         QDataStream in(&data, QIODevice::ReadOnly);
         abi::read<Counter, currentVersion>(in, restored);
 
-        QCOMPARE(restored.getValue(), variable.getValue());
+        QCOMPARE(std::get<int>(restored.getValue()), std::get<int>(variable.getValue()));
         QCOMPARE(restored.getName(), variable.getName());
         QCOMPARE(restored.getId(), variable.getId());
 
@@ -86,7 +86,7 @@ void EngineTest::counter_serializing()
         Counter restored2;
         abi::read<Counter, currentVersion>(list, restored2);
 
-        QCOMPARE(restored2.getValue(), variable.getValue());
+        QCOMPARE(std::get<int>(restored2.getValue()), std::get<int>(variable.getValue()));
         QCOMPARE(restored2.getName(), variable.getName());
         QCOMPARE(restored2.getId(), variable.getId());
     }
@@ -107,7 +107,7 @@ void EngineTest::trigger_serializing()
         QDataStream in(&data, QIODevice::ReadOnly);
         abi::read<Trigger, currentVersion>(in, restored);
 
-        QCOMPARE(restored.getValue(), variable.getValue());
+        QCOMPARE(std::get<bool>(restored.getValue()), std::get<bool>(variable.getValue()));
         QCOMPARE(restored.getName(), variable.getName());
         QCOMPARE(restored.getId(), variable.getId());
 
@@ -117,7 +117,7 @@ void EngineTest::trigger_serializing()
         Trigger restored2;
         abi::read<Trigger, currentVersion>(list, restored2);
 
-        QCOMPARE(restored2.getValue(), variable.getValue());
+        QCOMPARE(std::get<bool>(restored2.getValue()), std::get<bool>(variable.getValue()));
         QCOMPARE(restored2.getName(), variable.getName());
         QCOMPARE(restored2.getId(), variable.getId());
     }
@@ -181,7 +181,7 @@ void EngineTest::player_serializing() {
         auto id = static_cast<Context::key_t>(i);
         auto valOrig = exp.getValue(utils::id_type(id));
         auto valRest = restoredExp.getValue(id);
-        QCOMPARE(valRest, valOrig);
+        QVERIFY(compare(valOrig, valRest));
     }
 
     QByteArray serialized;
@@ -245,7 +245,8 @@ void EngineTest::dialognode_serializing()
             StringListCursor original;
             abi::write<DialogNode, currentVersion>(original, n);
 
-            DialogNode copy(original);
+            DialogNode copy;
+            abi::read<DialogNode, EngineInfo::defaultVersion>(original, copy);
             checkNode(n, copy);
         }
     }
@@ -258,6 +259,13 @@ void EngineTest::dialognode_variant_management()
 void EngineTest::dialog_serializing()
 {
     dialognode_serializing();
+}
+
+// ---------------- Scene ----------------
+
+void EngineTest::scene_serializing()
+{
+
 }
 
 // ---------------- Context ----------------
@@ -332,7 +340,7 @@ void EngineTest::context_serializing() {
         auto id = static_cast<Context::key_t>(i);
         if(i % 3 == 0) continue;
         QVERIFY(restored.containsVariable(id));
-        QCOMPARE(restored.getValue(id), ctx.getValue(id));
+        QVERIFY(compare(restored.getValue(id), ctx.getValue(id)));
     }
 }
 
@@ -397,14 +405,14 @@ void EngineTest::test_context_algebra()
         }
         }
 
-        info.var->id = i + 1;
+        info.var->id = i;
         context.addVariable(std::unique_ptr<ContextVar>(info.var));
         vars.push_back(std::move(info));
     }
 
     for(int i = 0; i < varCount; ++i){
         const auto& info = vars[i];
-        int id = i + 1;
+        int id = i;
 
         AssignmentOperator op(id, info.newValue);
         bool applied = op.apply(context, dummyScene);
@@ -427,8 +435,8 @@ void EngineTest::test_context_algebra()
     ConditionOperator condition(true, std::make_unique<Event>(), nullptr);
     condition.apply(context, dummyScene);
 
-    context.variables.find(2)->second->setValue(false);
-    WhileOperator whileOp(2, &event);
+    context.variables.find(1)->second->setValue(false);
+    WhileOperator whileOp(1, &event);
     whileOp.apply(context, dummyScene);
 }
 

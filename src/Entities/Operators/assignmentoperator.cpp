@@ -1,4 +1,4 @@
-#include "Entities/Operators/assignmentoperator.h"
+#include "assignmentoperator.ser"
 #include "utils.h"
 #include "Entities/context.h"
 #include "contextvar.ser"
@@ -20,7 +20,10 @@ AssignmentOperator::AssignmentOperator(id_type lvalue, ContextValue rvalue)
  */
 hash_type AssignmentOperator::hash() const
 {
-    return 1;
+    using entity_t = std::remove_cvref_t<decltype(*this)>;
+    constexpr auto version = EngineInfo::defaultVersion;
+
+    return utils::fnv1a_64(entity_traits<entity_t, version>::name);
 }
 
 /**

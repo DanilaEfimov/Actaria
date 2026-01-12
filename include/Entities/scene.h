@@ -5,6 +5,7 @@
 
 struct SceneMeta {
     QString backgroundPath;
+    QString description;
 };
 
 class Scene : public Entity
@@ -23,7 +24,12 @@ public:
     Scene(Scene&&) noexcept = default;
     Scene& operator=(Scene&&) noexcept = default;
 
-    hash_type hash() const override {return 0;};
+    Dialog* getDialog() const noexcept;
+    Event* getEvent(id_type event) const noexcept;
+    DialogNode* getNode(id_type node) const noexcept;
+    SceneMeta getMeta() const noexcept;
+
+    hash_type hash() const override;;
 
     void jump(id_type node);
 };

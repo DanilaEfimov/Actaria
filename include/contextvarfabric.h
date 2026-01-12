@@ -71,7 +71,7 @@ VarType typeOf(ContextValue value);
  * @param action
  * @param var
  *  This function have to hide std::variant based checks.
- *  Action is lambda to process Context.
+ *  Action is lambda to process ContextVar.
  *  Action have to acts by signature (ContextValue -> Anything).
  */
 template<typename Foo>
@@ -80,6 +80,21 @@ void process(Foo action, ContextVar* var) {
     std::visit([&](auto&& arg){
         action(arg);
     }, val);
+}
+
+/**
+ * @brief process
+ * @param action
+ * @param var
+ *  This function have to hide std::variant based checks.
+ *  Action is lambda to process ContextValue.
+ *  Action have to acts by signature (ContextValue -> Anything).
+ */
+template<typename Foo>
+void process(Foo action, const ContextValue& var) {
+    std::visit([&](auto&& arg){
+        action(arg);
+    }, var);
 }
 
 /**
@@ -120,5 +135,16 @@ void context_cast(ContextValue& value) {
         }
     }, value);
 }
+
+bool compare(ContextValue left, ContextValue right);
+
+QString toString(const ContextValue& value);
+void fromString(ContextValue& value, QString str, VarType type);
+
+void writeValue(QDataStream& out, const ContextValue& value);
+void writeValue(StringListCursor& out, const ContextValue& value);
+
+void readValue(QDataStream& in, ContextValue& value);
+void readValue(StringListCursor& in, ContextValue& value);
 
 #endif // CONTEXTVARFABRIC_H

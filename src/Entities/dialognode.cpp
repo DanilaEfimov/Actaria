@@ -1,5 +1,4 @@
 #include "Entities/dialognode.h"
-#include "entity.ser"
 #include "dialognode.ser"
 #include <QBuffer>
 #include <QDataStream>
@@ -20,27 +19,6 @@ DialogNode::DialogNode(id_type parent, id_type event, id_type fromCharacter, QSt
     event(event),
     fromCharacter(fromCharacter)
 {}
-
-/**
- * @brief DialogNode::DialogNode
- * @param data
- */
-DialogNode::DialogNode(const QByteArray &data)
-    : Entity(Entity::NonIncrementFlag{})
-{
-    QDataStream in(data);
-    abi::read<DialogNode, EngineInfo::defaultVersion>(in, *this);
-}
-
-/**
- * @brief DialogNode::DialogNode
- * @param data
- */
-DialogNode::DialogNode(StringListCursor &data)
-    : Entity(Entity::NonIncrementFlag{})
-{
-    abi::read<DialogNode, EngineInfo::defaultVersion>(data, *this);
-}
 
 /**
  * @brief DialogNode::hash
@@ -132,7 +110,7 @@ void DialogNode::addVariant(QString&& title, const DialogNode& variant)
  * @brief DialogNode::removeChild
  * @param idx
  */
-void DialogNode::removeChild(int idx)
+void DialogNode::removeChild(id_type idx)
 {
     this->variants.removeAt(idx);
 }
@@ -146,22 +124,38 @@ void DialogNode::clear() noexcept
 }
 
 /**
- * @brief DialogNode::isValid
- * @return
+ * @brief DialogNode::hasChild
+ * @param variant
+ * @return  True if exists variant noe with such id
  */
-bool DialogNode::isValid() const noexcept
+bool DialogNode::hasChild(id_type variant) const noexcept
 {
-    return !this->variants.empty();
+    for(const auto& v : this->variants){
+        if(v.second == variant)
+            return true;
+    }
+
+    return false;
+}
+
+/**
+ * @brief DialogNode::empty
+ * @return  True if node is nil
+ */
+bool DialogNode::empty() const noexcept
+{
+    return this->variants.empty();
 }
 
 /**
  * @brief DialogNode::getChild
  * @param variant
- * @return
+ * @return  Child's at <variant> place id
  */
 DialogNode::id_type DialogNode::getChild(int variant) const noexcept
 {
     if(variant >= 0 && variant < this->variants.size())
         return this->variants[variant].second;
+
     return UNDEFINED_ID;
 }

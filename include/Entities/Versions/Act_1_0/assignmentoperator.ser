@@ -1,0 +1,61 @@
+/**
+ *  @file operator.ser
+ *  @version Act_1_0
+ */
+
+
+#ifndef ASSIGNMENTOPERATOR_SER
+#define ASSIGNMENTOPERATOR_SER
+
+#include "Entities/Operators/assignmentoperator.h"
+
+namespace abi {
+
+/**
+ * @brief The entity_traits class
+ * byte and words measuring traits for Entity
+ */
+template<>
+struct entity_traits<AssignmentOperator, abi::Version::Act_1_0> {
+    static constexpr bool is_fixed = true;
+    static constexpr int minimum_bytes = 0;
+    static constexpr int maximum_bytes = minimum_bytes;
+
+    static constexpr const char* name = "AssignmentOperator";
+    static constexpr int minimum_words = 0;
+    static constexpr int maximum_words = minimum_words;
+};
+
+/**
+ * @brief The Writer class
+ * version generalized write interface
+ */
+template<>
+struct Writer<AssignmentOperator, abi::Version::Act_1_0> {
+    static void write(QDataStream&, const Operator&) {
+
+    }
+
+    static void write(StringListCursor&, const Operator&) {
+
+    }
+};
+
+/**
+ * @brief The Reader class
+ * version generalized read interface
+ */
+template<>
+struct Reader<AssignmentOperator, abi::Version::Act_1_0> {
+    static void read(QDataStream&, Operator&) {
+
+    }
+
+    static void read(StringListCursor&, Operator&) {
+
+    }
+};
+
+}   // namespace abi
+
+#endif  // ASSIGNMENTOPERATOR_SER

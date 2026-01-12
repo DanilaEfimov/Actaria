@@ -8,7 +8,6 @@ DEFAULT_ENGINE_VERSION_PATH = include/Entities/Versions/Act_1_0
 ALIASES = include/Aliases
 
 INCLUDEPATH += include \
-            include/Aliases \
             $$DEFAULT_ENGINE_VERSION_PATH \
             $$ALIASES
 
@@ -41,4 +40,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 DISTFILES += \
     abi \
     api \
+    include/Entities/Versions/Act_1_0/assignmentoperator.ser \
     target

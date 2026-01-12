@@ -22,8 +22,6 @@ private:
     id_type fromCharacter;
 
 public:
-    DialogNode(const QByteArray& data);
-    DialogNode(StringListCursor& data);
     DialogNode(id_type parent = UNDEFINED_ID, id_type event = UNDEFINED_ID,
                id_type fromCharacter= UNDEFINED_ID, QString message = "");
     virtual ~DialogNode() = default;
@@ -41,9 +39,11 @@ public:
 
     void addVariant(const variant_t& variant);
     void addVariant(QString&& title, const DialogNode& variant);
-    void removeChild(int idx);
+    void removeChild(id_type idx);
     void clear() noexcept;
-    bool isValid() const noexcept;
+
+    bool hasChild(id_type variant) const noexcept;
+    bool empty() const noexcept;
 
     id_type getChild(int variant) const noexcept;
 };
