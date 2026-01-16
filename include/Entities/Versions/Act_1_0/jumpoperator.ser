@@ -1,0 +1,61 @@
+/**
+ *  @file jumpoperator.ser
+ *  @version Act_1_0
+ */
+
+
+#ifndef JUMPOPERATOR_SER
+#define JUMPOPERATOR_SER
+
+#include "Entities/Operators/jumpoperator.h"
+
+namespace abi {
+
+/**
+ * @brief The entity_traits class
+ * byte and words measuring traits for Entity
+ */
+template<>
+struct entity_traits<JumpOperator, abi::Version::Act_1_0> {
+    static constexpr bool is_fixed = true;
+    static constexpr int minimum_bytes = 0;
+    static constexpr int maximum_bytes = minimum_bytes;
+
+    static constexpr const char* name = "JumpOperator";
+    static constexpr int minimum_words = 0;
+    static constexpr int maximum_words = minimum_words;
+};
+
+/**
+ * @brief The Writer class
+ * version generalized write interface
+ */
+template<>
+struct Writer<JumpOperator, abi::Version::Act_1_0> {
+    static void write(QDataStream& out, const JumpOperator& o) {
+
+    }
+
+    static void write(StringListCursor& out, const JumpOperator& o) {
+
+    }
+};
+
+/**
+ * @brief The Reader class
+ * version generalized read interface
+ */
+template<>
+struct Reader<JumpOperator, abi::Version::Act_1_0> {
+    static void read(QDataStream& in, JumpOperator& o) {
+
+    }
+
+    static void read(StringListCursor& in, JumpOperator& o) {
+
+    }
+};
+
+}   // namespace abi
+
+#endif  // JUMPOPERATOR_SER

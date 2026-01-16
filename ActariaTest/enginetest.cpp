@@ -1,445 +1,409 @@
 #include "enginetest.h"
-#include "contextvarfabric.h"
-#include "serializecharacters"
-#include "dialognode.ser"
 #include "testutils.h"
-#include "Operators/assignmentoperator.h"
-#include "Operators/jumpoperator.h"
-#include "Operators/nextoperator.h"
-#include "Operators/conditionoperator.h"
-#include "Operators/whileoperator.h"
-#include "Operators/returnoperator.h"
-#include "Entities/scene.h"
-#include <variant>
+#include "readwrite.h"
+#include "contextvarfabric.h"
 
+#include "entity.ser"
+
+#include "trigger.ser"
+#include "counter.ser"
+#include "namevar.ser"
+
+#include "operator.ser"
+#include "assignmentoperator.ser"
+
+#include "Entities/context.h"
+
+#include "Entities/scene.h"
+
+#include "Errors/nosuchid.h"
+
+#include <QByteArray>
+
+
+namespace {
+
+static Context context;
+static Scene scene({});
+
+static auto initContext = []() -> bool {
+
+    int count = 100;
+    for(int i = 0; i < count; i++) {
+        QString name = QString("trigger%1").arg(QString::number(i));
+        bool value = QRandomGenerator().bounded(10) ? true : false;
+        context.addVariable(std::make_unique<Trigger>(value, name));
+    }
+
+    for(int i = 0; i < count; i++) {
+        QString name = QString("counter%1").arg(QString::number(i));
+        int value = QRandomGenerator().bounded(1000);
+        context.addVariable(std::make_unique<Counter>(value, name));
+    }
+
+    for(int i = 0; i < count; i++) {
+        QString name = QString("named%1").arg(QString::number(i));
+        QString value = randomString(5 + i % 12);
+        context.addVariable(std::make_unique<NameVar>(value, name));
+    }
+
+    qDebug() << "initContext: global test context initialized.";
+
+    return true;
+}();
+
+static auto initScene = []() -> bool {
+
+    qDebug() << "initScene: global test scene initialized.";
+
+    return true;
+}();
+
+};
 
 EngineTest::EngineTest(QObject *parent)
     : QObject(parent)
 {}
 
-// ---------------- Context Variables ----------------
+void EngineTest::test_serializing()
+{
+    this->context_serializing();
+    this->context_variable_serializing();
+    this->operators_serializing();
+}
+
+void EngineTest::test_processing()
+{
+    this->operators_processing();
+}
+
+void EngineTest::test_id_counting()
+{
+
+}
+
+void EngineTest::test_context_algebra()
+{
+
+}
+
+void EngineTest::test_OSG()
+{
+
+}
 
 void EngineTest::namedvar_serializing()
 {
-    QStringList names = {
-        "Danila", "", "-1201-20*@&#&!@%#!&", "Данила",
-        "Lg&Fw3[09F0p#*fyO8&fuhp#(F-0_3F9_(*#f#f_#8F_f"
-    };
+    constexpr int count = 50;
 
-    for(int i = 0; i < 20; i++){
-        int size_inc = (i*i + 7*i + 10) % 100;
-        names.append(randomString(10 + size_inc));
-    }
+    for (int i = 0; i < count; ++i) {
+        QString name  = QString("namevar_%1").arg(i);
+        QString value = randomString(5 + i % 10);
 
-    for(const auto& name : names){
-        NameVar variable(name, randomString(10));
+        if(i == 0)      value = "";
+        else if(i == 1) value = "VERY_VERY_LARGE_CONTEXT_VARIABLE_VALUE_WHICH_WONT_BE_USED_IN_REALY_GAME";
+        else if(i == 1) value = "st276 &6)S  s78 0 | |} | I~) I~|_W) |_)@|_ @U|E("; // strange unreadable value
 
-        QByteArray data;
-        QDataStream out(&data, QIODevice::WriteOnly);
-        abi::write<NameVar, currentVersion>(out, variable);
-
+        NameVar original(value, name);
         NameVar restored;
-        QDataStream in(&data, QIODevice::ReadOnly);
-        abi::read<NameVar, currentVersion>(in, restored);
 
-        QCOMPARE(std::get<QString>(restored.getValue()), std::get<QString>(variable.getValue()));
-        QCOMPARE(restored.getName(), variable.getName());
-        QCOMPARE(restored.getId(), variable.getId());
+        QByteArray buffer;
 
-        StringListCursor list;
-        abi::write<NameVar, currentVersion>(list, variable);
+        {
+            QDataStream out(&buffer, QIODevice::WriteOnly);
+            abi::write<NameVar, EngineInfo::defaultVersion>(out, original);
+        }
 
-        NameVar restored2;
-        abi::read<NameVar, currentVersion>(list, restored2);
+        {
+            QDataStream in(&buffer, QIODevice::ReadOnly);
+            abi::read<NameVar, EngineInfo::defaultVersion>(in, restored);
+        }
 
-        QCOMPARE(std::get<QString>(restored2.getValue()), std::get<QString>(variable.getValue()));
-        QCOMPARE(restored2.getName(), variable.getName());
-        QCOMPARE(restored2.getId(), variable.getId());
+        QCOMPARE(restored.type(), VarType::Name);
+        QCOMPARE(restored.hash(), original.hash());
+        QCOMPARE(QString(restored), QString(original));
+        QCOMPARE(
+            std::get<NameVar::value_type>(restored.getValue()),
+            std::get<NameVar::value_type>(original.getValue())
+            );
+        QCOMPARE(restored.getName(), original.getName());
     }
 }
 
 void EngineTest::counter_serializing()
 {
-    QList<int> values = {0, 1, -1, INT_MAX, INT_MIN};
-    for(int i = 0; i < 20; i++){
-        values.append(i*i*i*i + 0xFFFF);
-    }
+    constexpr int count = 50;
 
-    for(const auto& value : values){
-        Counter variable(value, randomString(10));
+    for (int i = 0; i < count; ++i) {
+        QString name  = QString("counter_%1").arg(i);
+        int value = QRandomGenerator().bounded(10000);
 
-        QByteArray data;
-        QDataStream out(&data, QIODevice::WriteOnly);
-        abi::write<Counter, currentVersion>(out, variable);
+        if(i == 0)      value = 0xFFFFFFFF;
+        else if(i == 1) value = 0xF0F0F0F0;
+        else if(i == 1) value = 0x00000000;
 
+        Counter original(value, name);
         Counter restored;
-        QDataStream in(&data, QIODevice::ReadOnly);
-        abi::read<Counter, currentVersion>(in, restored);
 
-        QCOMPARE(std::get<int>(restored.getValue()), std::get<int>(variable.getValue()));
-        QCOMPARE(restored.getName(), variable.getName());
-        QCOMPARE(restored.getId(), variable.getId());
+        QByteArray buffer;
 
-        StringListCursor list;
-        abi::write<Counter, currentVersion>(list, variable);
+        {
+            QDataStream out(&buffer, QIODevice::WriteOnly);
+            abi::write<Counter, EngineInfo::defaultVersion>(out, original);
+        }
 
-        Counter restored2;
-        abi::read<Counter, currentVersion>(list, restored2);
+        {
+            QDataStream in(&buffer, QIODevice::ReadOnly);
+            abi::read<Counter, EngineInfo::defaultVersion>(in, restored);
+        }
 
-        QCOMPARE(std::get<int>(restored2.getValue()), std::get<int>(variable.getValue()));
-        QCOMPARE(restored2.getName(), variable.getName());
-        QCOMPARE(restored2.getId(), variable.getId());
+        QCOMPARE(restored.type(), VarType::Counter);
+        QCOMPARE(restored.hash(), original.hash());
+        QCOMPARE(int(restored), int(original));
+        QCOMPARE(
+            std::get<Counter::value_type>(restored.getValue()),
+            std::get<Counter::value_type>(original.getValue())
+            );
+        QCOMPARE(restored.getName(), original.getName());
     }
 }
 
 void EngineTest::trigger_serializing()
 {
-    QList<bool> values = {true, false};
+    constexpr int count = 50;
 
-    for(const auto& value : values){
-        Trigger variable(value, "game_trigger");
+    for (int i = 0; i < count; ++i) {
+        QString name  = QString("trigger_%1").arg(i);
+        int value = i%2 ? true : false;
 
-        QByteArray data;
-        QDataStream out(&data, QIODevice::WriteOnly);
-        abi::write<Trigger, currentVersion>(out, variable);
-
+        Trigger original(value, name);
         Trigger restored;
-        QDataStream in(&data, QIODevice::ReadOnly);
-        abi::read<Trigger, currentVersion>(in, restored);
 
-        QCOMPARE(std::get<bool>(restored.getValue()), std::get<bool>(variable.getValue()));
-        QCOMPARE(restored.getName(), variable.getName());
-        QCOMPARE(restored.getId(), variable.getId());
+        QByteArray buffer;
 
-        StringListCursor list;
-        abi::write<Trigger, currentVersion>(list, variable);
+        {
+            QDataStream out(&buffer, QIODevice::WriteOnly);
+            abi::write<Trigger, EngineInfo::defaultVersion>(out, original);
+        }
 
-        Trigger restored2;
-        abi::read<Trigger, currentVersion>(list, restored2);
+        {
+            QDataStream in(&buffer, QIODevice::ReadOnly);
+            abi::read<Trigger, EngineInfo::defaultVersion>(in, restored);
+        }
 
-        QCOMPARE(std::get<bool>(restored2.getValue()), std::get<bool>(variable.getValue()));
-        QCOMPARE(restored2.getName(), variable.getName());
-        QCOMPARE(restored2.getId(), variable.getId());
+        QCOMPARE(restored.type(), VarType::Trigger);
+        QCOMPARE(restored.hash(), original.hash());
+        QCOMPARE(bool(restored), bool(original));
+        QCOMPARE(
+            std::get<Trigger::value_type>(restored.getValue()),
+            std::get<Trigger::value_type>(original.getValue())
+            );
+        QCOMPARE(restored.getName(), original.getName());
     }
 }
 
 void EngineTest::context_variable_serializing()
 {
-    namedvar_serializing();
-    counter_serializing();
-    trigger_serializing();
+    this->namedvar_serializing();
+    this->trigger_serializing();
+    this->counter_serializing();
 }
 
-// ---------------- Characters ----------------
+void EngineTest::context_variables_processing()
+{
+    QString nameValue = "";
+    bool triggerValue = false;
+    int counterValue = 0;
 
-void EngineTest::player_serializing() {
-    Player& player = Player::instance();
-    Context& exp = player.experience;
-    exp.clear();
+    QRandomGenerator* generator = QRandomGenerator::global();
 
-    const int varCount = 50;
-    for(int i = 0; i < varCount; ++i) {
-        auto id = static_cast<Context::key_t>(i);
-        std::unique_ptr<ContextVar> var;
-
-        QString name = QString("NameVar%1").arg(i);
-        switch(i % 3) {
-        case 0: var = ContextVariableFabric::make_namevar(name, randomString(10)); break;
-        case 1: var = ContextVariableFabric::make_counter(name, i); break;
-        case 2: var = ContextVariableFabric::make_trigger(name, i % 2 == 0); break;
+    for(auto& variable : context.variables){
+        VarType type = variable.second->type();
+        switch(type){
+        case VarType::Name:
+            nameValue = randomString(8 + generator->bounded(8));
+            variable.second->setValue(nameValue); break;
+        case VarType::Counter:
+            triggerValue = generator->bounded(10) % 2 ? true : false;
+            variable.second->setValue(counterValue); break;
+        case VarType::Trigger:
+            counterValue = generator->bounded(0x0000FFFF);
+            variable.second->setValue(triggerValue); break;
+        default:
+            qDebug() << "EngineTest::assignment_operator_serializing: undefined type";
         }
 
-        var->id = id;
-        exp.set(id, var->getValue());
-        exp.addVariable(std::move(var));
+        compare(true, variable.second->getValue());
     }
+}
 
-    player.setName("Danila");
-    player.setMood(Mood::Excited);
+void EngineTest::context_serializing()
+{
+    // Context copy;
 
-    for(int i = 0; i < 10; ++i) {
-        QString charName = QString("Character%1").arg(i);
-        Character c(charName, static_cast<Mood>(i % 4));
-        player.experience.addCharacter(c);
-    }
+    // QByteArray serialized;
+    // {
+    //     QDataStream out(&serialized, QIODevice::WriteOnly);
+    //     abi::write<Context, EngineInfo::defaultVersion>(out, context);
+    // }
 
-    QByteArray data;
-    QDataStream out(&data, QIODevice::WriteOnly);
-    abi::write<Player, currentVersion>(out, player);
+    // {
+    //     QDataStream in(&serialized, QIODevice::ReadOnly);
+    //     abi::read<Context, EngineInfo::defaultVersion>(in, copy);
+    // }
 
-    Player restored;
-    QDataStream in(&data, QIODevice::ReadOnly);
-    abi::read<Player, currentVersion>(in, restored);
+    // QCOMPARE(copy, context);
 
-    QCOMPARE(restored.getName(), player.getName());
-    QCOMPARE(restored.getMood(), player.getMood());
+    // StringListCursor line;
 
-    const Context& restoredExp = restored.experience;
-    QCOMPARE(restoredExp.size(), exp.size());
+    // abi::write<Context, EngineInfo::defaultVersion>(line, context);
 
-    for(int i = 0; i < varCount; ++i) {
-        auto id = static_cast<Context::key_t>(i);
-        auto valOrig = exp.getValue(utils::id_type(id));
-        auto valRest = restoredExp.getValue(id);
-        QVERIFY(compare(valOrig, valRest));
-    }
+    // abi::read<Context, EngineInfo::defaultVersion>(line, copy);
 
-    QByteArray serialized;
-    StringListCursor list;
-    abi::write<Player, currentVersion>(list, player);
+    // QCOMPARE(copy, context);
+}
 
-    Player restored2;
-    abi::read<Player, currentVersion>(list, restored2);
+void EngineTest::player_serializing()
+{
 
-    QCOMPARE(restored2.getName(), player.getName());
-    QCOMPARE(restored2.getMood(), player.getMood());
-    QCOMPARE(restored2.experience.size(), exp.size());
 }
 
 void EngineTest::character_serializing()
 {
-    player_serializing();
+
 }
 
-// ---------------- Dialog ----------------
+// ^^^ characters serializing / operators serializing vvv
 
-DialogNode root(UNDEFINED_ID, UNDEFINED_ID, UNDEFINED_ID, "Hello, World!");
+void EngineTest::operators_serializing()
+{
+    this->return_operator_serializing();
+    this->call_operator_serializing();
+    this->while_operator_serializing();
+    this->jump_operator_serializing();
+    this->condition_operator_serializing();
+    this->assignment_operator_serializing();
+}
+
+void EngineTest::jump_operator_serializing()
+{
+
+}
+
+void EngineTest::call_operator_serializing()
+{
+
+}
+
+void EngineTest::next_operator_serializing()
+{
+
+}
+
+void EngineTest::return_operator_serializing()
+{
+
+}
+
+void EngineTest::while_operator_serializing()
+{
+
+}
+
+void EngineTest::condition_operator_serializing()
+{
+
+}
+
+void EngineTest::assignment_operator_serializing()
+{
+
+}
+
+// ^^^ operators serializing / operators processing vvv
+
+void EngineTest::operators_processing()
+{
+    this->assignment_operator_processing();
+}
+
+void EngineTest::jump_operator_processing()
+{
+
+}
+
+void EngineTest::call_operator_processing()
+{
+
+}
+
+void EngineTest::next_operator_processing()
+{
+
+}
+
+void EngineTest::return_operator_processing()
+{
+
+}
+
+void EngineTest::while_operator_processing()
+{
+
+}
+
+void EngineTest::condition_operator_processing()
+{
+
+}
+
+void EngineTest::assignment_operator_processing()
+{
+    for(auto& variable : context.variables) {
+        auto type = variable.second->type();
+        AssignmentOperator op(variable.first, {});
+
+        ContextValue assigned;
+        switch(type){
+        case VarType::Name: assigned = randomString(8 + QRandomGenerator().bounded(8)); break;
+        case VarType::Counter: assigned = QRandomGenerator().bounded(0x0000FFFF); break;
+        case VarType::Trigger: assigned = true; break;
+        default: break;
+        }
+
+        op.rvalue = assigned;
+        op.apply(context, scene);   // scene marked as gnu::unused
+
+        QVERIFY(compare(op.rvalue, variable.second->getValue()));
+    }
+
+    try {
+
+        AssignmentOperator op(UNDEFINED_ID, {});
+        op.apply(context, scene);
+
+    } catch(const NoSuchId& e) {
+        qDebug() << "\n\t pseudo error catched \n\t"<< e.what();
+    }
+
+}
+
 void EngineTest::dialognode_serializing()
 {
-    QVector<DialogNode> nodes = {root};
-    QSet<Entity::id_type> parents = {UNDEFINED_ID};
 
-    for(int i = 0; i < 200; i++){
-        DialogNode node(randomElement(parents), UNDEFINED_ID, UNDEFINED_ID,
-                        randomString(QRandomGenerator::global()->bounded(20)));
-
-        nodes[QRandomGenerator::global()->bounded(nodes.size())]
-            .addVariant(DialogNode::variant_t(randomString(10), node.getId()));
-
-        nodes.push_back(node);
-        parents.insert(node.getId());
-    }
-
-    auto checkNode = [](const DialogNode& a, const DialogNode& b){
-        QCOMPARE(a.getId(), b.getId());
-        QCOMPARE(a.getMessage(), b.getMessage());
-        QCOMPARE(a.getEventId(), b.getEventId());
-        QCOMPARE(a.getFromCharacter(), b.getFromCharacter());
-        QCOMPARE(a.variants, b.variants);
-    };
-
-    for(const auto& n : nodes){
-        {
-            QByteArray serialized;
-            QDataStream out(&serialized, QIODevice::WriteOnly);
-            abi::write<DialogNode, currentVersion>(out, n);
-
-            DialogNode copy;
-            QDataStream in(&serialized, QIODevice::ReadOnly);
-            abi::read<DialogNode, currentVersion>(in, copy);
-
-            checkNode(n, copy);
-        }
-
-        {
-            StringListCursor original;
-            abi::write<DialogNode, currentVersion>(original, n);
-
-            DialogNode copy;
-            abi::read<DialogNode, EngineInfo::defaultVersion>(original, copy);
-            checkNode(n, copy);
-        }
-    }
 }
 
 void EngineTest::dialognode_variant_management()
 {
+
 }
 
 void EngineTest::dialog_serializing()
 {
-    dialognode_serializing();
-}
 
-// ---------------- Scene ----------------
+}
 
 void EngineTest::scene_serializing()
 {
 
-}
-
-// ---------------- Context ----------------
-
-void EngineTest::context_serializing() {
-    Context ctx;
-    const int varCount = 300;
-    QVector<QString> names;
-    names.reserve(varCount);
-
-    for(int i = 0; i < varCount; ++i) {
-        names.append(randomString(12));
-    }
-
-    for(int i = 0; i < varCount; ++i) {
-        auto id = static_cast<Context::key_t>(i);
-        std::unique_ptr<ContextVar> var;
-
-        switch(i % 3) {
-        case 0: var = ContextVariableFabric::make_namevar(names[i], QString("val%1").arg(i)); break;
-        case 1: var = ContextVariableFabric::make_counter(names[i], i); break;
-        case 2: var = ContextVariableFabric::make_trigger(names[i], i % 2 == 0); break;
-        }
-
-        var->id = id;
-        ctx.set(id, var->getValue());
-        ctx.addVariable(std::move(var));
-    }
-
-    QCOMPARE(ctx.size(), varCount);
-
-    for(int i = 0; i < varCount; ++i) {
-        auto id = static_cast<Context::key_t>(i);
-        QVERIFY(ctx.containsVariable(id));
-        auto val = ctx.getValue(id);
-        QVERIFY(!val.valueless_by_exception());
-
-        switch(i % 3) {
-        case 0: QCOMPARE(std::get<QString>(val), QString("val%1").arg(i)); break;
-        case 1: QCOMPARE(std::get<int>(val), i); break;
-        case 2: QCOMPARE(std::get<bool>(val), i % 2 == 0); break;
-        }
-    }
-
-    for(int i = 0; i < varCount; i += 3) {
-        auto id = static_cast<Context::key_t>(i);
-        ctx.removeVariable(id);
-    }
-
-    for(int i = 0; i < varCount; ++i) {
-        auto id = static_cast<Context::key_t>(i);
-        if(i % 3 == 0) {
-            QVERIFY(!ctx.containsVariable(id));
-        } else {
-            QVERIFY(ctx.containsVariable(id));
-        }
-    }
-
-    QCOMPARE(ctx.size(), varCount - varCount / 3);
-
-    QByteArray serialized;
-    QDataStream out(&serialized, QIODevice::WriteOnly);
-    abi::write<Context, currentVersion>(out, ctx);
-
-    Context restored;
-    QDataStream in(&serialized, QIODevice::ReadOnly);
-    abi::read<Context, currentVersion>(in, restored);
-
-    QCOMPARE(restored.size(), ctx.size());
-
-    for(int i = 0; i < varCount; ++i) {
-        auto id = static_cast<Context::key_t>(i);
-        if(i % 3 == 0) continue;
-        QVERIFY(restored.containsVariable(id));
-        QVERIFY(compare(restored.getValue(id), ctx.getValue(id)));
-    }
-}
-
-// ---------------- Private slots ----------------
-
-void EngineTest::test_serializing()
-{
-    context_variable_serializing();
-    character_serializing();
-    dialog_serializing();
-    context_serializing();
-}
-
-void EngineTest::test_id_counting()
-{
-}
-
-void EngineTest::test_context_algebra()
-{
-    Context& context = Player::experience;
-    context.clear();
-
-    const int varCount = 100;
-
-    std::unique_ptr<Dialog> dialog(new Dialog());
-    dialog->nodes.addObj(&root);
-    Scene dummyScene(std::move(dialog));
-
-    struct VarInfo {
-        ContextVar* var;
-        ContextVar::ContextValue newValue;
-    };
-
-    QVector<VarInfo> vars;
-    vars.reserve(varCount);
-
-    for(int i = 0; i < varCount; ++i){
-        auto typeSelector = i % 3;
-        VarInfo info;
-
-        switch(typeSelector){
-        case 0: {
-            int initial = QRandomGenerator::global()->bounded(1000);
-            int newVal  = QRandomGenerator::global()->bounded(10000);
-            info.var = ContextVariableFabric::make_counter(QString("Counter%1").arg(i), initial).release();
-            info.newValue = newVal;
-            break;
-        }
-        case 1: {
-            bool initial = QRandomGenerator::global()->bounded(2);
-            bool newVal  = QRandomGenerator::global()->bounded(2);
-            info.var = ContextVariableFabric::make_trigger(QString("Trigger%1").arg(i), initial).release();
-            info.newValue = newVal;
-            break;
-        }
-        case 2: {
-            QString initial = randomString(5 + QRandomGenerator::global()->bounded(10));
-            QString newVal  = randomString(5 + QRandomGenerator::global()->bounded(10));
-            info.var = ContextVariableFabric::make_namevar(QString("Name%1").arg(i), initial).release();
-            info.newValue = newVal;
-            break;
-        }
-        }
-
-        info.var->id = i;
-        context.addVariable(std::unique_ptr<ContextVar>(info.var));
-        vars.push_back(std::move(info));
-    }
-
-    for(int i = 0; i < varCount; ++i){
-        const auto& info = vars[i];
-        int id = i;
-
-        AssignmentOperator op(id, info.newValue);
-        bool applied = op.apply(context, dummyScene);
-        QVERIFY(applied);
-
-        ContextVar::ContextValue val = context.getValue(id);
-        std::visit([&](auto&& v){
-            using T = std::decay_t<decltype(v)>;
-            QVERIFY(v == std::get<T>(info.newValue));
-        }, val);
-    }
-
-    JumpOperator jmp(UNDEFINED_ID);
-    jmp.apply(context, dummyScene);
-
-    Event event;
-    ReturnOperator returnOp(&event);
-    returnOp.apply(context, dummyScene);
-
-    ConditionOperator condition(true, std::make_unique<Event>(), nullptr);
-    condition.apply(context, dummyScene);
-
-    context.variables.find(1)->second->setValue(false);
-    WhileOperator whileOp(1, &event);
-    whileOp.apply(context, dummyScene);
-}
-
-void EngineTest::test_OSG()
-{
 }

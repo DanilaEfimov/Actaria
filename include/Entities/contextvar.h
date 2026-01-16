@@ -41,6 +41,8 @@ public:
 
     virtual ContextValue getValue() const = 0;
     virtual void setValue(ContextValue value) = 0;
+
+    bool setValueSafe(ContextValue value);
 };
 
 #endif // CONTEXTVAR_H

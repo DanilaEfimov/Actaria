@@ -1,4 +1,5 @@
 #include "contextvar.ser"
+#include "utils.h"
 
 
 /**
@@ -45,4 +46,20 @@ QString ContextVar::getName() const
 void ContextVar::setName(const QString &name) noexcept
 {
     this->name = name;
+}
+
+/**
+ * @brief ContextVar::setValueSafe
+ * @param value : ContextValue
+ * @return  true if given value type matches and it's updated.
+ *          false otherwise.
+ */
+bool ContextVar::setValueSafe(ContextValue value)
+{
+    if(typeOf(value) != this->type())
+        return false;
+
+    this->setValue(value);
+
+    return true;
 }

@@ -29,3 +29,12 @@ bool CallOperator::apply(Context &context, Scene &scene)
 
     return toCall->exec(context, scene);
 }
+
+/**
+ * @brief CallOperator::type
+ * @return type of this operator
+ */
+OperatorType CallOperator::type() const
+{
+    return OperatorType::Call;
+}

@@ -1,5 +1,7 @@
 #include "Entities/scene.h"
 #include "Entities/dialog.h"
+#include "dialognode.ser"
+#include "Errors/nosuchid.h"
 
 
 /**
@@ -34,9 +36,18 @@ Event *Scene::getEvent(id_type event) const noexcept
  * @param node
  * @return
  */
-DialogNode *Scene::getNode(id_type node) const noexcept
+DialogNode* Scene::getNode(id_type node) const noexcept
 {
-    this->dialog->getNode(node);
+    return this->dialog->getNode(node);
+}
+
+/**
+ * @brief Scene::getMeta
+ * @return  scene meta data (background image path e.g.)
+ */
+SceneMeta Scene::getMeta() const noexcept
+{
+    return this->meta;
 }
 
 /**
@@ -53,5 +64,8 @@ Entity::hash_type Scene::hash() const {
  */
 void Scene::jump(id_type node)
 {
+    if(!this->dialog->containsNode(node))
+        throw NoSuchId(node, abi::entity_traits<DialogNode, EngineInfo::defaultVersion>::name);
+
     this->dialog->setRoot(node);
 }

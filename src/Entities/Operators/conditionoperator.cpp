@@ -9,12 +9,12 @@
  */
 ConditionOperator::ConditionOperator(
     bool value,
-    std::unique_ptr<Event> trueEvent,
-    std::unique_ptr<Event> falseEvent
+    std::shared_ptr<Event> trueEvent,
+    std::shared_ptr<Event> falseEvent
 )
     : Operator(),
-    trueEvent(std::move(trueEvent)),
-    falseEvent(std::move(falseEvent)),
+    trueEvent(trueEvent),
+    falseEvent(falseEvent),
     value(value)
 {}
 
@@ -46,4 +46,13 @@ bool ConditionOperator::apply(Context &context, Scene &scene)
     }
 
     return true;
+}
+
+/**
+ * @brief ConditionOperator::type
+ * @return type of this operator
+ */
+OperatorType ConditionOperator::type() const
+{
+    return OperatorType::Condition;
 }

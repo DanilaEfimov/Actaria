@@ -1,22 +1,6 @@
 /**
  *  @file event.ser
  *  @version Act_1_0
- *
- *  This header defines a pseudo-serialization interface
- *  to simplify saving classes derived from Operator using the base_t style.
- *
- *  Usage:
- *
- *  class MyClass : public Event {
- *      ACT_SERIALIZABLE
- *      ...
- *      using base_t = Event;
- *      ...
- *  }
- *
- *  This avoids having to manually track which base classes in the inheritance
- *  chain are involved in the ABI serialization. In short, it preserves
- *  a consistent interface for all derived classes.
  */
 
 
@@ -24,6 +8,8 @@
 #define EVENT_SER
 
 #include "Entities/event.h"
+#include "Entities/Operators/operator.h"
+#include "Entities/trigger.h"
 
 namespace abi {
 
@@ -37,7 +23,7 @@ struct entity_traits<Event, abi::Version::Act_1_0> {
     static constexpr int minimum_bytes = 0;
     static constexpr int maximum_bytes = minimum_bytes;
 
-    static constexpr const char* name = "Operator";
+    static constexpr const char* name = "Event";
     static constexpr int minimum_words = 0;
     static constexpr int maximum_words = minimum_words;
 };
@@ -48,9 +34,22 @@ struct entity_traits<Event, abi::Version::Act_1_0> {
  */
 template<>
 struct Writer<Event, abi::Version::Act_1_0> {
-    static void write(QDataStream&, const Event&) {}
+    static void write(QDataStream& out, const Event& e) {
+        out << e.returned
+            << static_cast<int>(e.operators.size());
+        for(int i = 0; i < e.operators.size(); i++){
+            fix::write(out, *e.operators[i]);
+        }
+    }
 
-    static void write(StringListCursor&, const Event&) {}
+    static void write(StringListCursor& out, const Event& e) {
+        out.append(entity_traits<Event, EngineInfo::defaultVersion>::name);
+        out.append(e.returned ? TRUE_S : FALSE_S);
+        out.append(QString::number(e.operators.size()));
+        for(int i = 0; i < e.operators.size(); i++){
+            fix::write(out, *e.operators[i]);
+        }
+    }
 };
 
 /**
@@ -59,9 +58,26 @@ struct Writer<Event, abi::Version::Act_1_0> {
  */
 template<>
 struct Reader<Event, abi::Version::Act_1_0> {
-    static void read(QDataStream&, Event&) {}
+    static void read(QDataStream& in, Event& e) {
+        in >> e.returned;
 
-    static void read(StringListCursor&, Event&) {}
+        int size;
+        in >> size;
+        for(int i = 0; i < e.operators.size(); i++){
+            fix::read(in, *e.operators[i]);
+        }
+    }
+
+    static void read(StringListCursor& in, Event& e) {
+        e.returned = in.peek() == TRUE_S;
+
+        int size = in.next().toInt();
+        for(int i = 0; i < size; i++){
+            fix::read(in, *e.operators[i]);
+        }
+
+        in.skip();
+    }
 };
 
 }   // namespace abi

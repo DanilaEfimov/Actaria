@@ -1,0 +1,61 @@
+/**
+ *  @file calloperator.ser
+ *  @version Act_1_0
+ */
+
+
+#ifndef CALLOPERATOR_SER
+#define CALLOPERATOR_SER
+
+#include "Entities/Operators/calloperator.h"
+
+namespace abi {
+
+/**
+ * @brief The entity_traits class
+ * byte and words measuring traits for Entity
+ */
+template<>
+struct entity_traits<CallOperator, abi::Version::Act_1_0> {
+    static constexpr bool is_fixed = true;
+    static constexpr int minimum_bytes = 0;
+    static constexpr int maximum_bytes = minimum_bytes;
+
+    static constexpr const char* name = "CallOperator";
+    static constexpr int minimum_words = 0;
+    static constexpr int maximum_words = minimum_words;
+};
+
+/**
+ * @brief The Writer class
+ * version generalized write interface
+ */
+template<>
+struct Writer<CallOperator, abi::Version::Act_1_0> {
+    static void write(QDataStream& out, const CallOperator& o) {
+
+    }
+
+    static void write(StringListCursor& out, const CallOperator& o) {
+
+    }
+};
+
+/**
+ * @brief The Reader class
+ * version generalized read interface
+ */
+template<>
+struct Reader<CallOperator, abi::Version::Act_1_0> {
+    static void read(QDataStream& in, CallOperator& o) {
+
+    }
+
+    static void read(StringListCursor& in, CallOperator& o) {
+
+    }
+};
+
+}   // namespace abi
+
+#endif  // CALLOPERATOR_SER

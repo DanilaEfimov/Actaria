@@ -20,6 +20,15 @@ Entity::hash_type ReturnOperator::hash() const
 }
 
 /**
+ * @brief ReturnOperator::type
+ * @return type of this operator
+ */
+OperatorType ReturnOperator::type() const
+{
+    return OperatorType::Return;
+}
+
+/**
  * @brief ReturnOperator::apply
  * @param context
  * @param scene

@@ -8,7 +8,7 @@
 #ifndef ENTITYMANAGER_H
 #define ENTITYMANAGER_H
 
-#include "utils.h"
+#include "common.h"
 #include "Entities/entity.h"
 #include <QHash>
 #include <QBuffer>

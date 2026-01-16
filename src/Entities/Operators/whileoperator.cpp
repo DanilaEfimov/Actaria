@@ -1,6 +1,6 @@
 #include "Entities/Operators/whileoperator.h"
 #include "Entities/context.h"
-#include "contextvarfabric.h"
+#include "utils.h"
 #include "Errors/typemismatch.h"
 
 
@@ -44,4 +44,13 @@ bool WhileOperator::apply(Context &context, Scene &scene)
     }
 
     return res;
+}
+
+/**
+ * @brief WhileOperator::type
+ * @return type of this operator
+ */
+OperatorType WhileOperator::type() const
+{
+    return OperatorType::While;
 }

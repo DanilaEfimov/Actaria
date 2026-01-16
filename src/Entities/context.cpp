@@ -132,7 +132,7 @@ bool Context::equals(const key_t& key, value_types value) const
 {
     auto it = variables.find(key);
     if (it == variables.end())
-        return false;
+        throw NoSuchId(key, abi::entity_traits<ContextVar, EngineInfo::defaultVersion>::name);
 
     return it->second->getValue() == value;
 }
@@ -141,11 +141,12 @@ bool Context::equals(const key_t& key, value_types value) const
  * @brief Context::set
  * @param name
  * @param value
+ * @throws NoSuchId exception if there isn't such variable.
  */
 void Context::set(const key_t& key, value_types value)
 {
     if(!this->containsVariable(key))
-        return;
+        throw NoSuchId(key, abi::entity_traits<ContextVar, EngineInfo::defaultVersion>::name);
 
     this->variables[key]->setValue(value);
 }

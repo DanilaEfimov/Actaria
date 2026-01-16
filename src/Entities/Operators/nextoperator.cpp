@@ -24,6 +24,15 @@ Entity::hash_type NextOperator::hash() const
 }
 
 /**
+ * @brief NextOperator::type
+ * @return type of this operator
+ */
+OperatorType NextOperator::type() const
+{
+    return OperatorType::Next;
+}
+
+/**
  * @brief NextOperator::apply
  * @param context
  * @param scene

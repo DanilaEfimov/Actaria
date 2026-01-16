@@ -7,7 +7,7 @@
 #ifndef READWRITE_H
 #define READWRITE_H
 
-#include "utils.h"
+#include "common.h"
 #include "engineinfo.h"
 #include "stringlistcursor.h"
 #include <type_traits>
@@ -26,10 +26,10 @@
  * Marks a class as serializable in the ABI system.
  *
  * Usage:
- *   class MyClass {
- *       ACT_SERIALIZABLE
- *       ...
- *   };
+ *      class MyClass {
+ *          ACT_SERIALIZABLE
+ *          ...
+ *      };
  *
  * This macro declares friendship with the abi::Writer and abi::Reader
  * templates for all versions, allowing serialization and deserialization
@@ -52,6 +52,29 @@
     template <utils::GameEntity T, abi::Version V> \
     friend void abi::read(StringListCursor&, T&);
 
+/**
+ * @macro SPECIFICATION_REQUIRED
+ * Makes a template unit is required for specialization
+ *
+ * Usage:
+ *      template<...>
+ *      class/signature MyTemplateUnit {
+ *
+ *      SPECIFICATION_REQUIRED
+ *      ...
+ *
+ *      }
+ *
+ * Artificial reflection assert
+ * ISO C++ forbids in-class initialization of non-const static member
+ * 'abi::Writer<T, V>::require'
+ */
+#define SPECIFICATION_REQUIRED \
+static auto require = []() { \
+    qDebug() << "T: " << typeid(T).name() << ", V: " << typeid(V).hash_code(); \
+    return typeid(T).hash_code(); \
+}();
+
 namespace abi {
 
 static constexpr int unlimited = -1;
@@ -61,7 +84,8 @@ static constexpr int unlimited = -1;
  */
 template <utils::GameEntity T, Version V = EngineInfo::defaultVersion>
 struct entity_traits {
-    static_assert(sizeof(T) == 0, "abi::entity_traits<T, V>: specialization required");
+
+    SPECIFICATION_REQUIRED
 
     static constexpr bool is_fixed = std::is_fundamental_v<T>;
     static constexpr int minimum_bytes = sizeof(T);
@@ -77,7 +101,8 @@ struct entity_traits {
  */
 template <typename T, Version V = EngineInfo::defaultVersion>
 struct Writer {
-    static_assert(sizeof(T) == 0, "abi::Writer<T, V>: specialization required");
+
+    SPECIFICATION_REQUIRED
 
     static void write(QDataStream&, const T&);
     static void write(StringListCursor&, const T&);
@@ -89,7 +114,8 @@ struct Writer {
  */
 template <typename T, Version V = EngineInfo::defaultVersion>
 struct Reader {
-    static_assert(sizeof(T) == 0, "abi::Reader<T, V>: specialization required");
+
+    SPECIFICATION_REQUIRED
 
     static void read(QDataStream&, T&);
     static void read(StringListCursor&, T&);

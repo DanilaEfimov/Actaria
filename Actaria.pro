@@ -40,5 +40,4 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 DISTFILES += \
     abi \
     api \
-    include/Entities/Versions/Act_1_0/assignmentoperator.ser \
     target

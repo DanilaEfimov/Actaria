@@ -1,5 +1,5 @@
 #include "assignmentoperator.ser"
-#include "utils.h"
+#include "common.h"
 #include "Entities/context.h"
 #include "contextvar.ser"
 #include "Errors/nosuchid.h"
@@ -11,7 +11,9 @@
  * @param rvalue
  */
 AssignmentOperator::AssignmentOperator(id_type lvalue, ContextValue rvalue)
-    : Operator(), lvalue(lvalue), rvalue(rvalue)
+    : Operator(),
+    lvalue(lvalue),
+    rvalue(rvalue)
 {}
 
 /**
@@ -24,6 +26,15 @@ hash_type AssignmentOperator::hash() const
     constexpr auto version = EngineInfo::defaultVersion;
 
     return utils::fnv1a_64(entity_traits<entity_t, version>::name);
+}
+
+/**
+ * @brief AssignmentOperator::type
+ * @return type of this operator
+ */
+OperatorType AssignmentOperator::type() const
+{
+    return OperatorType::Assignment;
 }
 
 /**

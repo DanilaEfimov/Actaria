@@ -15,6 +15,8 @@ public:
     hash_type hash() const override;
 
     bool apply(Context &context, Scene &scene) override;
+
+    OperatorType type() const override;
 };
 
 #endif // JUMPOPERATOR_H

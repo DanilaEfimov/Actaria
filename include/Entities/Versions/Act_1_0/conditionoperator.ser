@@ -1,0 +1,89 @@
+#ifndef CONDITIONOPERATOR_SER
+#define CONDITIONOPERATOR_SER
+
+#include "Entities/Operators/conditionoperator.h"
+#include "entity.ser"
+#include "event.ser"
+#include "Entities/trigger.h"
+
+
+namespace abi {
+
+/**
+ * @brief The entity_traits class
+ * byte and words measuring traits for Entity
+ */
+template<>
+struct entity_traits<ConditionOperator, abi::Version::Act_1_0> {
+    static constexpr bool is_fixed = true;
+    static constexpr int minimum_bytes = 0;
+    static constexpr int maximum_bytes = minimum_bytes;
+
+    static constexpr const char* name = "ConditionOperator";
+    static constexpr int minimum_words = 0;
+    static constexpr int maximum_words = minimum_words;
+};
+
+/**
+ * @brief The Writer class
+ * version generalized write interface
+ */
+template<>
+struct Writer<ConditionOperator, abi::Version::Act_1_0> {
+    static void write(QDataStream& out, const ConditionOperator& c) {
+        out << c.value;
+
+        abi::write<Event, Version::Act_1_0>(out, *c.trueEvent);
+
+        out << (c.falseEvent.get() ? true : false);
+        if(c.falseEvent.get()){
+            abi::write<Event, Version::Act_1_0>(out, *c.falseEvent);
+        }
+    }
+
+    static void write(StringListCursor& out, const ConditionOperator& c) {
+        out.append(c.value ? TRUE_S : FALSE_S);
+
+        abi::write<Event, Version::Act_1_0>(out, *c.trueEvent);
+
+        out.append(c.falseEvent.get() ? TRUE_S : FALSE_S);
+        if(c.falseEvent.get()){
+            abi::write<Event, Version::Act_1_0>(out, *c.falseEvent);
+        }
+    }
+};
+
+/**
+ * @brief The Reader class
+ * version generalized read interface
+ */
+template<>
+struct Reader<ConditionOperator, abi::Version::Act_1_0> {
+    static void read(QDataStream& in, ConditionOperator& c) {
+        in >> c.value;
+
+        abi::read<Event, Version::Act_1_0>(in, *c.trueEvent);
+
+        bool falseBranchFlag;
+        in >> falseBranchFlag;
+        if(falseBranchFlag){
+            abi::read<Event, Version::Act_1_0>(in, *c.falseEvent);
+        }
+    }
+
+    static void read(StringListCursor& in, ConditionOperator& c) {
+        c.value = in.peek() == TRUE_S;
+        in.size();
+
+        abi::read<Event, Version::Act_1_0>(in, *c.trueEvent);
+
+        bool falseBranchFlag = in.next() == TRUE_S;
+        if(falseBranchFlag){
+            abi::read<Event, Version::Act_1_0>(in, *c.falseEvent);
+        }
+    }
+};
+
+}   // namespace abi
+
+#endif

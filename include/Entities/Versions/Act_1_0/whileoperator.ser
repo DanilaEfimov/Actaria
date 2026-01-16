@@ -1,0 +1,61 @@
+/**
+ *  @file whileoperator.ser
+ *  @version Act_1_0
+ */
+
+
+#ifndef WHILEOPERATOR_SER
+#define WHILEOPERATOR_SER
+
+#include "Entities/Operators/whileoperator.h"
+
+namespace abi {
+
+/**
+ * @brief The entity_traits class
+ * byte and words measuring traits for Entity
+ */
+template<>
+struct entity_traits<WhileOperator, abi::Version::Act_1_0> {
+    static constexpr bool is_fixed = true;
+    static constexpr int minimum_bytes = 0;
+    static constexpr int maximum_bytes = minimum_bytes;
+
+    static constexpr const char* name = "WhileOperator";
+    static constexpr int minimum_words = 0;
+    static constexpr int maximum_words = minimum_words;
+};
+
+/**
+ * @brief The Writer class
+ * version generalized write interface
+ */
+template<>
+struct Writer<WhileOperator, abi::Version::Act_1_0> {
+    static void write(QDataStream& out, const WhileOperator& o) {
+
+    }
+
+    static void write(StringListCursor& out, const WhileOperator& o) {
+
+    }
+};
+
+/**
+ * @brief The Reader class
+ * version generalized read interface
+ */
+template<>
+struct Reader<WhileOperator, abi::Version::Act_1_0> {
+    static void read(QDataStream& in, WhileOperator& o) {
+
+    }
+
+    static void read(StringListCursor& in, WhileOperator& o) {
+
+    }
+};
+
+}   // namespace abi
+
+#endif  // WHILEOPERATOR_SER

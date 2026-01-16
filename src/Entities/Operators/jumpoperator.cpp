@@ -21,6 +21,15 @@ Entity::hash_type JumpOperator::hash() const
 }
 
 /**
+ * @brief JumpOperator::type
+ * @return type of this operator
+ */
+OperatorType JumpOperator::type() const
+{
+    return OperatorType::Jump;
+}
+
+/**
  * @brief JumpOperator::apply
  * @param context
  * @param scene

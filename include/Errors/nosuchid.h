@@ -2,7 +2,7 @@
 #define NOSUCHID_H
 
 #include "error.h"
-#include "utils.h"
+#include "common.h"
 
 class NoSuchId : public Error
 {

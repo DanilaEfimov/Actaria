@@ -50,3 +50,11 @@ void NameVar::setValue(ContextValue value) noexcept
 {
     this->value = std::get<QString>(value);
 }
+
+/**
+ * @brief NameVar::operator QString
+ */
+NameVar::operator QString() const noexcept
+{
+    return this->value;
+}

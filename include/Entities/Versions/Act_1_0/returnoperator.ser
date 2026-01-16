@@ -1,0 +1,61 @@
+/**
+ *  @file returnoperator.ser
+ *  @version Act_1_0
+ */
+
+
+#ifndef RETURNOPERATOR_SER
+#define RETURNOPERATOR_SER
+
+#include "Entities/Operators/returnoperator.h"
+
+namespace abi {
+
+/**
+ * @brief The entity_traits class
+ * byte and words measuring traits for Entity
+ */
+template<>
+struct entity_traits<ReturnOperator, abi::Version::Act_1_0> {
+    static constexpr bool is_fixed = true;
+    static constexpr int minimum_bytes = 0;
+    static constexpr int maximum_bytes = minimum_bytes;
+
+    static constexpr const char* name = "ReturnOperator";
+    static constexpr int minimum_words = 0;
+    static constexpr int maximum_words = minimum_words;
+};
+
+/**
+ * @brief The Writer class
+ * version generalized write interface
+ */
+template<>
+struct Writer<ReturnOperator, abi::Version::Act_1_0> {
+    static void write(QDataStream& out, const ReturnOperator& o) {
+
+    }
+
+    static void write(StringListCursor& out, const ReturnOperator& o) {
+
+    }
+};
+
+/**
+ * @brief The Reader class
+ * version generalized read interface
+ */
+template<>
+struct Reader<ReturnOperator, abi::Version::Act_1_0> {
+    static void read(QDataStream& in, ReturnOperator& o) {
+
+    }
+
+    static void read(StringListCursor& in, ReturnOperator& o) {
+
+    }
+};
+
+}   // namespace abi
+
+#endif  // RETURNOPERATOR_SER

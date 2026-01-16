@@ -1,0 +1,61 @@
+/**
+ *  @file nextoperator.ser
+ *  @version Act_1_0
+ */
+
+
+#ifndef NEXTOPERATOR_SER
+#define NEXTOPERATOR_SER
+
+#include "Entities/Operators/nextoperator.h"
+
+namespace abi {
+
+/**
+ * @brief The entity_traits class
+ * byte and words measuring traits for Entity
+ */
+template<>
+struct entity_traits<NextOperator, abi::Version::Act_1_0> {
+    static constexpr bool is_fixed = true;
+    static constexpr int minimum_bytes = 0;
+    static constexpr int maximum_bytes = minimum_bytes;
+
+    static constexpr const char* name = "NextOperator";
+    static constexpr int minimum_words = 0;
+    static constexpr int maximum_words = minimum_words;
+};
+
+/**
+ * @brief The Writer class
+ * version generalized write interface
+ */
+template<>
+struct Writer<NextOperator, abi::Version::Act_1_0> {
+    static void write(QDataStream& out, const NextOperator& o) {
+
+    }
+
+    static void write(StringListCursor& out, const NextOperator& o) {
+
+    }
+};
+
+/**
+ * @brief The Reader class
+ * version generalized read interface
+ */
+template<>
+struct Reader<NextOperator, abi::Version::Act_1_0> {
+    static void read(QDataStream& in, NextOperator& o) {
+
+    }
+
+    static void read(StringListCursor& in, NextOperator& o) {
+
+    }
+};
+
+}   // namespace abi
+
+#endif  // NEXTOPERATOR_SER

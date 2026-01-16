@@ -10,20 +10,25 @@ class ConditionOperator : public Operator
 {
     ACT_SERIALIZABLE
 
+public:
+    using base_t = Operator;
     using ContextValue = ContextVar::ContextValue;
 
-    std::unique_ptr<Event> trueEvent;
-    std::unique_ptr<Event> falseEvent;
+private:
+    std::shared_ptr<Event> trueEvent;
+    std::shared_ptr<Event> falseEvent;
     bool value;
 
 public:
     ConditionOperator(bool value,
-                      std::unique_ptr<Event> trueEvent,
-                      std::unique_ptr<Event> falseEvent = nullptr);
+                      std::shared_ptr<Event> trueEvent,
+                      std::shared_ptr<Event> falseEvent = nullptr);
 
     hash_type hash() const override;
 
     bool apply(Context &context, Scene &scene) override;
+
+    OperatorType type() const override;
 };
 
 #endif // CONDITIONOPERATOR_H
