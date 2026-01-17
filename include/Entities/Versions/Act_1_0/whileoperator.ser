@@ -33,11 +33,13 @@ struct entity_traits<WhileOperator, abi::Version::Act_1_0> {
 template<>
 struct Writer<WhileOperator, abi::Version::Act_1_0> {
     static void write(QDataStream& out, const WhileOperator& o) {
-
+        out << o.toCompare << o.body;
     }
 
     static void write(StringListCursor& out, const WhileOperator& o) {
-
+        out.append(entity_traits<WhileOperator, abi::Version::Act_1_0>::name);
+        out.append(QString::number(o.toCompare));
+        out.append(QString::number(o.body));
     }
 };
 
@@ -48,11 +50,14 @@ struct Writer<WhileOperator, abi::Version::Act_1_0> {
 template<>
 struct Reader<WhileOperator, abi::Version::Act_1_0> {
     static void read(QDataStream& in, WhileOperator& o) {
-
+        in >> o.toCompare >> o.body;
     }
 
     static void read(StringListCursor& in, WhileOperator& o) {
+        o.toCompare = static_cast<Entity::id_type>(in.next().toLongLong());
+        o.body = static_cast<Entity::id_type>(in.next().toLongLong());
 
+        in.skip();
     }
 };
 

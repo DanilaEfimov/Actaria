@@ -35,12 +35,13 @@ template<>
 struct Writer<AssignmentOperator, abi::Version::Act_1_0> {
     static void write(QDataStream& out, const AssignmentOperator& o) {
         out << o.lvalue;
-        writeValue(out, o.rvalue);
+        utils::writeValue(out, o.rvalue);
     }
 
     static void write(StringListCursor& out, const AssignmentOperator& o) {
+        out.append(entity_traits<AssignmentOperator, abi::Version::Act_1_0>::name);
         out.append(QString::number(o.lvalue));
-        writeValue(out, o.rvalue);
+        utils::writeValue(out, o.rvalue);
     }
 };
 
@@ -52,12 +53,16 @@ template<>
 struct Reader<AssignmentOperator, abi::Version::Act_1_0> {
     static void read(QDataStream& in, AssignmentOperator& o) {
         in >> o.lvalue;
-        readValue(in, o.rvalue);
+        utils::readValue(in, o.rvalue);
     }
 
     static void read(StringListCursor& in, AssignmentOperator& o) {
+        in.skip();
         o.lvalue = static_cast<Entity::id_type>(in.peek().toLongLong());
-        readValue(in, o.rvalue);
+
+        in.skip();
+        utils::readValue(in, o.rvalue);
+        in.skip();
     }
 };
 

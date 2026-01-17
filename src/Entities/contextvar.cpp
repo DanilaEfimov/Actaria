@@ -56,7 +56,7 @@ void ContextVar::setName(const QString &name) noexcept
  */
 bool ContextVar::setValueSafe(ContextValue value)
 {
-    if(typeOf(value) != this->type())
+    if(utils::typeOf(value) != this->type())
         return false;
 
     this->setValue(value);

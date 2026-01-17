@@ -5,11 +5,14 @@
 
 
 /**
- * @brief WhileOperator::hash
- * @return
+ * @brief WhileOperator::WhileOperator
+ * @param variable
+ * @param body
  */
-WhileOperator::WhileOperator(id_type variable, Event *body)
-    : Operator(), body(body), toCompare(variable)
+WhileOperator::WhileOperator(id_type variable, id_type body)
+    : Operator(),
+    body(body),
+    toCompare(variable)
 {}
 
 /**
@@ -32,14 +35,14 @@ bool WhileOperator::apply(Context &context, Scene &scene)
 
     ContextValue val = context.getValue(this->toCompare);
 
-    if(typeOf(val) != VarType::Trigger)
+    if(utils::typeOf(val) != VarType::Trigger)
         throw TypeMismatch(
             "WhileOperator::apply: variable have to be a Trigger",
-            typeOf(val), VarType::Trigger
+            utils::typeOf(val), VarType::Trigger
             );
 
-    while(std::get<bool>(val)){
-        res &= this->body->exec(context, scene);
+    while(std::get<Trigger::value_type>(val)){
+        //res &= this->body->exec(context, scene);
         val = context.getValue(this->toCompare);
     }
 

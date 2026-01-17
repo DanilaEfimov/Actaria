@@ -1,13 +1,14 @@
 #include "Entities/Operators/returnoperator.h"
 #include "Entities/event.h"
+#include "Entities/context.h"
 
 
 /**
  * @brief ReturnOperator::ReturnOperator
  * @param caller
  */
-ReturnOperator::ReturnOperator(Event *caller)
-    : Operator(), caller(caller)
+ReturnOperator::ReturnOperator()
+    : Operator()
 {}
 
 /**
@@ -36,5 +37,7 @@ OperatorType ReturnOperator::type() const
 bool ReturnOperator::apply([[gnu::unused]] Context &context,
                            [[gnu::unused]] Scene &scene)
 {
-    return this->caller->returned = true;
+    context.popEvent();
+
+    return true;
 }

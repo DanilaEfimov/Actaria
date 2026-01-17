@@ -9,10 +9,12 @@ class ReturnOperator : public Operator
 {
     ACT_SERIALIZABLE
 
-    Event* caller;
-
 public:
-    ReturnOperator(Event* caller);
+    using base_t = Operator;
+
+    static constexpr int magic_mark = static_cast<int>(utils::fnv1a_64("returnoperator"));
+
+    ReturnOperator();
 
     hash_type hash() const override;
 

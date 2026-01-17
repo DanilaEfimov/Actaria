@@ -16,6 +16,7 @@ public:
 private slots:
     void test_serializing();
     void test_processing();
+    void test_utils_processing();
     void test_id_counting();
     void test_context_algebra();
     void test_OSG();

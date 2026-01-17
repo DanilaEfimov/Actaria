@@ -7,7 +7,10 @@
 #ifndef RETURNOPERATOR_SER
 #define RETURNOPERATOR_SER
 
+#define MAGIC_MARK
+
 #include "Entities/Operators/returnoperator.h"
+
 
 namespace abi {
 
@@ -33,11 +36,11 @@ struct entity_traits<ReturnOperator, abi::Version::Act_1_0> {
 template<>
 struct Writer<ReturnOperator, abi::Version::Act_1_0> {
     static void write(QDataStream& out, const ReturnOperator& o) {
-
+        out << ReturnOperator::magic_mark;
     }
 
     static void write(StringListCursor& out, const ReturnOperator& o) {
-
+        out.append(entity_traits<ReturnOperator, abi::Version::Act_1_0>::name);
     }
 };
 
@@ -48,11 +51,11 @@ struct Writer<ReturnOperator, abi::Version::Act_1_0> {
 template<>
 struct Reader<ReturnOperator, abi::Version::Act_1_0> {
     static void read(QDataStream& in, ReturnOperator& o) {
-
+        in.skipRawData(sizeof(ReturnOperator::magic_mark));
     }
 
     static void read(StringListCursor& in, ReturnOperator& o) {
-
+        in.skip();
     }
 };
 

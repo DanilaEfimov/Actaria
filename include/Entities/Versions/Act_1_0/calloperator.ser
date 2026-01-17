@@ -33,11 +33,11 @@ struct entity_traits<CallOperator, abi::Version::Act_1_0> {
 template<>
 struct Writer<CallOperator, abi::Version::Act_1_0> {
     static void write(QDataStream& out, const CallOperator& o) {
-
+        out << o.event;
     }
 
     static void write(StringListCursor& out, const CallOperator& o) {
-
+        out.append(QString::number(o.event));
     }
 };
 
@@ -48,11 +48,12 @@ struct Writer<CallOperator, abi::Version::Act_1_0> {
 template<>
 struct Reader<CallOperator, abi::Version::Act_1_0> {
     static void read(QDataStream& in, CallOperator& o) {
-
+        in >> o.event;
     }
 
     static void read(StringListCursor& in, CallOperator& o) {
-
+        o.event = static_cast<Entity::id_type>(in.peek().toLongLong());
+        in.skip();
     }
 };
 

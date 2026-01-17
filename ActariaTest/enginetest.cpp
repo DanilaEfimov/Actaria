@@ -2,6 +2,7 @@
 #include "testutils.h"
 #include "readwrite.h"
 #include "contextvarfabric.h"
+#include "utils.h"
 
 #include "entity.ser"
 
@@ -11,6 +12,9 @@
 
 #include "operator.ser"
 #include "assignmentoperator.ser"
+#include "returnoperator.ser"
+#include "calloperator.ser"
+#include "whileoperator.ser"
 
 #include "Entities/context.h"
 
@@ -77,6 +81,11 @@ void EngineTest::test_processing()
     this->operators_processing();
 }
 
+void EngineTest::test_utils_processing()
+{
+
+}
+
 void EngineTest::test_id_counting()
 {
 
@@ -122,10 +131,7 @@ void EngineTest::namedvar_serializing()
         QCOMPARE(restored.type(), VarType::Name);
         QCOMPARE(restored.hash(), original.hash());
         QCOMPARE(QString(restored), QString(original));
-        QCOMPARE(
-            std::get<NameVar::value_type>(restored.getValue()),
-            std::get<NameVar::value_type>(original.getValue())
-            );
+        QVERIFY(utils::compare(original.getValue(), restored.getValue()));
         QCOMPARE(restored.getName(), original.getName());
     }
 }
@@ -160,10 +166,7 @@ void EngineTest::counter_serializing()
         QCOMPARE(restored.type(), VarType::Counter);
         QCOMPARE(restored.hash(), original.hash());
         QCOMPARE(int(restored), int(original));
-        QCOMPARE(
-            std::get<Counter::value_type>(restored.getValue()),
-            std::get<Counter::value_type>(original.getValue())
-            );
+        QVERIFY(utils::compare(original.getValue(), restored.getValue()));
         QCOMPARE(restored.getName(), original.getName());
     }
 }
@@ -194,10 +197,7 @@ void EngineTest::trigger_serializing()
         QCOMPARE(restored.type(), VarType::Trigger);
         QCOMPARE(restored.hash(), original.hash());
         QCOMPARE(bool(restored), bool(original));
-        QCOMPARE(
-            std::get<Trigger::value_type>(restored.getValue()),
-            std::get<Trigger::value_type>(original.getValue())
-            );
+        QVERIFY(utils::compare(original.getValue(), restored.getValue()));
         QCOMPARE(restored.getName(), original.getName());
     }
 }
@@ -233,7 +233,7 @@ void EngineTest::context_variables_processing()
             qDebug() << "EngineTest::assignment_operator_serializing: undefined type";
         }
 
-        compare(true, variable.second->getValue());
+        utils::compare(true, variable.second->getValue());
     }
 }
 
@@ -282,6 +282,7 @@ void EngineTest::operators_serializing()
     this->while_operator_serializing();
     this->jump_operator_serializing();
     this->condition_operator_serializing();
+    this->next_operator_serializing();
     this->assignment_operator_serializing();
 }
 
@@ -292,7 +293,41 @@ void EngineTest::jump_operator_serializing()
 
 void EngineTest::call_operator_serializing()
 {
+    QList<Entity::id_type> ids = {
+        0,
+        1,
+        42,
+        UNDEFINED_ID,
+        std::numeric_limits<Entity::id_type>::max(),
+        std::numeric_limits<Entity::id_type>::min()
+    };
 
+    for(auto id : ids) {
+
+        CallOperator op(id);
+        CallOperator restored(UNDEFINED_ID);
+
+        QByteArray buffer;
+
+        QDataStream out(&buffer, QDataStream::WriteOnly);
+        abi::write<CallOperator, EngineInfo::defaultVersion>(out, op);
+
+        QDataStream in(&buffer, QIODevice::ReadOnly);
+        abi::read<CallOperator, EngineInfo::defaultVersion>(in, restored);
+
+        QCOMPARE(op.id, restored.id);
+        QCOMPARE(op.event, restored.event);
+
+        StringListCursor strbuffer;
+
+        abi::write<CallOperator, EngineInfo::defaultVersion>(strbuffer, op);
+
+        strbuffer.reset();
+        abi::read<CallOperator, EngineInfo::defaultVersion>(strbuffer, restored);
+
+        QCOMPARE(op.id, restored.id);
+        QCOMPARE(op.event, restored.event);
+    }
 }
 
 void EngineTest::next_operator_serializing()
@@ -300,14 +335,80 @@ void EngineTest::next_operator_serializing()
 
 }
 
+/**
+ * @brief EngineTest::return_operator_serializing
+ *
+ * Return operator is a special deriver of Operator.
+ * Object of same type have not any own fields.
+ */
 void EngineTest::return_operator_serializing()
 {
+    ReturnOperator op;
+    ReturnOperator restored;
 
+    QByteArray buffer;
+
+    QDataStream out(&buffer, QDataStream::WriteOnly);
+    abi::write<ReturnOperator, EngineInfo::defaultVersion>(out, op);
+
+    DEBUG_ONLY(
+        qDebug() << "\n\treturn operator dump:\n\t" << buffer.toHex(' ');
+        );
+
+    QDataStream in(&buffer, QIODevice::ReadOnly);
+    abi::read<ReturnOperator, EngineInfo::defaultVersion>(in, restored);
+
+    QVERIFY(op.id == restored.id);
+
+    StringListCursor strbuffer;
+
+    abi::write<ReturnOperator, EngineInfo::defaultVersion>(strbuffer, op);
+
+    strbuffer.reset();
+    abi::read<ReturnOperator, EngineInfo::defaultVersion>(strbuffer, restored);
+
+    QVERIFY(op.id == restored.id);
 }
 
 void EngineTest::while_operator_serializing()
 {
+    QList<Entity::id_type> ids = {
+        0,
+        1,
+        42,
+        UNDEFINED_ID,
+        std::numeric_limits<Entity::id_type>::max(),
+        std::numeric_limits<Entity::id_type>::min()
+    };
 
+    for (auto id1 : ids) {
+        for (auto id2 : ids) {
+
+            WhileOperator op(id1, id2);
+            WhileOperator restored(UNDEFINED_ID, UNDEFINED_ID);
+
+            QByteArray buffer;
+            QDataStream out(&buffer, QDataStream::WriteOnly);
+            abi::write<WhileOperator, EngineInfo::defaultVersion>(out, op);
+
+            QDataStream in(&buffer, QIODevice::ReadOnly);
+            abi::read<WhileOperator, EngineInfo::defaultVersion>(in, restored);
+
+            QCOMPARE(op.id, restored.id);
+            QCOMPARE(op.body, restored.body);
+            QCOMPARE(op.toCompare, restored.toCompare);
+
+            StringListCursor strbuffer;
+            abi::write<WhileOperator, EngineInfo::defaultVersion>(strbuffer, op);
+
+            strbuffer.reset();
+            abi::read<WhileOperator, EngineInfo::defaultVersion>(strbuffer, restored);
+
+            QCOMPARE(op.id, restored.id);
+            QCOMPARE(op.body, restored.body);
+            QCOMPARE(op.toCompare, restored.toCompare);
+        }
+    }
 }
 
 void EngineTest::condition_operator_serializing()
@@ -317,7 +418,44 @@ void EngineTest::condition_operator_serializing()
 
 void EngineTest::assignment_operator_serializing()
 {
+    AssignmentOperator restored(UNDEFINED_ID, {});
 
+    QRandomGenerator* generator = QRandomGenerator::global();
+
+    for(auto& variable : context.variables) {
+
+        AssignmentOperator op(variable.second->id,
+            [&]() -> ContextValue {
+            switch(variable.second->type()){
+                case VarType::Counter: return generator->bounded(0x7FFFFFFF);
+                case VarType::Name: return randomString(16);
+                case VarType::Trigger: return variable.first % 2 ? true : false;
+                default:
+                    return -1;
+            }
+        }());
+
+        QByteArray buffer;
+
+        QDataStream out(&buffer, QDataStream::WriteOnly);
+        abi::write<AssignmentOperator, EngineInfo::defaultVersion>(out, op);
+
+        QDataStream in(&buffer, QIODevice::ReadOnly);
+        abi::read<AssignmentOperator, EngineInfo::defaultVersion>(in, restored);
+
+        QCOMPARE(op.lvalue, restored.lvalue);
+        QVERIFY(utils::compare(op.rvalue, restored.rvalue));
+
+        StringListCursor strbuffer;
+
+        abi::write<AssignmentOperator, EngineInfo::defaultVersion>(strbuffer, op);
+
+        strbuffer.reset();
+        abi::read<AssignmentOperator, EngineInfo::defaultVersion>(strbuffer, restored);
+
+        QCOMPARE(op.lvalue, restored.lvalue);
+        QVERIFY(utils::compare(op.rvalue, op.rvalue));
+    }
 }
 
 // ^^^ operators serializing / operators processing vvv
@@ -374,7 +512,7 @@ void EngineTest::assignment_operator_processing()
         op.rvalue = assigned;
         op.apply(context, scene);   // scene marked as gnu::unused
 
-        QVERIFY(compare(op.rvalue, variable.second->getValue()));
+        QVERIFY(utils::compare(op.rvalue, variable.second->getValue()));
     }
 
     try {

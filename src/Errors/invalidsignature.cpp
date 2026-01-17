@@ -31,7 +31,7 @@ const char* InvalidSignature::what() const noexcept
         QString s = "";
         auto it = this->given.begin();
         for(size_t i = 0; i < this->given.size(); i++){
-            s += ContextValueTypeString(*(it + i));
+            s += utils::ContextValueTypeString(*(it + i));
             if(i + 1 < this->given.size())
                 s += ", ";
         }

@@ -7,14 +7,21 @@
  * @brief Context::Context
  */
 Context::Context()
-    : Entity(), variables(), characters()
+    : Entity(),
+    variables(),
+    characters(),
+    callStack()
 {}
 
 /**
  * @brief Context::Context
  * @param other
  */
-Context::Context(Context &&other)
+Context::Context(Context&& other)
+    : Entity(),
+    variables(),
+    characters(),
+    callStack()
 {
     this->merge(std::move(other));
 }
@@ -40,6 +47,56 @@ void Context::merge(Context&& context)
 {
     this->variables.merge(std::move(context.variables));
     this->characters.merge(std::move(context.characters));
+}
+
+/**
+ * @brief Context::stackDepth
+ * @return
+ */
+int Context::stackDepth() const noexcept
+{
+    this->callStack.size();
+}
+
+/**
+ * @brief Context::top
+ * @return  last called event pointer if call stack is not empty,
+ *          nullptr otherwise.
+ */
+Context::event_ptr Context::top() const noexcept
+{
+    if(this->callStack.empty())
+        return nullptr;
+
+    return this->callStack.top();
+}
+
+/**
+ * @brief Context::stackEmpty
+ * @return  true if call stack is empty,
+ *          false otherwise.
+ */
+bool Context::stackEmpty() const noexcept
+{
+    return this->callStack.empty();
+}
+
+/**
+ * @brief Context::pushEvent
+ * @param event
+ */
+void Context::pushEvent(event_ptr event)
+{
+    this->callStack.push(event);
+}
+
+/**
+ * @brief Context::popEvent
+ */
+void Context::popEvent()
+{
+    if(!this->stackEmpty())
+        this->callStack.pop();
 }
 
 /**

@@ -15,11 +15,11 @@
 Constant calculateBinary(ContextAlgebra op, Constant l, Constant r) {
     switch(op){
     case ContextAlgebra::Plus:
-        if(typeOf(l) != typeOf(r))
+        if(utils::typeOf(l) != utils::typeOf(r))
             throw TypeMismatch(
-                "Invalid types for Plus", typeOf(l), typeOf(r)
+                "Invalid types for Plus", utils::typeOf(l), utils::typeOf(r)
                 );
-        if(typeOf(l) == VarType::Counter)
+        if(utils::typeOf(l) == VarType::Counter)
         return std::get<int>(l) + std::get<int>(r);
         else
         return std::get<QString>(l) + std::get<QString>(r);
@@ -56,10 +56,10 @@ Constant BinaryOp::evaluate() const
     auto l = this->left->evaluate();
     auto r = this->right->evaluate();
 
-    if(!isValidSignature(this->op, {typeOf(l), typeOf(r)}))
+    if(!isValidSignature(this->op, {utils::typeOf(l), utils::typeOf(r)}))
         throw InvalidSignature(
             "Operation can't be calculed",
-            {typeOf(l), typeOf(r)},
+            {utils::typeOf(l), utils::typeOf(r)},
             this->op);
 
     return calculateBinary(op, l, r);
@@ -77,7 +77,7 @@ Constant UnaryOp::evaluate() const
         }
         throw TypeMismatch(
             "invalid operand type for 'not'",
-            typeOf(value),
+            utils::typeOf(value),
             VarType::Trigger
             );
     default:

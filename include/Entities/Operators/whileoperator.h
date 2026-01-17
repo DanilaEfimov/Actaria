@@ -7,12 +7,16 @@
 
 class WhileOperator : public Operator
 {
+    ACT_SERIALIZABLE
+
 protected:
-    Event* body;
-    id_type toCompare;
+    id_type body;       // id of cycle body event
+    id_type toCompare;  // id of condition variable
 
 public:
-    WhileOperator(id_type variable, Event* body);
+    using base_t = Operator;
+
+    WhileOperator(id_type variable, id_type body);
 
     hash_type hash() const override;
 

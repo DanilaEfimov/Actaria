@@ -3,12 +3,16 @@
 
 #include "Entities/contextvar.h"
 #include "Entities/trigger.h"
+#include "Entities/trigger.h"
+#include "Entities/counter.h"
+#include "Entities/namevar.h"
 
 #include <QString>
 
-
 using ContextValue = ContextVar::ContextValue;
 
+
+namespace utils {
 
 /**
  * @brief ContextValueTypeString
@@ -25,7 +29,7 @@ QString ContextValueTypeString(VarType type);
  *          It is assumed that the order of the alternatives in
  *          ContextVar::ContextValue matches the values of the VarType enum.
  */
-VarType typeOf(ContextValue value);
+VarType typeOf(const ContextValue& value);
 
 /**
  * @brief process
@@ -97,16 +101,37 @@ void context_cast(ContextValue& value) {
     }, value);
 }
 
-bool compare(ContextValue left, ContextValue right);
+/**
+ * vvv Context variable types traits section vvv
+ */
+template<VarType V> struct VarTypeTrait;
+
+template<> struct VarTypeTrait<VarType::Counter> { using type = Counter::value_type; };
+template<> struct VarTypeTrait<VarType::Trigger> { using type = Trigger::value_type; };
+template<> struct VarTypeTrait<VarType::Name>    { using type = NameVar::value_type; };
+
+template<VarType V>
+decltype(auto) get(ContextValue& v) {
+    return std::get<typename VarTypeTrait<V>::type>(v);
+}
+/// ^^^ Context variable types traits section ^^^
+
+bool compare(const ContextValue& left, const ContextValue& right);
 bool isSuchValue(ContextValue value, VarType type);
 
 QString toString(const ContextValue& value);
 void fromString(ContextValue& value, QString str, VarType type);
 
+/**
+ * vvv abi read/write Context value interface section vvv
+ */
 void writeValue(QDataStream& out, const ContextValue& value);
 void writeValue(StringListCursor& out, const ContextValue& value);
 
 void readValue(QDataStream& in, ContextValue& value);
 void readValue(StringListCursor& in, ContextValue& value);
+/// ^^^ abi read/write Context value interface section ^^^
+
+}   // namespace utils
 
 #endif // UTILS_H

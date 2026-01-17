@@ -5,7 +5,9 @@
 #include "variables"
 #include <memory>
 #include <unordered_map>
+#include <stack>
 
+class Event;
 
 class Context : public Entity
 {
@@ -17,10 +19,12 @@ public:
     using key_t = Entity::id_type;
     using value_t = contextvar_p;
     using value_types = ContextVar::ContextValue;
+    using event_ptr = std::shared_ptr<Event>;
 
 private:
     std::unordered_map<key_t, value_t> variables;
     std::unordered_map<key_t, Character> characters;
+    std::stack<event_ptr> callStack;
 
 public:
     Context();
@@ -30,6 +34,12 @@ public:
     virtual hash_type hash() const override;
 
     void merge(Context&& context);
+
+    int stackDepth() const noexcept;
+    event_ptr top() const noexcept;
+    bool stackEmpty() const noexcept;
+    void pushEvent(event_ptr event);
+    void popEvent();
 
     void addVariable(contextvar_p contextvar);
     void addCharacter(const Character& character);
