@@ -12,7 +12,7 @@ enum class ContextAlgebra {
     And,        // (bool, bool)                     -> bool
     Or,         // (bool, bool)                     -> bool
     XOr,        // (bool, bool)                     -> bool
-    Not,        // x: bool                          -> !x
+    Not,        // bool                             -> bool
 };
 
 static constexpr size_t argRequired(ContextAlgebra);

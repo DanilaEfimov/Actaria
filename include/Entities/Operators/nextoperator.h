@@ -8,13 +8,13 @@ class NextOperator : public Operator
 {
     ACT_SERIALIZABLE
 
-    using base_t = Operator;
-
 protected:
-    Scene* next;
+    id_type next;       // id of next scene
 
 public:
-    NextOperator(Scene* newScene);
+    using base_t = Operator;
+
+    NextOperator(id_type newScene);
 
     hash_type hash() const override;
 

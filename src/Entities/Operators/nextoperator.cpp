@@ -5,14 +5,10 @@
  * @brief NextOperator::NextOperator
  * @param newScene
  */
-NextOperator::NextOperator(Scene* newScene)
-    :Operator(), next(nullptr)
-{
-    if(!newScene)
-        throw std::invalid_argument("NextOperator::NextOperator: new scene pointer can not be nullptr");
-
-    this->next = newScene;
-}
+NextOperator::NextOperator(id_type newScene)
+    : Operator(),
+    next(newScene)
+{}
 
 /**
  * @brief NextOperator::hash
@@ -40,9 +36,4 @@ OperatorType NextOperator::type() const
  */
 bool NextOperator::apply([[gnu::unused]] Context& context, Scene& scene)
 {
-    if(&scene == this->next)
-        return false;
-
-    scene = std::move(*this->next);
-    return true;
 }

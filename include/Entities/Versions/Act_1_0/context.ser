@@ -124,7 +124,7 @@ struct Writer<Context, abi::Version::Act_1_0> {
         out << static_cast<qsizetype>(c.characters.size());
         for(auto& character : c.characters){
             abi::write<Character, abi::Version::Act_1_0>(
-                out, *reinterpret_cast<const Character*>(&character.second)
+                out, character.second
             );
         }
     }
@@ -138,7 +138,7 @@ struct Writer<Context, abi::Version::Act_1_0> {
         out.append(QString::number(c.characters.size()));
         for(auto& character : c.characters){
             abi::write<Character, abi::Version::Act_1_0>(
-                out, *reinterpret_cast<const Character*>(&character.second)
+                out, character.second
             );
         }
     }

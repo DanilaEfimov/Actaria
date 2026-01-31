@@ -31,25 +31,14 @@ struct entity_traits<ConditionOperator, abi::Version::Act_1_0> {
 template<>
 struct Writer<ConditionOperator, abi::Version::Act_1_0> {
     static void write(QDataStream& out, const ConditionOperator& c) {
-        out << c.value;
-
-        abi::write<Event, Version::Act_1_0>(out, *c.trueEvent);
-
-        out << (c.falseEvent.get() ? true : false);
-        if(c.falseEvent.get()){
-            abi::write<Event, Version::Act_1_0>(out, *c.falseEvent);
-        }
+        out << c.value << c.trueEvent << c.falseEvent;
     }
 
     static void write(StringListCursor& out, const ConditionOperator& c) {
+        out.append(entity_traits<ConditionOperator, abi::Version::Act_1_0>::name);
         out.append(c.value ? TRUE_S : FALSE_S);
-
-        abi::write<Event, Version::Act_1_0>(out, *c.trueEvent);
-
-        out.append(c.falseEvent.get() ? TRUE_S : FALSE_S);
-        if(c.falseEvent.get()){
-            abi::write<Event, Version::Act_1_0>(out, *c.falseEvent);
-        }
+        out.append(QString::number(c.trueEvent));
+        out.append(QString::number(c.falseEvent));
     }
 };
 
@@ -60,27 +49,15 @@ struct Writer<ConditionOperator, abi::Version::Act_1_0> {
 template<>
 struct Reader<ConditionOperator, abi::Version::Act_1_0> {
     static void read(QDataStream& in, ConditionOperator& c) {
-        in >> c.value;
-
-        abi::read<Event, Version::Act_1_0>(in, *c.trueEvent);
-
-        bool falseBranchFlag;
-        in >> falseBranchFlag;
-        if(falseBranchFlag){
-            abi::read<Event, Version::Act_1_0>(in, *c.falseEvent);
-        }
+        in >> c.value >> c.trueEvent >> c.falseEvent;
     }
 
     static void read(StringListCursor& in, ConditionOperator& c) {
-        c.value = in.peek() == TRUE_S;
-        in.size();
+        c.value = in.next() == TRUE_S;
+        c.trueEvent = static_cast<Entity::id_type>(in.next().toLongLong());
+        c.falseEvent = static_cast<Entity::id_type>(in.next().toLongLong());
 
-        abi::read<Event, Version::Act_1_0>(in, *c.trueEvent);
-
-        bool falseBranchFlag = in.next() == TRUE_S;
-        if(falseBranchFlag){
-            abi::read<Event, Version::Act_1_0>(in, *c.falseEvent);
-        }
+        in.skip();
     }
 };
 

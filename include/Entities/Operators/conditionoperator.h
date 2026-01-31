@@ -15,14 +15,14 @@ public:
     using ContextValue = ContextVar::ContextValue;
 
 private:
-    std::shared_ptr<Event> trueEvent;
-    std::shared_ptr<Event> falseEvent;
+    id_type trueEvent;
+    id_type falseEvent;
     bool value;
 
 public:
     ConditionOperator(bool value,
-                      std::shared_ptr<Event> trueEvent,
-                      std::shared_ptr<Event> falseEvent = nullptr);
+                      id_type trueEvent,
+                      id_type falseEvent = UNDEFINED_ID);
 
     hash_type hash() const override;
 

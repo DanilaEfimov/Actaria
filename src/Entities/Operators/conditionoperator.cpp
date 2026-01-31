@@ -7,11 +7,7 @@
  * @param trueEvent
  * @param falseEvent
  */
-ConditionOperator::ConditionOperator(
-    bool value,
-    std::shared_ptr<Event> trueEvent,
-    std::shared_ptr<Event> falseEvent
-)
+ConditionOperator::ConditionOperator(bool value, id_type trueEvent, id_type falseEvent)
     : Operator(),
     trueEvent(trueEvent),
     falseEvent(falseEvent),
@@ -37,11 +33,11 @@ bool ConditionOperator::apply(Context &context, Scene &scene)
     if(this->value){
         if(!this->trueEvent)
             return false;
-        return this->trueEvent->exec(context, scene);
+        //return this->trueEvent->exec(context, scene);
     }
     else{
         if(this->falseEvent){
-            return this->falseEvent->exec(context, scene);
+            //return this->falseEvent->exec(context, scene);
         }
     }
 

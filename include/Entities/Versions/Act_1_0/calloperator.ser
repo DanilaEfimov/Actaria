@@ -37,6 +37,7 @@ struct Writer<CallOperator, abi::Version::Act_1_0> {
     }
 
     static void write(StringListCursor& out, const CallOperator& o) {
+        out.append(abi::entity_traits<CallOperator, Act_1_0>::name);
         out.append(QString::number(o.event));
     }
 };
@@ -52,7 +53,7 @@ struct Reader<CallOperator, abi::Version::Act_1_0> {
     }
 
     static void read(StringListCursor& in, CallOperator& o) {
-        o.event = static_cast<Entity::id_type>(in.peek().toLongLong());
+        o.event = static_cast<Entity::id_type>(in.next().toLongLong());
         in.skip();
     }
 };

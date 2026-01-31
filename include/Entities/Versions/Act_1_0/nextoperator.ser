@@ -33,11 +33,12 @@ struct entity_traits<NextOperator, abi::Version::Act_1_0> {
 template<>
 struct Writer<NextOperator, abi::Version::Act_1_0> {
     static void write(QDataStream& out, const NextOperator& o) {
-
+        out << o.next;
     }
 
     static void write(StringListCursor& out, const NextOperator& o) {
-
+        out.append(entity_traits<NextOperator, abi::Version::Act_1_0>::name);
+        out.append(QString::number(o.next));
     }
 };
 
@@ -48,11 +49,13 @@ struct Writer<NextOperator, abi::Version::Act_1_0> {
 template<>
 struct Reader<NextOperator, abi::Version::Act_1_0> {
     static void read(QDataStream& in, NextOperator& o) {
-
+        in >> o.next;
     }
 
     static void read(StringListCursor& in, NextOperator& o) {
+        o.next = static_cast<Entity::id_type>(in.next().toLongLong());
 
+        in.skip();
     }
 };
 

@@ -6,10 +6,14 @@
 
 class JumpOperator : public Operator
 {
+    ACT_SERIALIZABLE
+
 protected:
     id_type node;   // dialog node id
 
 public:
+    using base_t = Operator;
+
     JumpOperator(id_type node);
 
     hash_type hash() const override;

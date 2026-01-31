@@ -24,14 +24,13 @@ private slots:
 private:
     static constexpr abi::Version currentVersion = abi::EngineInfo::defaultVersion;
 
-    // Context Variables
-    // serializing
+    /* Context Variables */
+    // serializing vvv
     void namedvar_serializing();
     void counter_serializing();
     void trigger_serializing();
     void context_variable_serializing();
-
-    // processing
+    // ^^^ serializing / processing vvv
     void context_variables_processing();
 
     // Context
@@ -41,7 +40,7 @@ private:
     void player_serializing();
     void character_serializing();
 
-    // Operators
+    /* Operators */
     // serializing vvv
     void operators_serializing();
     void jump_operator_serializing();
@@ -51,7 +50,6 @@ private:
     void while_operator_serializing();
     void condition_operator_serializing();
     void assignment_operator_serializing();
-
     // ^^^ serializing / processing vvv
     void operators_processing();
     void jump_operator_processing();

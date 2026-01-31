@@ -15,14 +15,19 @@
 #include "returnoperator.ser"
 #include "calloperator.ser"
 #include "whileoperator.ser"
+#include "conditionoperator.ser"
+#include "nextoperator.ser"
+#include "jumpoperator.ser"
+
+#include "context.ser"
 
 #include "Entities/context.h"
-
 #include "Entities/scene.h"
-
 #include "Errors/nosuchid.h"
 
 #include <QByteArray>
+#include <QString>
+#include <QDir>
 
 
 namespace {
@@ -62,6 +67,28 @@ static auto initScene = []() -> bool {
 
     return true;
 }();
+
+static QFile output = []() -> QFile {
+    constexpr const char* filename = "./output.txt";
+    QFile file(filename);
+
+    if (!file.exists()) {
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            file.close();
+        }
+    }
+
+    return QFile(filename);
+}();
+
+static void writeOutput(StringListCursor& list) {
+    if(!output.isOpen())
+        output.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
+
+    output.write("\n");
+    output.write(list.list().join(EngineInfo::separator).toUtf8());
+    output.write("\n");
+}
 
 };
 
@@ -105,6 +132,14 @@ void EngineTest::namedvar_serializing()
 {
     constexpr int count = 50;
 
+    auto check = [](const NameVar& original, const NameVar& restored) {
+        QCOMPARE(restored.type(), VarType::Name);
+        QCOMPARE(restored.hash(), original.hash());
+        QCOMPARE(QString(restored), QString(original));
+        QVERIFY(utils::compare(original.getValue(), restored.getValue()));
+        QCOMPARE(restored.getName(), original.getName());
+    };
+
     for (int i = 0; i < count; ++i) {
         QString name  = QString("namevar_%1").arg(i);
         QString value = randomString(5 + i % 10);
@@ -128,17 +163,31 @@ void EngineTest::namedvar_serializing()
             abi::read<NameVar, EngineInfo::defaultVersion>(in, restored);
         }
 
-        QCOMPARE(restored.type(), VarType::Name);
-        QCOMPARE(restored.hash(), original.hash());
-        QCOMPARE(QString(restored), QString(original));
-        QVERIFY(utils::compare(original.getValue(), restored.getValue()));
-        QCOMPARE(restored.getName(), original.getName());
+        check(original, restored);
+
+        StringListCursor list;
+
+        abi::write<NameVar, EngineInfo::defaultVersion>(list, original);
+
+        abi::read<NameVar, EngineInfo::defaultVersion>(list, restored);
+
+        check(original, restored);
+
+        if(i == count / 2) writeOutput(list);
     }
 }
 
 void EngineTest::counter_serializing()
 {
     constexpr int count = 50;
+
+    auto check = [](const Counter& original, const Counter& restored) {
+        QCOMPARE(restored.type(), VarType::Counter);
+        QCOMPARE(restored.hash(), original.hash());
+        QCOMPARE(int(restored), int(original));
+        QVERIFY(utils::compare(original.getValue(), restored.getValue()));
+        QCOMPARE(restored.getName(), original.getName());
+    };
 
     for (int i = 0; i < count; ++i) {
         QString name  = QString("counter_%1").arg(i);
@@ -163,11 +212,17 @@ void EngineTest::counter_serializing()
             abi::read<Counter, EngineInfo::defaultVersion>(in, restored);
         }
 
-        QCOMPARE(restored.type(), VarType::Counter);
-        QCOMPARE(restored.hash(), original.hash());
-        QCOMPARE(int(restored), int(original));
-        QVERIFY(utils::compare(original.getValue(), restored.getValue()));
-        QCOMPARE(restored.getName(), original.getName());
+        check(original, restored);
+
+        StringListCursor list;
+
+        abi::write<Counter, EngineInfo::defaultVersion>(list, original);
+
+        abi::read<Counter, EngineInfo::defaultVersion>(list, restored);
+
+        check(original, restored);
+
+        if(i == count / 2) writeOutput(list);
     }
 }
 
@@ -239,28 +294,30 @@ void EngineTest::context_variables_processing()
 
 void EngineTest::context_serializing()
 {
-    // Context copy;
+    Context copy;
 
-    // QByteArray serialized;
-    // {
-    //     QDataStream out(&serialized, QIODevice::WriteOnly);
-    //     abi::write<Context, EngineInfo::defaultVersion>(out, context);
-    // }
+    QByteArray serialized;
+    {
+        QDataStream out(&serialized, QIODevice::WriteOnly);
+        abi::write<Context, EngineInfo::defaultVersion>(out, context);
+    }
 
-    // {
-    //     QDataStream in(&serialized, QIODevice::ReadOnly);
-    //     abi::read<Context, EngineInfo::defaultVersion>(in, copy);
-    // }
+    {
+        QDataStream in(&serialized, QIODevice::ReadOnly);
+        abi::read<Context, EngineInfo::defaultVersion>(in, copy);
+    }
 
-    // QCOMPARE(copy, context);
+    QCOMPARE(copy, context);
 
-    // StringListCursor line;
+    StringListCursor line;
 
-    // abi::write<Context, EngineInfo::defaultVersion>(line, context);
+    abi::write<Context, EngineInfo::defaultVersion>(line, context);
 
-    // abi::read<Context, EngineInfo::defaultVersion>(line, copy);
+    abi::read<Context, EngineInfo::defaultVersion>(line, copy);
 
-    // QCOMPARE(copy, context);
+    writeOutput(line);
+
+    QCOMPARE(copy, context);
 }
 
 void EngineTest::player_serializing()
@@ -288,7 +345,43 @@ void EngineTest::operators_serializing()
 
 void EngineTest::jump_operator_serializing()
 {
+    QList<Entity::id_type> ids = {
+        0,
+        1,
+        42,
+        UNDEFINED_ID,
+        std::numeric_limits<Entity::id_type>::max(),
+        std::numeric_limits<Entity::id_type>::min()
+    };
 
+    for(auto id : ids) {
+
+        JumpOperator op(id);
+        JumpOperator restored(UNDEFINED_ID);
+
+        QByteArray buffer;
+
+        QDataStream out(&buffer, QDataStream::WriteOnly);
+        abi::write<JumpOperator, EngineInfo::defaultVersion>(out, op);
+
+        QDataStream in(&buffer, QIODevice::ReadOnly);
+        abi::read<JumpOperator, EngineInfo::defaultVersion>(in, restored);
+
+        QCOMPARE(op.id, restored.id);
+        QCOMPARE(op.node, restored.node);
+
+        StringListCursor strbuffer;
+
+        abi::write<JumpOperator, EngineInfo::defaultVersion>(strbuffer, op);
+
+        strbuffer.reset();
+        abi::read<JumpOperator, EngineInfo::defaultVersion>(strbuffer, restored);
+
+        QCOMPARE(op.id, restored.id);
+        QCOMPARE(op.node, restored.node);
+
+        if(id) writeOutput(strbuffer);
+    }
 }
 
 void EngineTest::call_operator_serializing()
@@ -327,12 +420,50 @@ void EngineTest::call_operator_serializing()
 
         QCOMPARE(op.id, restored.id);
         QCOMPARE(op.event, restored.event);
+
+        if(id) writeOutput(strbuffer);
     }
 }
 
 void EngineTest::next_operator_serializing()
 {
+    QList<Entity::id_type> ids = {
+        0,
+        1,
+        42,
+        UNDEFINED_ID,
+        std::numeric_limits<Entity::id_type>::max(),
+        std::numeric_limits<Entity::id_type>::min()
+    };
 
+    for(auto id : ids) {
+
+        NextOperator op(id);
+        NextOperator restored(UNDEFINED_ID);
+
+        QByteArray buffer;
+
+        QDataStream out(&buffer, QDataStream::WriteOnly);
+        abi::write<NextOperator, EngineInfo::defaultVersion>(out, op);
+
+        QDataStream in(&buffer, QIODevice::ReadOnly);
+        abi::read<NextOperator, EngineInfo::defaultVersion>(in, restored);
+
+        QCOMPARE(op.id, restored.id);
+        QCOMPARE(op.next, restored.next);
+
+        StringListCursor strbuffer;
+
+        abi::write<NextOperator, EngineInfo::defaultVersion>(strbuffer, op);
+
+        strbuffer.reset();
+        abi::read<NextOperator, EngineInfo::defaultVersion>(strbuffer, restored);
+
+        QCOMPARE(op.id, restored.id);
+        QCOMPARE(op.next, restored.next);
+
+        if(id) writeOutput(strbuffer);
+    }
 }
 
 /**
@@ -368,6 +499,8 @@ void EngineTest::return_operator_serializing()
     abi::read<ReturnOperator, EngineInfo::defaultVersion>(strbuffer, restored);
 
     QVERIFY(op.id == restored.id);
+
+    writeOutput(strbuffer);
 }
 
 void EngineTest::while_operator_serializing()
@@ -407,13 +540,54 @@ void EngineTest::while_operator_serializing()
             QCOMPARE(op.id, restored.id);
             QCOMPARE(op.body, restored.body);
             QCOMPARE(op.toCompare, restored.toCompare);
+
+            if(id1 > id2) writeOutput(strbuffer);
         }
     }
 }
 
 void EngineTest::condition_operator_serializing()
 {
+    QList<Entity::id_type> ids = {
+        0,
+        1,
+        42,
+        UNDEFINED_ID,
+        std::numeric_limits<Entity::id_type>::max(),
+        std::numeric_limits<Entity::id_type>::min()
+    };
 
+    for (auto id1 : ids) {
+        for (auto id2 : ids) {
+
+            bool value = (id1 + id2) % 2 ? true : false;
+            ConditionOperator op(value, id1, id2);
+            ConditionOperator restored(value, UNDEFINED_ID, UNDEFINED_ID);
+
+            QByteArray buffer;
+            QDataStream out(&buffer, QDataStream::WriteOnly);
+            abi::write<ConditionOperator, EngineInfo::defaultVersion>(out, op);
+
+            QDataStream in(&buffer, QIODevice::ReadOnly);
+            abi::read<ConditionOperator, EngineInfo::defaultVersion>(in, restored);
+
+            QCOMPARE(op.id, restored.id);
+            QCOMPARE(op.trueEvent, restored.trueEvent);
+            QCOMPARE(op.falseEvent, restored.falseEvent);
+
+            StringListCursor strbuffer;
+            abi::write<ConditionOperator, EngineInfo::defaultVersion>(strbuffer, op);
+
+            strbuffer.reset();
+            abi::read<ConditionOperator, EngineInfo::defaultVersion>(strbuffer, restored);
+
+            QCOMPARE(op.id, restored.id);
+            QCOMPARE(op.trueEvent, restored.trueEvent);
+            QCOMPARE(op.falseEvent, restored.falseEvent);
+
+            if(id1 > id2) writeOutput(strbuffer);
+        }
+    }
 }
 
 void EngineTest::assignment_operator_serializing()

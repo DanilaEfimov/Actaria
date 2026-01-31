@@ -1,0 +1,8 @@
+#include "operator.ser"
+#include "assignmentoperator.ser"
+#include "returnoperator.ser"
+#include "calloperator.ser"
+#include "whileoperator.ser"
+#include "nextoperator.ser"
+#include "jumpoperator.ser"
+#include "conditionoperator.ser"
