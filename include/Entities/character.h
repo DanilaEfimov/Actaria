@@ -10,7 +10,8 @@ enum class Mood {
     Happy,
     Excited,
     Scared,
-    Angry
+    Angry,
+    Unknown // a special value for bounding Mood range
 };
 
 class Character : public Entity

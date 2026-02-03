@@ -1,4 +1,122 @@
-#ifndef SCENE_H
-#define SCENE_H
+#ifndef SCENE_SER
+#define SCENE_SER
 
-#endif // SCENE_H
+#include "Entities/scene.h"
+#include "dialog.ser"
+
+namespace abi {
+
+/**
+ * abi-like interface for scecific class SceneMeta
+ * provides two overrides of read/write functions
+ * with version control
+ */
+
+/**
+ * @brief write
+ * @param out output data stream reference
+ * @param sm const scene meta reference
+ */
+template<std::derived_from<SceneMeta> T,
+         abi::Version = abi::Version::Act_1_0>
+void write(QDataStream& out, const T& sm) {
+    out << sm.getBackgroundPath()
+        << sm.getSoundPath()
+        << sm.getDescription();
+};
+
+/**
+ * @brief read
+ * @param in
+ * @param sm
+ */
+template<std::derived_from<SceneMeta> T,
+         abi::Version = abi::Version::Act_1_0>
+void read(QDataStream& in, T& sm) {
+    path_t buffer;
+    in >> buffer; sm.setBackgroundPath(std::move(buffer));
+    in >> buffer; sm.setSoundPath(std::move(buffer));
+    in >> buffer; sm.setDescription(std::move(buffer));
+};
+
+/**
+ * @brief write
+ * @param out
+ * @param sm
+ */
+template<std::derived_from<SceneMeta> T,
+         abi::Version = abi::Version::Act_1_0>
+void write(StringListCursor& out, const T& sm) {
+    out.append(sm.getBackgroundPath());
+    out.append(sm.getSoundPath());
+    out.append(sm.getDescription());
+};
+
+/**
+ * @brief read
+ * @param in
+ * @param sm
+ */
+template<std::derived_from<SceneMeta> T,
+         abi::Version = abi::Version::Act_1_0>
+void read(StringListCursor& in, T& sm) {
+    sm.setBackgroundPath(in.peek());
+    sm.setSoundPath(in.next());
+    sm.setDescription(in.next());
+}
+
+/**
+ * @brief The entity_traits class
+ * byte and words measuring traits for Entity
+ */
+template<>
+struct entity_traits<Scene, abi::Version::Act_1_0> {
+    static constexpr bool is_fixed = false;
+    static constexpr int minimum_bytes = sizeof(qsizetype)*2;
+    static constexpr int maximum_bytes = minimum_bytes;
+
+    static constexpr const char* name = "Scene";
+    static constexpr int minimum_words = 3;
+    static constexpr int maximum_words = minimum_words;
+};
+
+/**
+ * @brief The Writer class
+ * version generalized write interface
+ */
+template<>
+struct Writer<Scene, abi::Version::Act_1_0> {
+    static void write(QDataStream& out, const Scene& s) {
+        abi::write<Dialog, Version::Act_1_0>(out, *s.getDialog());
+        abi::write(out, s.getMeta());
+    }
+
+    static void write(StringListCursor& out, const Scene& s) {
+        out.append(entity_traits<Scene, abi::Version::Act_1_0>::name);
+        abi::write<Dialog, Version::Act_1_0>(out, *s.getDialog());
+        abi::write(out, s.getMeta());
+    }
+};
+
+/**
+ * @brief The Reader class
+ * version generalized read interface
+ */
+template<>
+struct Reader<Scene, abi::Version::Act_1_0> {
+    static void read(QDataStream& in, Scene& s) {
+        abi::read<Dialog, Version::Act_1_0>(in, *s.getDialog());
+        abi::read(in, s.getMeta());
+    }
+
+    static void read(StringListCursor& in, Scene& s) {
+        in.skip();  // skip typename
+
+        abi::read<Dialog, Version::Act_1_0>(in, *s.getDialog());
+        abi::read(in, s.getMeta());
+    }
+};
+
+}   // namespace abi
+
+#endif // SCENE_SER

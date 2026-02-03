@@ -1,8 +1,6 @@
 #include "player.ser"
 
 
-Context Player::experience{};
-
 /**
  * @brief Player::instance
  * @return singleton reference
@@ -34,4 +32,14 @@ Player::hash_type Player::hash() const
     constexpr auto version = EngineInfo::defaultVersion;
 
     return utils::fnv1a_64(entity_traits<entity_t, version>::name);
+}
+
+/**
+ * @brief Player::getExperience
+ * @return player experience (aka context) instance
+ */
+Context& Player::getExperience()
+{
+    static Context experience;
+    return experience;
 }

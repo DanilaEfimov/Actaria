@@ -98,6 +98,23 @@ public:
     bool empty() const noexcept {
         return this->objs.empty();
     }
+
+    /**
+     * @brief operator []
+     * @param idx
+     * @return
+     */
+    const T& operator[](int idx) const {
+        if(this->size() <= idx)
+            throw std::out_of_range("EntityManager::operator[]: index out of range");
+
+        auto it = this->objs.begin();
+        for(int i = 0; i < idx; i++) {
+            it++;
+        }
+
+        return *(it.value());
+    }
 };
 
 #endif // ENTITYMANAGER_H

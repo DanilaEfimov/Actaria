@@ -35,4 +35,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     enginetest.h \
+    globals.h \
     testutils.h

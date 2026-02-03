@@ -5,7 +5,6 @@
 #include <QtTest/QtTest>
 #include "engineinfo.h"
 
-
 class EngineTest : public QObject
 {
     Q_OBJECT

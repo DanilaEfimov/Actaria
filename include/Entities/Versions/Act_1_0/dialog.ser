@@ -2,6 +2,9 @@
 #define DIALOG_SER
 
 #include "Entities/dialog.h"
+#include "context.ser"
+#include "dialognode.ser"
+#include "event.ser"
 
 namespace abi {
 
@@ -27,10 +30,35 @@ struct entity_traits<Dialog, abi::Version::Act_1_0> {
 template<>
 struct Writer<Dialog, abi::Version::Act_1_0> {
     static void write(QDataStream& out, const Dialog& c) {
+        abi::write<Context, abi::Version::Act_1_0>(out, c.context);
+
+        qsizetype events = c.events.size();
+        out << static_cast<qsizetype>(events);
+        for(qsizetype i = 0; i < events; i++) {
+            abi::write<Event, abi::Version::Act_1_0>(out, c.events[i]);
+        }
+
+        qsizetype nodes = c.nodes.size();
+        out << static_cast<qsizetype>(nodes);
+        for(qsizetype i = 0; i < nodes; i++) {
+            abi::write<DialogNode, abi::Version::Act_1_0>(out, c.nodes[i]);
+        }
     }
 
     static void write(StringListCursor& out, const Dialog& c) {
         out.append(entity_traits<Dialog, abi::Version::Act_1_0>::name);
+
+        qsizetype events = c.events.size();
+        out.append(QString::number(events));
+        for(qsizetype i = 0; i < events; i++) {
+            abi::write<Event, abi::Version::Act_1_0>(out, c.events[i]);
+        }
+
+        qsizetype nodes = c.nodes.size();
+        out.append(QString::number(nodes));
+        for(qsizetype i = 0; i < nodes; i++) {
+            abi::write<DialogNode, abi::Version::Act_1_0>(out, c.nodes[i]);
+        }
     }
 };
 
@@ -41,12 +69,32 @@ struct Writer<Dialog, abi::Version::Act_1_0> {
 template<>
 struct Reader<Dialog, abi::Version::Act_1_0> {
     static void read(QDataStream& in, Dialog& c) {
+        abi::read<Context, abi::Version::Act_1_0>(in, c.context);
+
+        qsizetype events = 0;
+        in >> events;
+        for(qsizetype i = 0; i < events; i++) {
+            abi::write<Event, abi::Version::Act_1_0>(in, c.events[i]);
+        }
+
+        qsizetype nodes = 0;
+        in >> nodes;
+        for(qsizetype i = 0; i < nodes; i++) {
+            abi::write<DialogNode, abi::Version::Act_1_0>(in, c.nodes[i]);
+        }
     }
 
     static void read(StringListCursor& in, Dialog& c) {
-        if(in.remaining() < entity_traits<Dialog, abi::Version::Act_1_0>::minimum_words){
-            qWarning() << "Reader<Counter, Act_1_0>: not enought words in list";
-            return;
+        abi::read<Context, abi::Version::Act_1_0>(in, c.context);
+
+        qsizetype events = static_cast<qsizetype>(in.peek().toULongLong());
+        for(qsizetype i = 0; i < events; i++) {
+            abi::write<Event, abi::Version::Act_1_0>(in, c.events[i]);
+        }
+
+        qsizetype nodes = static_cast<qsizetype>(in.peek().toULongLong());
+        for(qsizetype i = 0; i < nodes; i++) {
+            abi::write<DialogNode, abi::Version::Act_1_0>(in, c.nodes[i]);
         }
     }
 };

@@ -20,53 +20,22 @@
 #include "jumpoperator.ser"
 
 #include "context.ser"
+#include "player.ser"
+#include "scene.ser"
 
-#include "Entities/context.h"
-#include "Entities/scene.h"
 #include "Errors/nosuchid.h"
 
 #include <QByteArray>
 #include <QString>
 #include <QDir>
 
+class Context;
+class Scene;
+
+extern Context context;
+extern Scene scene;
 
 namespace {
-
-static Context context;
-static Scene scene({});
-
-static auto initContext = []() -> bool {
-
-    int count = 100;
-    for(int i = 0; i < count; i++) {
-        QString name = QString("trigger%1").arg(QString::number(i));
-        bool value = QRandomGenerator().bounded(10) ? true : false;
-        context.addVariable(std::make_unique<Trigger>(value, name));
-    }
-
-    for(int i = 0; i < count; i++) {
-        QString name = QString("counter%1").arg(QString::number(i));
-        int value = QRandomGenerator().bounded(1000);
-        context.addVariable(std::make_unique<Counter>(value, name));
-    }
-
-    for(int i = 0; i < count; i++) {
-        QString name = QString("named%1").arg(QString::number(i));
-        QString value = randomString(5 + i % 12);
-        context.addVariable(std::make_unique<NameVar>(value, name));
-    }
-
-    qDebug() << "initContext: global test context initialized.";
-
-    return true;
-}();
-
-static auto initScene = []() -> bool {
-
-    qDebug() << "initScene: global test scene initialized.";
-
-    return true;
-}();
 
 static QFile output = []() -> QFile {
     constexpr const char* filename = "./output.txt";
@@ -83,7 +52,7 @@ static QFile output = []() -> QFile {
 
 static void writeOutput(StringListCursor& list) {
     if(!output.isOpen())
-        output.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
+        output.open(QIODevice::WriteOnly | QIODevice::Text);
 
     output.write("\n");
     output.write(list.list().join(EngineInfo::separator).toUtf8());
@@ -175,6 +144,10 @@ void EngineTest::namedvar_serializing()
 
         if(i == count / 2) writeOutput(list);
     }
+
+    StringListCursor list;
+    abi::write<Scene, abi::Version::Act_1_0>(list, scene);
+    writeOutput(list);
 }
 
 void EngineTest::counter_serializing()
@@ -314,6 +287,9 @@ void EngineTest::context_serializing()
     abi::write<Context, EngineInfo::defaultVersion>(line, context);
 
     abi::read<Context, EngineInfo::defaultVersion>(line, copy);
+
+    line.clear();
+    abi::write<Player, EngineInfo::defaultVersion>(line, Player::instance());
 
     writeOutput(line);
 

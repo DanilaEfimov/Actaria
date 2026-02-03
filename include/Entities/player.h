@@ -20,9 +20,9 @@ public:
 
     static Player& instance();
 
-    static Context experience;
-
     virtual hash_type hash() const override;
+
+    static Context& getExperience();
 };
 
 #endif // PLAYER_H
