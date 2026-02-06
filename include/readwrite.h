@@ -10,6 +10,8 @@
 #include "common.h"
 #include "engineinfo.h"
 #include "stringlistcursor.h"
+#include "Logging/logcore.h"
+
 #include <type_traits>
 #include <QByteArray>
 #include <QDataStream>
@@ -44,11 +46,11 @@
     template <typename T, abi::Version V> \
     friend struct abi::Reader; \
     template <utils::GameEntity T, abi::Version V> \
-    friend void abi::write(QDataStream&, const T&); \
+    friend void abi::write(DataStreamCursor&, const T&); \
     template <utils::GameEntity T, abi::Version V> \
     friend void abi::write(StringListCursor&, const T&); \
     template <utils::GameEntity T, abi::Version V> \
-    friend void abi::read(QDataStream&, T&); \
+    friend void abi::read(DataStreamCursor&, T&); \
     template <utils::GameEntity T, abi::Version V> \
     friend void abi::read(StringListCursor&, T&);
 
@@ -74,6 +76,8 @@ static auto require = []() { \
     qDebug() << "T: " << typeid(T).name() << ", V: " << typeid(V).hash_code(); \
     return typeid(T).hash_code(); \
 }();
+
+class DataStreamCursor;
 
 namespace abi {
 
@@ -104,7 +108,7 @@ struct Writer {
 
     SPECIFICATION_REQUIRED
 
-    static void write(QDataStream&, const T&);
+    static void write(DataStreamCursor&, const T&);
     static void write(StringListCursor&, const T&);
 };
 
@@ -117,7 +121,7 @@ struct Reader {
 
     SPECIFICATION_REQUIRED
 
-    static void read(QDataStream&, T&);
+    static void read(DataStreamCursor&, T&);
     static void read(StringListCursor&, T&);
 };
 
@@ -129,7 +133,7 @@ template <FundamentalType T, Version V>
 struct Writer<T, V> {
     static_assert(StreamWriteable<T> && Stringable<T>, "abi::Writer<T, V>: can not write non-specified fundamental type");
 
-    static void write(QDataStream& out, const T& obj) {
+    static void write(DataStreamCursor& out, const T& obj) {
         out << obj;
     }
 
@@ -141,7 +145,7 @@ struct Writer<T, V> {
             out.append(QString{obj});
         }
 
-        qWarning("%s", QString::asprintf("abi::Writer<%s, %s>: cannot write non-specified fundamental type",
+        qWarning(logCore, "%s", QString::asprintf("abi::Writer<%s, %s>: cannot write non-specified fundamental type",
                                          typeid(T).name(),
                                          typeid(V).name()).toUtf8().constData());
     }
@@ -154,13 +158,13 @@ template <FundamentalType T, Version V>
 struct Reader<T, V> {
     static_assert(StreamReadable<T>, "Reader<Fundamental T, V>:: can not read non-specified fundamental type");
 
-    static void read(QDataStream& in, T& obj) {
+    static void read(DataStreamCursor& in, T& obj) {
         in >> obj;
     }
 
     static void read(StringListCursor& in, T& obj) {
         if(in.empty()){
-            qWarning("abi::Reader<FundamentalType T, V>: was given empty string list");
+            qWarning(logCore, "abi::Reader<FundamentalType T, V>: was given empty string list");
             return;
         }
 
@@ -174,10 +178,10 @@ struct Reader<T, V> {
         }
 
         if (!ok) {
-            qWarning() << "abi::Reader<FundamentalType T, V>: failed to convert string to number";
+            qWarning(logCore) << "abi::Reader<FundamentalType T, V>: failed to convert string to number";
         }
 
-        qWarning("%s", QString::asprintf("abi::Read<%s, %s>: cannot read non-specified fundamental type",
+        qWarning(logCore, "%s", QString::asprintf("abi::Read<%s, %s>: cannot read non-specified fundamental type",
                                          typeid(T).name(),
                                          typeid(V).name()).toUtf8().constData());
     }
@@ -189,7 +193,7 @@ struct Reader<T, V> {
  * @param obj
  */
 template <utils::GameEntity T, abi::Version V>
-void write(QDataStream& out, const T& obj) {
+void write(DataStreamCursor& out, const T& obj) {
     using base_t = typename T::base_t;
 #ifdef POST_ORDER
     if constexpr (!std::is_same_v<base_t, void>) {
@@ -235,7 +239,7 @@ void write(StringListCursor& out, const T& obj) {
  * @param obj
  */
 template <utils::GameEntity T, abi::Version V>
-void read(QDataStream& in, T& obj) {
+void read(DataStreamCursor& in, T& obj) {
     using base_t = typename T::base_t;
 #ifdef POST_ORDER
     if constexpr (!std::is_same_v<base_t, void>) {

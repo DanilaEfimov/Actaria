@@ -16,6 +16,7 @@ CallOperator::CallOperator(id_type eventId)
  */
 Entity::hash_type CallOperator::hash() const
 {
+
 }
 
 /**

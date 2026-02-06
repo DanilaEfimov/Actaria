@@ -1,8 +1,12 @@
 #ifndef PLAYER_SER
 #define PLAYER_SER
 
+#include "datastreamcursor.h"
+#include "stringlistcursor.h"
 #include "Entities/player.h"
+
 #include "context.ser"
+
 
 namespace abi {
 
@@ -27,11 +31,11 @@ struct entity_traits<Player, abi::Version::Act_1_0> {
  */
 template<>
 struct Writer<Player, abi::Version::Act_1_0> {
-    static void write(QDataStream& out, const Player& c = Player::instance()) {
+    static void write(DataStreamCursor& out, [[gnu::unused]] const Player& c = Player::instance()) {
         abi::write<Context, abi::Version::Act_1_0>(out, Player::getExperience());
     }
 
-    static void write(StringListCursor& out, const Player& c = Player::instance()) {
+    static void write(StringListCursor& out, [[gnu::unused]] const Player& c = Player::instance()) {
         out.append(entity_traits<Player, abi::Version::Act_1_0>::name);
         abi::write<Context, abi::Version::Act_1_0>(out, Player::getExperience());
     }
@@ -43,11 +47,11 @@ struct Writer<Player, abi::Version::Act_1_0> {
  */
 template<>
 struct Reader<Player, abi::Version::Act_1_0> {
-    static void read(QDataStream& in, Player& c = Player::instance()) {
+    static void read(DataStreamCursor& in, [[gnu::unused]] Player& c = Player::instance()) {
         abi::read<Context, abi::Version::Act_1_0>(in, Player::getExperience());
     }
 
-    static void read(StringListCursor& in, Player& c = Player::instance()) {
+    static void read(StringListCursor& in, [[gnu::unused]] Player& c = Player::instance()) {
         if(in.remaining() < entity_traits<Context, abi::Version::Act_1_0>::minimum_words){
             qWarning() << "Reader<Player, Atc_1_0>::read: not enought words to parse";
             return;

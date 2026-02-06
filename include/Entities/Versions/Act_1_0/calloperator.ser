@@ -8,6 +8,8 @@
 #define CALLOPERATOR_SER
 
 #include "Entities/Operators/calloperator.h"
+#include "datastreamcursor.h"
+
 
 namespace abi {
 
@@ -32,7 +34,7 @@ struct entity_traits<CallOperator, abi::Version::Act_1_0> {
  */
 template<>
 struct Writer<CallOperator, abi::Version::Act_1_0> {
-    static void write(QDataStream& out, const CallOperator& o) {
+    static void write(DataStreamCursor& out, const CallOperator& o) {
         out << o.event;
     }
 
@@ -48,7 +50,7 @@ struct Writer<CallOperator, abi::Version::Act_1_0> {
  */
 template<>
 struct Reader<CallOperator, abi::Version::Act_1_0> {
-    static void read(QDataStream& in, CallOperator& o) {
+    static void read(DataStreamCursor& in, CallOperator& o) {
         in >> o.event;
     }
 

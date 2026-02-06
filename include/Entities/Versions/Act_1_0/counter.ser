@@ -6,8 +6,12 @@
 #ifndef COUNTER_SER
 #define COUNTER_SER
 
-#include "contextvar.ser"
 #include "Entities/counter.h"
+#include "stringlistcursor.h"
+#include "datastreamcursor.h"
+
+#include "contextvar.ser"
+
 
 namespace abi {
 
@@ -32,7 +36,7 @@ struct entity_traits<Counter, abi::Version::Act_1_0> {
  */
 template<>
 struct Writer<Counter, abi::Version::Act_1_0> {
-    static void write(QDataStream& out, const Counter& c) {
+    static void write(DataStreamCursor& out, const Counter& c) {
         out << static_cast<int>(Counter::contains) << c.value;
     }
 
@@ -49,7 +53,7 @@ struct Writer<Counter, abi::Version::Act_1_0> {
  */
 template<>
 struct Reader<Counter, abi::Version::Act_1_0> {
-    static void read(QDataStream& in, Counter& c) {
+    static void read(DataStreamCursor& in, Counter& c) {
         in.skipRawData(sizeof(int));    // Counter::contains
         in >> c.value;
     }

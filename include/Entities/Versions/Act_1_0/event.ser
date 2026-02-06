@@ -7,9 +7,12 @@
 #ifndef EVENT_SER
 #define EVENT_SER
 
+#include "stringlistcursor.h"
+#include "datastreamcursor.h"
 #include "Entities/event.h"
 #include "Entities/Operators/operator.h"
 #include "Entities/trigger.h"
+
 
 namespace abi {
 
@@ -34,11 +37,11 @@ struct entity_traits<Event, abi::Version::Act_1_0> {
  */
 template<>
 struct Writer<Event, abi::Version::Act_1_0> {
-    static void write(QDataStream& out, const Event& e) {
+    static void write(DataStreamCursor& out, const Event& e) {
         out << e.returned
             << static_cast<int>(e.operators.size());
-        for(int i = 0; i < e.operators.size(); i++){
-            fix::write(out, *e.operators[i]);
+        for(qsizetype i = 0; i < e.operators.size(); i++){
+            utils::write(out, *e.operators[i]);
         }
     }
 
@@ -46,8 +49,8 @@ struct Writer<Event, abi::Version::Act_1_0> {
         out.append(entity_traits<Event, EngineInfo::defaultVersion>::name);
         out.append(e.returned ? TRUE_S : FALSE_S);
         out.append(QString::number(e.operators.size()));
-        for(int i = 0; i < e.operators.size(); i++){
-            fix::write(out, *e.operators[i]);
+        for(qsizetype i = 0; i < e.operators.size(); i++){
+            utils::write(out, *e.operators[i]);
         }
     }
 };
@@ -58,13 +61,13 @@ struct Writer<Event, abi::Version::Act_1_0> {
  */
 template<>
 struct Reader<Event, abi::Version::Act_1_0> {
-    static void read(QDataStream& in, Event& e) {
+    static void read(DataStreamCursor& in, Event& e) {
         in >> e.returned;
 
         int size;
         in >> size;
-        for(int i = 0; i < e.operators.size(); i++){
-            fix::read(in, *e.operators[i]);
+        for(qsizetype i = 0; i < e.operators.size(); i++){
+            utils::read(in, *e.operators[i]);
         }
     }
 
@@ -73,7 +76,7 @@ struct Reader<Event, abi::Version::Act_1_0> {
 
         int size = in.next().toInt();
         for(int i = 0; i < size; i++){
-            fix::read(in, *e.operators[i]);
+            utils::read(in, *e.operators[i]);
         }
 
         in.skip();

@@ -6,8 +6,12 @@
 #ifndef TRIGGER_SER
 #define TRIGGER_SER
 
-#include "contextvar.ser"
 #include "Entities/trigger.h"
+#include "stringlistcursor.h"
+#include "datastreamcursor.h"
+
+#include "contextvar.ser"
+
 
 namespace abi {
 
@@ -32,7 +36,7 @@ struct entity_traits<Trigger, abi::Version::Act_1_0> {
  */
 template<>
 struct Writer<Trigger, abi::Version::Act_1_0> {
-    static void write(QDataStream& out, const Trigger& t) {
+    static void write(DataStreamCursor& out, const Trigger& t) {
         out << static_cast<int>(Trigger::contains) << (t.value ? true : false);
     }
 
@@ -49,7 +53,7 @@ struct Writer<Trigger, abi::Version::Act_1_0> {
  */
 template<>
 struct Reader<Trigger, abi::Version::Act_1_0> {
-    static void read(QDataStream& in, Trigger& t) {
+    static void read(DataStreamCursor& in, Trigger& t) {
         in.skipRawData(sizeof(int));
         in >> t.value;
     }

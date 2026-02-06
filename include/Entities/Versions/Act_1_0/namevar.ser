@@ -6,8 +6,12 @@
 #ifndef NAMEVAR_SER
 #define NAMEVAR_SER
 
-#include "contextvar.ser"
+#include "stringlistcursor.h"
+#include "datastreamcursor.h"
+
 #include "Entities/namevar.h"
+#include "contextvar.ser"
+
 
 namespace abi {
 
@@ -32,7 +36,7 @@ struct entity_traits<NameVar, abi::Version::Act_1_0> {
  */
 template<>
 struct Writer<NameVar, abi::Version::Act_1_0> {
-    static void write(QDataStream& out, const NameVar& n) {
+    static void write(DataStreamCursor& out, const NameVar& n) {
         out << static_cast<int>(NameVar::contains) << n.value;
     }
 
@@ -49,7 +53,7 @@ struct Writer<NameVar, abi::Version::Act_1_0> {
  */
 template<>
 struct Reader<NameVar, abi::Version::Act_1_0> {
-    static void read(QDataStream& in, NameVar& n) {
+    static void read(DataStreamCursor& in, NameVar& n) {
         in.skipRawData(sizeof(int));    // enum value-type hint
         in >> n.value;
     }

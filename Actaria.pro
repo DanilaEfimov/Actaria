@@ -15,6 +15,7 @@ SOURCES += $$files(src/Entities/*.cpp) \
            $$files(src/Entities/Operators/*.cpp) \
            $$files(src/Errors/*.cpp) \
            $$files(src/Logging/*.cpp) \
+           src/datastreamcursor.cpp \
            src/stringlistcursor.cpp \
            src/utils.cpp \
            src/contextvarfabric.cpp
@@ -25,7 +26,8 @@ HEADERS += $$files(include/Entities/*.h) \
            $$files(include/Errors/*.h) \
            $$files($$DEFAULT_ENGINE_VERSION_PATH/*.ser) \
            $$files(include/*.h) \
-           $$files(include/Logging/*.h)
+           $$files(include/Logging/*.h) \
+           include/datastreamcursor.h
 
 DEFINES += PRE_ORDER
 DEFINES += LITTLE_ENDIAN

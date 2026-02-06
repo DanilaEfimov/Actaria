@@ -1,7 +1,9 @@
 #include "entity.ser"
+
 #include "Entities/entity.h"
 #include "common.h"
 #include "engineinfo.h"
+#include "datastreamcursor.h"
 
 
 uint32_t Entity::counter = 0;
@@ -39,7 +41,7 @@ Entity::Entity(QStringList &represent)
  */
 Entity::Entity(const QByteArray &represent)
 {
-    QDataStream in(represent);
+    DataStreamCursor in(represent);
     Reader<Entity, EngineInfo::defaultVersion>::read(in, *this);
 }
 

@@ -8,9 +8,7 @@
 
 #include <QString>
 #include <QStringList>
-#ifdef ACTARIA_TEST
-#include <QDebug>
-#endif
+
 
 class StringListCursor {
     QStringList words;

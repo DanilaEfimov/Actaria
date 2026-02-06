@@ -19,7 +19,7 @@ struct EngineInfo {
     // abi section
     static constexpr Version defaultVersion = Version::Act_1_0;
 
-    static constexpr int endian =
+    static constexpr QDataStream::ByteOrder endian =
     #if defined(BIG_ENDIAN)
         QDataStream::BigEndian;
     #else

@@ -2,7 +2,11 @@
 #define SCENE_SER
 
 #include "Entities/scene.h"
+#include "stringlistcursor.h"
+#include "datastreamcursor.h"
+
 #include "dialog.ser"
+
 
 namespace abi {
 
@@ -19,7 +23,7 @@ namespace abi {
  */
 template<std::derived_from<SceneMeta> T,
          abi::Version = abi::Version::Act_1_0>
-void write(QDataStream& out, const T& sm) {
+void write(DataStreamCursor& out, const T& sm) {
     out << sm.getBackgroundPath()
         << sm.getSoundPath()
         << sm.getDescription();
@@ -32,7 +36,7 @@ void write(QDataStream& out, const T& sm) {
  */
 template<std::derived_from<SceneMeta> T,
          abi::Version = abi::Version::Act_1_0>
-void read(QDataStream& in, T& sm) {
+void read(DataStreamCursor& in, T& sm) {
     path_t buffer;
     in >> buffer; sm.setBackgroundPath(std::move(buffer));
     in >> buffer; sm.setSoundPath(std::move(buffer));
@@ -86,7 +90,7 @@ struct entity_traits<Scene, abi::Version::Act_1_0> {
  */
 template<>
 struct Writer<Scene, abi::Version::Act_1_0> {
-    static void write(QDataStream& out, const Scene& s) {
+    static void write(DataStreamCursor& out, const Scene& s) {
         abi::write<Dialog, Version::Act_1_0>(out, *s.getDialog());
         abi::write(out, s.getMeta());
     }
@@ -104,7 +108,7 @@ struct Writer<Scene, abi::Version::Act_1_0> {
  */
 template<>
 struct Reader<Scene, abi::Version::Act_1_0> {
-    static void read(QDataStream& in, Scene& s) {
+    static void read(DataStreamCursor& in, Scene& s) {
         abi::read<Dialog, Version::Act_1_0>(in, *s.getDialog());
         abi::read(in, s.getMeta());
     }

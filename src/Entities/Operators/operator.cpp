@@ -50,22 +50,22 @@ Operator::Operator()
     : Entity()
 {}
 
-void fix::write(QDataStream &out, const Operator& o)
+void utils::write(DataStreamCursor &out, const Operator& o)
 {
     SWITCH_BY_TYPES(out, o, abi::write, const);
 }
 
-void fix::write(StringListCursor &out, const Operator& o)
+void utils::write(StringListCursor &out, const Operator& o)
 {
     SWITCH_BY_TYPES(out, o, abi::write, const);
 }
 
-void fix::read(QDataStream &in, Operator& o)
+void utils::read(DataStreamCursor &in, Operator& o)
 {
     SWITCH_BY_TYPES(in, o, abi::read, /*non const*/);
 }
 
-void fix::read(StringListCursor &in, Operator& o)
+void utils::read(StringListCursor &in, Operator& o)
 {
     SWITCH_BY_TYPES(in, o, abi::read, /*non const*/);
 }

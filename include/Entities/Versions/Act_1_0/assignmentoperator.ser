@@ -8,7 +8,9 @@
 #define ASSIGNMENTOPERATOR_SER
 
 #include "Entities/Operators/assignmentoperator.h"
+#include "datastreamcursor.h"
 #include "utils.h"
+
 
 namespace abi {
 
@@ -33,7 +35,7 @@ struct entity_traits<AssignmentOperator, abi::Version::Act_1_0> {
  */
 template<>
 struct Writer<AssignmentOperator, abi::Version::Act_1_0> {
-    static void write(QDataStream& out, const AssignmentOperator& o) {
+    static void write(DataStreamCursor& out, const AssignmentOperator& o) {
         out << o.lvalue;
         utils::writeValue(out, o.rvalue);
     }
@@ -51,7 +53,7 @@ struct Writer<AssignmentOperator, abi::Version::Act_1_0> {
  */
 template<>
 struct Reader<AssignmentOperator, abi::Version::Act_1_0> {
-    static void read(QDataStream& in, AssignmentOperator& o) {
+    static void read(DataStreamCursor& in, AssignmentOperator& o) {
         in >> o.lvalue;
         utils::readValue(in, o.rvalue);
     }

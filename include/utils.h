@@ -125,10 +125,10 @@ void fromString(ContextValue& value, QString str, VarType type);
 /**
  * vvv abi read/write Context value interface section vvv
  */
-void writeValue(QDataStream& out, const ContextValue& value);
+void writeValue(DataStreamCursor& out, const ContextValue& value);
 void writeValue(StringListCursor& out, const ContextValue& value);
 
-void readValue(QDataStream& in, ContextValue& value);
+void readValue(DataStreamCursor& in, ContextValue& value);
 void readValue(StringListCursor& in, ContextValue& value);
 /// ^^^ abi read/write Context value interface section ^^^
 

@@ -7,6 +7,9 @@
 #define CONTEXTVAR_SER
 
 #include "Entities/contextvar.h"
+#include "stringlistcursor.h"
+#include "datastreamcursor.h"
+
 
 namespace abi {
 
@@ -31,7 +34,7 @@ struct entity_traits<ContextVar, abi::Version::Act_1_0>  {
  */
 template<>
 struct Writer<ContextVar, abi::Version::Act_1_0> {
-    static void write(QDataStream& out, const ContextVar& c) {
+    static void write(DataStreamCursor& out, const ContextVar& c) {
         out << c.name;
     }
 
@@ -47,7 +50,7 @@ struct Writer<ContextVar, abi::Version::Act_1_0> {
  */
 template<>
 struct Reader<ContextVar, abi::Version::Act_1_0> {
-    static void read(QDataStream& in, ContextVar& c) {
+    static void read(DataStreamCursor& in, ContextVar& c) {
         in >> c.name;
     }
 

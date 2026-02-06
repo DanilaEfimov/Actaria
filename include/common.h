@@ -77,6 +77,9 @@ concept GameEntity =
     std::is_same_v<T, Entity>;
 
 template<typename T>
+concept NotGameEntity = !GameEntity<T>;
+
+template<typename T>
 concept ContextVariable = std::derived_from<T, ContextVar>;
 
 inline constexpr size_t strlen_ct(const char* str) noexcept {
@@ -104,11 +107,11 @@ inline constexpr bool is_same_entity_types(const T1& first, const T2& second) no
 }
 
 // bits stuff
-inline constexpr std::byte bitmask(int pos) noexcept {
+[[gnu::unused]]inline constexpr std::byte bitmask(int pos) noexcept {
     return std::byte(1 << pos % 8);
 }
 
-inline constexpr std::byte resetbit(int pos) noexcept {
+[[gnu::unused]]inline constexpr std::byte resetbit(int pos) noexcept {
     return ~bitmask(pos);
 }
 

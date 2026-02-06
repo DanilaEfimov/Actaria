@@ -2,9 +2,12 @@
 #define CONDITIONOPERATOR_SER
 
 #include "Entities/Operators/conditionoperator.h"
+#include "stringlistcursor.h"
+#include "datastreamcursor.h"
+#include "Entities/trigger.h"
+
 #include "entity.ser"
 #include "event.ser"
-#include "Entities/trigger.h"
 
 
 namespace abi {
@@ -30,7 +33,7 @@ struct entity_traits<ConditionOperator, abi::Version::Act_1_0> {
  */
 template<>
 struct Writer<ConditionOperator, abi::Version::Act_1_0> {
-    static void write(QDataStream& out, const ConditionOperator& c) {
+    static void write(DataStreamCursor& out, const ConditionOperator& c) {
         out << c.value << c.trueEvent << c.falseEvent;
     }
 
@@ -48,7 +51,7 @@ struct Writer<ConditionOperator, abi::Version::Act_1_0> {
  */
 template<>
 struct Reader<ConditionOperator, abi::Version::Act_1_0> {
-    static void read(QDataStream& in, ConditionOperator& c) {
+    static void read(DataStreamCursor& in, ConditionOperator& c) {
         in >> c.value >> c.trueEvent >> c.falseEvent;
     }
 

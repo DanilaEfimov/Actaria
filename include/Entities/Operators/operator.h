@@ -36,12 +36,12 @@ public:
  * Undefined behavior otherwise.
  */
 
-namespace fix {
+namespace utils {
 
-void write(QDataStream& out, const Operator& o);
+void write(DataStreamCursor& out, const Operator& o);
 void write(StringListCursor& out, const Operator& o);
 
-void read(QDataStream& in, Operator& o);
+void read(DataStreamCursor& in, Operator& o);
 void read(StringListCursor& in, Operator& o);
 
 }

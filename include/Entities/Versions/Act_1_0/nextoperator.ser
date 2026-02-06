@@ -7,7 +7,11 @@
 #ifndef NEXTOPERATOR_SER
 #define NEXTOPERATOR_SER
 
+#include "stringlistcursor.h"
+#include "datastreamcursor.h"
+
 #include "Entities/Operators/nextoperator.h"
+
 
 namespace abi {
 
@@ -32,7 +36,7 @@ struct entity_traits<NextOperator, abi::Version::Act_1_0> {
  */
 template<>
 struct Writer<NextOperator, abi::Version::Act_1_0> {
-    static void write(QDataStream& out, const NextOperator& o) {
+    static void write(DataStreamCursor& out, const NextOperator& o) {
         out << o.next;
     }
 
@@ -48,7 +52,7 @@ struct Writer<NextOperator, abi::Version::Act_1_0> {
  */
 template<>
 struct Reader<NextOperator, abi::Version::Act_1_0> {
-    static void read(QDataStream& in, NextOperator& o) {
+    static void read(DataStreamCursor& in, NextOperator& o) {
         in >> o.next;
     }
 

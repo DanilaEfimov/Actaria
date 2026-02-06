@@ -7,6 +7,9 @@
 #define DIALOGNODE_SER
 
 #include "Entities/dialognode.h"
+#include "stringlistcursor.h"
+#include "datastreamcursor.h"
+
 
 namespace abi {
 
@@ -31,7 +34,7 @@ struct entity_traits<DialogNode, abi::Version::Act_1_0> {
  */
 template<>
 struct Writer<DialogNode, abi::Version::Act_1_0> {
-    static void write(QDataStream& out, const DialogNode& d) {
+    static void write(DataStreamCursor& out, const DialogNode& d) {
         out << d.event << d.parent << d.fromCharacter
             << d.message << static_cast<qsizetype>(d.variants.size());
 
@@ -60,7 +63,7 @@ struct Writer<DialogNode, abi::Version::Act_1_0> {
  */
 template<>
 struct Reader<DialogNode, abi::Version::Act_1_0> {
-    static void read(QDataStream& in, DialogNode& d) {
+    static void read(DataStreamCursor& in, DialogNode& d) {
         in >> d.event >> d.parent >> d.fromCharacter
             >> d.message;
 

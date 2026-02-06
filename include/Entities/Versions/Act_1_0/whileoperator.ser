@@ -8,6 +8,9 @@
 #define WHILEOPERATOR_SER
 
 #include "Entities/Operators/whileoperator.h"
+#include "datastreamcursor.h"
+#include "stringlistcursor.h"
+
 
 namespace abi {
 
@@ -32,7 +35,7 @@ struct entity_traits<WhileOperator, abi::Version::Act_1_0> {
  */
 template<>
 struct Writer<WhileOperator, abi::Version::Act_1_0> {
-    static void write(QDataStream& out, const WhileOperator& o) {
+    static void write(DataStreamCursor& out, const WhileOperator& o) {
         out << o.toCompare << o.body;
     }
 
@@ -49,7 +52,7 @@ struct Writer<WhileOperator, abi::Version::Act_1_0> {
  */
 template<>
 struct Reader<WhileOperator, abi::Version::Act_1_0> {
-    static void read(QDataStream& in, WhileOperator& o) {
+    static void read(DataStreamCursor& in, WhileOperator& o) {
         in >> o.toCompare >> o.body;
     }
 

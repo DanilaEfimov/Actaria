@@ -4,6 +4,7 @@
 #include "namevar.ser"
 #include "trigger.ser"
 
+#include "datastreamcursor.h"
 #include "Logging/logcore.h"
 
 
@@ -40,7 +41,7 @@ void utils::print(const ContextValue &val, QString message)
     }, val);
 }
 
-void utils::writeValue(QDataStream &out, const ContextValue &value)
+void utils::writeValue(DataStreamCursor &out, const ContextValue &value)
 {
     int type = static_cast<int>(utils::typeOf(value));
     out << type;
@@ -78,7 +79,7 @@ QString utils::toString(const ContextValue &value)
     return res;
 }
 
-void utils::readValue(QDataStream &in, ContextValue &value)
+void utils::readValue(DataStreamCursor &in, ContextValue &value)
 {
     int type = -1;
     in >> type;

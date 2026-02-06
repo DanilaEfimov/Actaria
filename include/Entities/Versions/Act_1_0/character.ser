@@ -6,7 +6,10 @@
 #ifndef CHARACTER_SER
 #define CHARACTER_SER
 
+#include "stringlistcursor.h"
+#include "datastreamcursor.h"
 #include "Entities/character.h"
+
 
 namespace abi {
 
@@ -31,7 +34,7 @@ struct entity_traits<Character, abi::Version::Act_1_0> {
  */
 template<>
 struct Writer<Character, abi::Version::Act_1_0> {
-    static void write(QDataStream& out, const Character& c) {
+    static void write(DataStreamCursor& out, const Character& c) {
         out << c.name << static_cast<int>(c.mood);
     }
 
@@ -48,7 +51,7 @@ struct Writer<Character, abi::Version::Act_1_0> {
  */
 template<>
 struct Reader<Character, abi::Version::Act_1_0> {
-    static void read(QDataStream& in, Character& c) {
+    static void read(DataStreamCursor& in, Character& c) {
         in >> c.name >> c.mood;
     }
 

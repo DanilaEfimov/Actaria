@@ -23,7 +23,11 @@
 #ifndef OPERATOR_SER
 #define OPERATOR_SER
 
+#include "stringlistcursor.h"
+#include "datastreamcursor.h"
+
 #include "Entities/Operators/operator.h"
+
 
 namespace abi {
 
@@ -48,7 +52,7 @@ struct entity_traits<Operator, abi::Version::Act_1_0> {
  */
 template<>
 struct Writer<Operator, abi::Version::Act_1_0> {
-    static void write(QDataStream&, const Operator&) {}
+    static void write(DataStreamCursor&, const Operator&) {}
 
     static void write(StringListCursor&, const Operator&) {}
 };
@@ -59,7 +63,7 @@ struct Writer<Operator, abi::Version::Act_1_0> {
  */
 template<>
 struct Reader<Operator, abi::Version::Act_1_0> {
-    static void read(QDataStream&, Operator&) {}
+    static void read(DataStreamCursor&, Operator&) {}
 
     static void read(StringListCursor&, Operator&) {}
 };

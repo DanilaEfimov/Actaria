@@ -7,7 +7,9 @@
 #define ENTITY_SER
 
 #include "stringlistcursor.h"
+#include "datastreamcursor.h"
 #include "Entities/entity.h"
+
 
 namespace abi {
 
@@ -32,7 +34,7 @@ struct entity_traits<Entity, abi::Version::Act_1_0> {
  */
 template<>
 struct Writer<Entity, abi::Version::Act_1_0> {
-    static void write(QDataStream& out, const Entity& e) {
+    static void write(DataStreamCursor& out, const Entity& e) {
         out << e.id;
     }
 
@@ -48,7 +50,7 @@ struct Writer<Entity, abi::Version::Act_1_0> {
  */
 template<>
 struct Reader<Entity, abi::Version::Act_1_0> {
-    static void read(QDataStream& in, Entity& e) {
+    static void read(DataStreamCursor& in, Entity& e) {
         in >> e.id;
     }
 

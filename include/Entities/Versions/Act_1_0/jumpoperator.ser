@@ -8,6 +8,9 @@
 #define JUMPOPERATOR_SER
 
 #include "Entities/Operators/jumpoperator.h"
+#include "stringlistcursor.h"
+#include "datastreamcursor.h"
+
 
 namespace abi {
 
@@ -32,7 +35,7 @@ struct entity_traits<JumpOperator, abi::Version::Act_1_0> {
  */
 template<>
 struct Writer<JumpOperator, abi::Version::Act_1_0> {
-    static void write(QDataStream& out, const JumpOperator& o) {
+    static void write(DataStreamCursor& out, const JumpOperator& o) {
         out << o.node;
     }
 
@@ -48,7 +51,7 @@ struct Writer<JumpOperator, abi::Version::Act_1_0> {
  */
 template<>
 struct Reader<JumpOperator, abi::Version::Act_1_0> {
-    static void read(QDataStream& in, JumpOperator& o) {
+    static void read(DataStreamCursor& in, JumpOperator& o) {
         in >> o.node;
     }
 

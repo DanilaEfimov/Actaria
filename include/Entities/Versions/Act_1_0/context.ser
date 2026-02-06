@@ -9,6 +9,8 @@
 #include "Entities/context.h"
 #include "Entities/character.h"
 #include "contextvarfabric.h"
+#include "datastreamcursor.h"
+
 #include "entity.ser"
 #include "character.ser"
 #include "counter.ser"
@@ -16,7 +18,7 @@
 #include "namevar.ser"
 
 
-inline void writeContextVariable(QDataStream& out, const ContextVar* var) {
+inline void writeContextVariable(DataStreamCursor& out, const ContextVar* var) {
     if(!var) return;
     VarType type = var->type();
     switch(type) {
@@ -30,7 +32,7 @@ inline void writeContextVariable(QDataStream& out, const ContextVar* var) {
         abi::write<Trigger, abi::Version::Act_1_0>(out, *reinterpret_cast<const Trigger*>(var));
         break;
     default:
-        qWarning() << "Act_1_0::context.ser::writeContextVariable: undefined variable type:" << static_cast<int>(type);
+        qWarning(logCore) << "Act_1_0::context.ser::writeContextVariable: undefined variable type:" << static_cast<int>(type);
         return;
     }
 }
@@ -49,12 +51,12 @@ inline void writeContextVariable(StringListCursor& out, const ContextVar* var) {
         abi::write<Trigger, abi::Version::Act_1_0>(out, *reinterpret_cast<const Trigger*>(var));
         break;
     default:
-        qWarning() << "Act_1_0::context.ser::writeContextVariable: undefined variable type:" << static_cast<int>(type);
+        qWarning(logCore) << "Act_1_0::context.ser::writeContextVariable: undefined variable type:" << static_cast<int>(type);
         return;
     }
 }
 
-inline void readContextVariable(QDataStream& in, ContextVar* var) {
+inline void readContextVariable(DataStreamCursor& in, ContextVar* var) {
     if(!var) return;
     VarType type = var->type();
     switch(type) {
@@ -68,7 +70,7 @@ inline void readContextVariable(QDataStream& in, ContextVar* var) {
         abi::read<Trigger, abi::Version::Act_1_0>(in, *reinterpret_cast<Trigger*>(var));
         break;
     default:
-        qWarning() << "Act_1_0::context.ser::readContextVariable: undefined variable type:" << static_cast<int>(type);
+        qWarning(logCore) << "Act_1_0::context.ser::readContextVariable: undefined variable type:" << static_cast<int>(type);
         return;
     }
 }
@@ -87,7 +89,7 @@ inline void readContextVariable(StringListCursor& in, ContextVar* var) {
         abi::read<Trigger, abi::Version::Act_1_0>(in, *reinterpret_cast<Trigger*>(var));
         break;
     default:
-        qWarning() << "Act_1_0::context.ser::readContextVariable: undefined variable type:" << static_cast<int>(type);
+        qWarning(logCore) << "Act_1_0::context.ser::readContextVariable: undefined variable type:" << static_cast<int>(type);
         return;
     }
 }
@@ -116,16 +118,14 @@ struct entity_traits<Context, abi::Version::Act_1_0> {
  */
 template<>
 struct Writer<Context, abi::Version::Act_1_0> {
-    static void write(QDataStream& out, const Context& c) {
+    static void write(DataStreamCursor& out, const Context& c) {
         out << static_cast<qsizetype>(c.variables.size());
         for(auto& var : c.variables){
             writeContextVariable(out, var.second.get());
         }
         out << static_cast<qsizetype>(c.characters.size());
         for(auto& character : c.characters){
-            abi::write<Character, abi::Version::Act_1_0>(
-                out, character.second
-            );
+            abi::write<Character, abi::Version::Act_1_0>(out, character.second);
         }
     }
 
@@ -137,9 +137,7 @@ struct Writer<Context, abi::Version::Act_1_0> {
         }
         out.append(QString::number(c.characters.size()));
         for(auto& character : c.characters){
-            abi::write<Character, abi::Version::Act_1_0>(
-                out, character.second
-            );
+            abi::write<Character, abi::Version::Act_1_0>(out, character.second);
         }
     }
 };
@@ -150,7 +148,7 @@ struct Writer<Context, abi::Version::Act_1_0> {
  */
 template<>
 struct Reader<Context, abi::Version::Act_1_0> {
-    static void read(QDataStream& in, Context& c) {
+    static void read(DataStreamCursor& in, Context& c) {
         auto getType = [&in]() -> VarType {
             int type = -1;
             in.startTransaction();
@@ -177,7 +175,7 @@ struct Reader<Context, abi::Version::Act_1_0> {
 
     static void read(StringListCursor& in, Context& c) {
         if(in.remaining() < entity_traits<Context>::minimum_words){
-            qWarning() << "Reader<Context, Act_1_0>::read: not enought words to parse context";
+            qWarning(logCore) << "Reader<Context, Act_1_0>::read: not enought words to parse context";
             return;
         }
         c.clear();
@@ -193,7 +191,7 @@ struct Reader<Context, abi::Version::Act_1_0> {
         qsizetype size = in.next().toInt(&ok);
         in.skip();     // skip count of variables
         if(!ok){
-            qWarning() << "Reader<Context, Act_1_0>::read: not enought words to parse context";
+            qWarning(logCore) << "Reader<Context, Act_1_0>::read: not enought words to parse context";
             return;
         }
         for(int i = 0; i < size; i++){
@@ -206,7 +204,7 @@ struct Reader<Context, abi::Version::Act_1_0> {
         size = in.peek().toInt(&ok);
         in.skip();  // skip count of characters
         if(!ok){
-            qWarning() << "Reader<Context, Act_1_0>::read: not enought words to parse context";
+            qWarning(logCore) << "Reader<Context, Act_1_0>::read: not enought words to parse context";
             return;
         }
         for(int i = 0; i < size; i++){
