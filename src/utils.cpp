@@ -4,14 +4,17 @@
 #include "namevar.ser"
 #include "trigger.ser"
 
+#include "Logging/logcore.h"
 
-QString utils::ContextValueTypeString(VarType type) {
+
+QString utils::contextValueTypeString(VarType type) {
     switch(type){
     case VarType::Counter:  return abi::entity_traits<Counter, EngineInfo::defaultVersion>::name;
     case VarType::Trigger:  return abi::entity_traits<Trigger, EngineInfo::defaultVersion>::name;
     case VarType::Name:     return abi::entity_traits<NameVar, EngineInfo::defaultVersion>::name;
     default:
-        return "Unknown";
+        qWarning(logCore) << "utils::contextValueTypeString: unknown type";
+        return "unknown";
     }
 }
 
@@ -21,15 +24,19 @@ VarType utils::typeOf(const ContextVar::ContextValue& value) {
 
 void print(ContextValue&& val, QString message)
 {
+    if(logCore().isDebugEnabled()) return;
+
     std::visit([&](auto&& arg){
-        qDebug() << message << arg;
+        qDebug(logCore) << message << arg;
     }, val);
 }
 
 void utils::print(const ContextValue &val, QString message)
 {
+    if(logCore().isDebugEnabled()) return;
+
     std::visit([&](auto&& arg){
-        qDebug() << message << arg;
+        qDebug(logCore) << message << arg;
     }, val);
 }
 
@@ -64,7 +71,7 @@ QString utils::toString(const ContextValue &value)
         res = std::get<static_cast<int>(VarType::Name)>
             (value); break;
     default:
-        qDebug() << "toString: undefined type";
+        qWarning(logCore) << "utils::toString: undefined type: " << static_cast<int>(typeOf(value));
         res = "";
     }
 
@@ -88,7 +95,7 @@ void utils::readValue(QDataStream &in, ContextValue &value)
     case VarType::Counter:
         in >> intval; value = intval; return;
     default:
-        qDebug() << "readValue: undefined type";
+        qWarning(logCore) << "utils::readValue: undefined type: " << static_cast<int>(type);
         return;
     }
 }
@@ -109,7 +116,7 @@ void utils::fromString(ContextValue &value, QString str, VarType type)
     case VarType::Counter:
         value = str.toInt(); return;
     default:
-        qDebug() << "fromString: undefined type";
+        qWarning(logCore) << "utils::fromString: undefined type: " << static_cast<int>(type);
         return;
     }
 }

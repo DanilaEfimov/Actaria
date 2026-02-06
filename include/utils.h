@@ -20,7 +20,7 @@ namespace utils {
  * @return  Name of such context variable type,
  *          use abi::entity_traits<>
  */
-QString ContextValueTypeString(VarType type);
+QString contextValueTypeString(VarType type);
 
 /**
  * @brief typeOf

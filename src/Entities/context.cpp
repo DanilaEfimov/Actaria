@@ -1,6 +1,6 @@
 #include "context.ser"
-#include "trigger.ser"
 #include "Errors/nosuchid.h"
+#include "Logging/logcore.h"
 
 
 /**
@@ -55,7 +55,7 @@ void Context::merge(Context&& context)
  */
 int Context::stackDepth() const noexcept
 {
-    this->callStack.size();
+    return static_cast<int>(this->callStack.size());
 }
 
 /**
@@ -97,6 +97,9 @@ void Context::popEvent()
 {
     if(!this->stackEmpty())
         this->callStack.pop();
+
+    else if(logCore().isDebugEnabled())
+        qWarning(logCore) << "Context::popEvent: event stack is empty";
 }
 
 /**
@@ -164,10 +167,14 @@ bool Context::empty() const noexcept
     return this->size() == 0;
 }
 
+/**
+ * @brief Context::clear
+ */
 void Context::clear() noexcept
 {
     this->variables.clear();
     this->characters.clear();
+    while(!this->callStack.empty()) this->callStack.pop();
 }
 
 /**
@@ -217,7 +224,7 @@ const Context::value_types Context::getValue(const key_t& key) const
 {
     auto it = variables.find(key);
     if (it == variables.end())
-        throw NoSuchId(key, abi::entity_traits<Trigger, EngineInfo::defaultVersion>::name);
+        throw NoSuchId(key, abi::entity_traits<ContextVar, EngineInfo::defaultVersion>::name);
 
     return it->second->getValue();
 }

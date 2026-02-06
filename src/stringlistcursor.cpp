@@ -1,4 +1,6 @@
 #include "stringlistcursor.h"
+#include "Logging/logcore.h"
+
 #include <algorithm>
 
 
@@ -177,9 +179,9 @@ void StringListCursor::clear() noexcept
 void StringListCursor::remove(qsizetype idx) noexcept
 {
     if(idx >= this->words.size()) {
-#       ifdef ACTARIA_TEST
-        qWarning() << "StringListCursor::remove: index out of range: " << idx;
-#       endif
+        if (logCore().isDebugEnabled()) {
+            qWarning(logCore) << "StringListCursor::remove: index out of range:" << idx;
+        }
         return;
     }
 
@@ -195,9 +197,9 @@ void StringListCursor::remove(qsizetype idx) noexcept
 void StringListCursor::removeLast() noexcept
 {
     if(this->words.empty()){
-#   ifdef ACTARIA_TEST
-        qWarning("StringListCursor::removeLast: list is empty");
-#   endif
+        if (logCore().isDebugEnabled()) {
+            qWarning(logCore) << "StringListCursor::removeLast: list is empty";
+        }
         return;
     }
 
@@ -210,9 +212,9 @@ void StringListCursor::removeLast() noexcept
 void StringListCursor::removeFirst() noexcept
 {
     if(this->words.empty()){
-#   ifdef ACTARIA_TEST
-        qWarning("StringListCursor::removeFirst: list is empty");
-#   endif
+        if (logCore().isDebugEnabled()) {
+            qWarning(logCore) << "StringListCursor::removeFirst: list is empty";
+        }
         return;
     }
 

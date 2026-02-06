@@ -1,8 +1,8 @@
-QT += core gui
+QT += core
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
-CONFIG += c++20
+TARGET = actariacore
+TEMPLATE = lib
+CONFIG += staticlib c++20
 
 DEFAULT_ENGINE_VERSION_PATH = include/Entities/Versions/Act_1_0
 ALIASES = include/Aliases
@@ -13,24 +13,22 @@ INCLUDEPATH += include \
 
 SOURCES += $$files(src/Entities/*.cpp) \
            $$files(src/Entities/Operators/*.cpp) \
-           $$files(src/Compiler/*.cpp) \
-           $$files(src/GUI/*.cpp) \
            $$files(src/Errors/*.cpp) \
-           $$files(src/*.cpp)
+           $$files(src/Logging/*.cpp) \
+           src/stringlistcursor.cpp \
+           src/utils.cpp \
+           src/contextvarfabric.cpp
 
 HEADERS += $$files(include/Entities/*.h) \
            $$files(include/Entities/Operators/*.h) \
-           $$files(include/Compiler/*.h) \
-           $$files(include/GUI/*.h) \
            $$files(include/Aliases/*.h) \
            $$files(include/Errors/*.h) \
            $$files($$DEFAULT_ENGINE_VERSION_PATH/*.ser) \
-           $$files(include/*.h)
-
-FORMS += \
-    mainwindow.ui
+           $$files(include/*.h) \
+           $$files(include/Logging/*.h)
 
 DEFINES += PRE_ORDER
+DEFINES += LITTLE_ENDIAN
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

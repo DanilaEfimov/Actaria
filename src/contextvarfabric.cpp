@@ -2,6 +2,7 @@
 #include "trigger.ser"
 #include "namevar.ser"
 #include "contextvarfabric.h"
+#include "Logging/logcore.h"
 
 
 /**
@@ -38,7 +39,7 @@ std::unique_ptr<Trigger> ContextVariableFabric::make_trigger(const QString &name
  */
 std::unique_ptr<NameVar> ContextVariableFabric::make_namevar(const QString &name, const QByteArray &value)
 {
-    return std::make_unique<NameVar>(QString(value), name);
+    return std::make_unique<NameVar>(QString::fromUtf8(value), name);
 }
 
 /**
@@ -54,7 +55,7 @@ std::unique_ptr<ContextVar> ContextVariableFabric::make_default(VarType type)
     case VarType::Name:     return std::make_unique<NameVar>(NameVar({},{}));
     case VarType::Trigger:  return std::make_unique<Trigger>(Trigger({},{}));
     default:
-        qWarning() << "ContextVariableFabric::make_default: unknown type: " << QString::number(static_cast<int>(type));
+        qWarning(logCore) << "ContextVariableFabric::make_default: unknown type: " << static_cast<int>(type);
         return nullptr;
     }
 }
@@ -70,7 +71,7 @@ std::unique_ptr<Counter> ContextVariableFabric::make_counter(const QString &name
     bool ok = true;
     int val = value.toInt(&ok);
     if(!ok){
-        qWarning() << "ContextVariableFabric::make_counter: failed to parse int from: " << value;
+        qWarning(logCore) << "ContextVariableFabric::make_counter: failed to parse int from: " << value;
         return nullptr;
     }
 
@@ -101,6 +102,7 @@ std::unique_ptr<ContextVar> ContextVariableFabric::make_variable(VarType type, c
     case VarType::Name: return ContextVariableFabric::make_namevar(name, value);
     case VarType::Trigger: return ContextVariableFabric::make_trigger(name, value);
     default:
+        qWarning(logCore) << "ContextVariableFabric::make_variable: unknown type: " << static_cast<int>(type);
         return nullptr;
     }
 }
@@ -118,6 +120,7 @@ std::unique_ptr<ContextVar> ContextVariableFabric::make_variable(VarType type, c
     case VarType::Name: return ContextVariableFabric::make_namevar(name, value);
     case VarType::Trigger: return ContextVariableFabric::make_trigger(name, value);
     default:
+        qWarning(logCore) << "ContextVariableFabric::make_variable: unknown type: " << static_cast<int>(type);
         return nullptr;
     }
 }
@@ -168,19 +171,21 @@ ContextVariableFabric::value_types ContextVariableFabric::getValue(VarType type,
         bool ok = true;
         int res = value.toInt(&ok);
         if(!ok)
-            qWarning() << "ContextVariableFabric::getValue: failed to parse int from: " << value;
+            qWarning(logCore) << "ContextVariableFabric::getValue: failed to parse int from: " << value;
         return res;
     } break;
+
     case VarType::Trigger: {
         bool res = value == TRUE_S;
         return res;
     } break;
+
     case VarType::Name:
         return value;
+
     default:
-        qWarning() << "ContextVariableFabric::getValue: unknown context variable type: " << static_cast<int>(type);
-        return false;
+        qWarning(logCore) << "ContextVariableFabric::getValue: unknown type: " << static_cast<int>(type);
     }
 
-    return false;
+    return {};
 }

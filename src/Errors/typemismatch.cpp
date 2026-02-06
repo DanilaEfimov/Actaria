@@ -29,8 +29,8 @@ TypeMismatch::TypeMismatch(QString&& msg, VarType t1, VarType t2)
 const char* TypeMismatch::what() const noexcept
 {
     QString res = "Type mismatch: ";
-    QString t1 = utils::ContextValueTypeString(type1);
-    QString t2 = utils::ContextValueTypeString(type2);
+    QString t1 = utils::contextValueTypeString(type1);
+    QString t2 = utils::contextValueTypeString(type2);
 
     res += t1 + " and " + t2 + " : " + this->message;
 
