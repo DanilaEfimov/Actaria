@@ -1,14 +1,17 @@
 /**
- *  @file Entity.ser
+ *  @file entity.ser
  *  @version Act_1_0
  */
+
 
 #ifndef ENTITY_SER
 #define ENTITY_SER
 
 #include "stringlistcursor.h"
 #include "datastreamcursor.h"
+
 #include "Entities/entity.h"
+#include "Logging/logcore.h"
 
 
 namespace abi {
@@ -66,7 +69,7 @@ struct Reader<Entity, abi::Version::Act_1_0> {
         }
 
         if(!ok){
-            qWarning() << "Reader<Entity, Act_1_0>::read: can not parse id from: " << in.peek();
+            qWarning(logCore) << "Reader<Entity, Act_1_0>::read: can not parse id from: " << in.peek();
         }
 
         in.skip();  // skipping this->id field

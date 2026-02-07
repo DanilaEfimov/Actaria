@@ -2,6 +2,7 @@
 #include "Entities/dialog.h"
 #include "dialognode.ser"
 #include "Errors/nosuchid.h"
+#include "scene.ser"
 
 
 /**
@@ -63,8 +64,12 @@ SceneMeta& Scene::getMeta() noexcept
  * @brief Scene::hash
  * @return
  */
-Entity::hash_type Scene::hash() const {
-    return 0;
+Entity::hash_type Scene::hash() const
+{
+    using entity_t = std::remove_cvref_t<decltype(*this)>;
+    constexpr auto version = EngineInfo::defaultVersion;
+
+    return utils::fnv1a_64(entity_traits<entity_t, version>::name);
 }
 
 /**

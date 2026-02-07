@@ -1,6 +1,7 @@
 #include "Entities/Operators/jumpoperator.h"
 #include "Entities/scene.h"
 #include "Errors/nosuchid.h"
+#include "jumpoperator.ser"
 
 
 /**
@@ -17,7 +18,10 @@ JumpOperator::JumpOperator(id_type node)
  */
 Entity::hash_type JumpOperator::hash() const
 {
-    return 1;
+    using entity_t = std::remove_cvref_t<decltype(*this)>;
+    constexpr auto version = EngineInfo::defaultVersion;
+
+    return utils::fnv1a_64(entity_traits<entity_t, version>::name);
 }
 
 /**

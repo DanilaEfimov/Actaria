@@ -198,7 +198,7 @@ bool Context::equals(const key_t& key, value_types value) const
     if (it == variables.end())
         throw NoSuchId(key, abi::entity_traits<ContextVar, EngineInfo::defaultVersion>::name);
 
-    return it->second->getValue() == value;
+    return utils::compare(it->second->getValue(), value);
 }
 
 /**

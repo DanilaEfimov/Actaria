@@ -1,5 +1,6 @@
 #include "Entities/Operators/calloperator.h"
 #include "Entities/scene.h"
+#include "calloperator.ser"
 
 
 /**
@@ -16,7 +17,10 @@ CallOperator::CallOperator(id_type eventId)
  */
 Entity::hash_type CallOperator::hash() const
 {
+    using entity_t = std::remove_cvref_t<decltype(*this)>;
+    constexpr auto version = EngineInfo::defaultVersion;
 
+    return utils::fnv1a_64(entity_traits<entity_t, version>::name);
 }
 
 /**

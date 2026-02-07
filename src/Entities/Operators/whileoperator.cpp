@@ -2,6 +2,7 @@
 #include "Entities/context.h"
 #include "utils.h"
 #include "Errors/typemismatch.h"
+#include "whileoperator.ser"
 
 
 /**
@@ -21,7 +22,10 @@ WhileOperator::WhileOperator(id_type variable, id_type body)
  */
 Entity::hash_type WhileOperator::hash() const
 {
-    return 0;
+    using entity_t = std::remove_cvref_t<decltype(*this)>;
+    constexpr auto version = EngineInfo::defaultVersion;
+
+    return utils::fnv1a_64(entity_traits<entity_t, version>::name);
 }
 
 /**

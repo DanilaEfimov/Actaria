@@ -8,6 +8,11 @@
 #include "Logging/logcore.h"
 
 
+/**
+ * @brief utils::contextValueTypeString
+ * @param type
+ * @return
+ */
 QString utils::contextValueTypeString(VarType type) {
     switch(type){
     case VarType::Counter:  return abi::entity_traits<Counter, EngineInfo::defaultVersion>::name;
@@ -19,10 +24,20 @@ QString utils::contextValueTypeString(VarType type) {
     }
 }
 
+/**
+ * @brief utils::typeOf
+ * @param value
+ * @return
+ */
 VarType utils::typeOf(const ContextVar::ContextValue& value) {
     return static_cast<VarType>(value.index());
 }
 
+/**
+ * @brief print
+ * @param val
+ * @param message
+ */
 void print(ContextValue&& val, QString message)
 {
     if(logCore().isDebugEnabled()) return;
@@ -32,6 +47,11 @@ void print(ContextValue&& val, QString message)
     }, val);
 }
 
+/**
+ * @brief utils::print
+ * @param val
+ * @param message
+ */
 void utils::print(const ContextValue &val, QString message)
 {
     if(logCore().isDebugEnabled()) return;
@@ -41,6 +61,11 @@ void utils::print(const ContextValue &val, QString message)
     }, val);
 }
 
+/**
+ * @brief utils::writeValue
+ * @param out
+ * @param value
+ */
 void utils::writeValue(DataStreamCursor &out, const ContextValue &value)
 {
     int type = static_cast<int>(utils::typeOf(value));
@@ -50,6 +75,11 @@ void utils::writeValue(DataStreamCursor &out, const ContextValue &value)
     }, value);
 }
 
+/**
+ * @brief utils::writeValue
+ * @param out
+ * @param value
+ */
 void utils::writeValue(StringListCursor &out, const ContextValue &value)
 {
     int type = static_cast<int>(typeOf(value));
@@ -57,6 +87,11 @@ void utils::writeValue(StringListCursor &out, const ContextValue &value)
     out.append(toString(value));
 }
 
+/**
+ * @brief utils::toString
+ * @param value
+ * @return
+ */
 QString utils::toString(const ContextValue &value)
 {
     QString res = "";
@@ -79,6 +114,11 @@ QString utils::toString(const ContextValue &value)
     return res;
 }
 
+/**
+ * @brief utils::readValue
+ * @param in
+ * @param value
+ */
 void utils::readValue(DataStreamCursor &in, ContextValue &value)
 {
     int type = -1;
@@ -101,12 +141,23 @@ void utils::readValue(DataStreamCursor &in, ContextValue &value)
     }
 }
 
+/**
+ * @brief utils::readValue
+ * @param in
+ * @param value
+ */
 void utils::readValue(StringListCursor &in, ContextValue &value)
 {
     VarType type = static_cast<VarType>(in.peek().toInt());
     fromString(value, in.next(), type);
 }
 
+/**
+ * @brief utils::fromString
+ * @param value
+ * @param str
+ * @param type
+ */
 void utils::fromString(ContextValue &value, QString str, VarType type)
 {
     switch(type){
@@ -122,6 +173,12 @@ void utils::fromString(ContextValue &value, QString str, VarType type)
     }
 }
 
+/**
+ * @brief utils::compare
+ * @param left
+ * @param right
+ * @return
+ */
 bool utils::compare(const ContextValue& left, const ContextValue& right)
 {
     if(typeOf(left) != typeOf(right))
@@ -130,6 +187,12 @@ bool utils::compare(const ContextValue& left, const ContextValue& right)
     return left == right;
 }
 
+/**
+ * @brief utils::isSuchValue
+ * @param value
+ * @param type
+ * @return
+ */
 bool utils::isSuchValue(ContextValue value, VarType type)
 {
     return typeOf(value) == type;

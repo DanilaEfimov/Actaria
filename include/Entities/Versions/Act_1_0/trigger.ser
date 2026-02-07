@@ -1,12 +1,15 @@
 /**
- * @file triggerser
+ * @file trigger.ser
  * @version Act_1_0
  */
+
 
 #ifndef TRIGGER_SER
 #define TRIGGER_SER
 
 #include "Entities/trigger.h"
+#include "Logging/logcore.h"
+
 #include "stringlistcursor.h"
 #include "datastreamcursor.h"
 
@@ -60,7 +63,7 @@ struct Reader<Trigger, abi::Version::Act_1_0> {
 
     static void read(StringListCursor& in, Trigger& t) {
         if(in.remaining() < entity_traits<Trigger, abi::Version::Act_1_0>::minimum_words){
-            qWarning() << "Reader<Trigger, Act_1_0>: not enought words in list";
+            qWarning(logCore) << "Reader<Trigger, Act_1_0>: not enought words in list";
             t.value = false;
             return;
         }

@@ -3,10 +3,13 @@
  * @version Act_1_0
  */
 
+
 #ifndef DIALOGNODE_SER
 #define DIALOGNODE_SER
 
 #include "Entities/dialognode.h"
+#include "Logging/logcore.h"
+
 #include "stringlistcursor.h"
 #include "datastreamcursor.h"
 
@@ -99,7 +102,7 @@ struct Reader<DialogNode, abi::Version::Act_1_0> {
         }
 
         if(!ok){
-            qWarning() << "Reader<DialogNode, Act_1_0>::read: can not parse id from: " << in.peek();
+            qWarning(logCore) << "Reader<DialogNode, Act_1_0>::read: can not parse id from: " << in.peek();
         }
 
         for(qsizetype i = 0; ok && i < size; i++){
@@ -110,7 +113,7 @@ struct Reader<DialogNode, abi::Version::Act_1_0> {
         }
 
         if(!ok){
-            qWarning() << "Reader<DialogNode, Act_1_0>::read: can not parse id from: " << in.peek();
+            qWarning(logCore) << "Reader<DialogNode, Act_1_0>::read: can not parse id from: " << in.peek();
         }
 
         in.skip();

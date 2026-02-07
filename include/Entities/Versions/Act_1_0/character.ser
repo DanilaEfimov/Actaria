@@ -8,8 +8,9 @@
 
 #include "stringlistcursor.h"
 #include "datastreamcursor.h"
-#include "Entities/character.h"
 
+#include "Entities/character.h"
+#include "Logging/logcore.h"
 
 namespace abi {
 
@@ -57,7 +58,7 @@ struct Reader<Character, abi::Version::Act_1_0> {
 
     static void read(StringListCursor& in, Character& c) {
         if(in.remaining() < entity_traits<Character, abi::Version::Act_1_0>::minimum_words){
-            qWarning() << "Reader<Character, Act_1_0>::read: not enought words at cursor";
+            qWarning(logCore) << "Reader<Character, Act_1_0>::read: not enought words at cursor";
             return;
         }
 
@@ -69,7 +70,7 @@ struct Reader<Character, abi::Version::Act_1_0> {
         c.mood = static_cast<Mood>(in.next().toInt(&ok));
 
         if(!ok){
-            qWarning() << "Reader<Character, Act_1_0>::read: can not parse mood from: " << in.peek();
+            qWarning(logCore) << "Reader<Character, Act_1_0>::read: can not parse mood from: " << in.peek();
         }
 
         in.skip();

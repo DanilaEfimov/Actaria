@@ -1,13 +1,29 @@
 #include "datastreamcursor.h"
 
+#include "QDataStream"
+
 
 /// operator >>
+
+/**
+ * @brief operator <<
+ * @param out
+ * @param value
+ * @return
+ */
 DataStreamCursor& operator<<(DataStreamCursor& out, const ContextValue& value) {
     utils::writeValue(out, value);
     return out;
 }
 
 /// operator <<
+
+/**
+ * @brief operator >>
+ * @param in
+ * @param value
+ * @return
+ */
 DataStreamCursor& operator>>(DataStreamCursor& in, ContextValue& value) {
     utils::readValue(in, value);
     return in;
@@ -29,6 +45,17 @@ DataStreamCursor::DataStreamCursor()
 DataStreamCursor::DataStreamCursor(const QByteArray &arr)
     : stream(arr)
 {}
+
+/**
+ * @brief DataStreamCursor::DataStreamCursor
+ * @param device
+ * @param m
+ */
+DataStreamCursor::DataStreamCursor(QByteArray* device, QIODeviceBase::OpenModeFlag m)
+    : stream(device, m)
+{
+    this->stream.setByteOrder(EngineInfo::endian);
+}
 
 /**
  * @brief DataStreamCursor::DataStreamCursor

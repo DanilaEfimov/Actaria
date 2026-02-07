@@ -21,6 +21,7 @@ class DataStreamCursor {
 public:
     DataStreamCursor();
     DataStreamCursor(const QByteArray& arr);
+    explicit DataStreamCursor(QByteArray* device, QIODeviceBase::OpenModeFlag m);
     explicit DataStreamCursor(QIODevice& device);
     ~DataStreamCursor() = default;
 
@@ -36,40 +37,40 @@ public:
 
 /// operator <<
 template<typename T>
-DataStreamCursor& operator<<(DataStreamCursor& out, const T& value) {
+inline DataStreamCursor& operator<<(DataStreamCursor& out, const T& value) {
     out.data() << value;
     return out;
 }
 
 template<utils::NotGameEntity T>
-DataStreamCursor& operator<<(DataStreamCursor& out, const T& value) {
+inline DataStreamCursor& operator<<(DataStreamCursor& out, const T& value) {
     out.data() << value;
     return out;
 };
 
 template<utils::GameEntity T>
-DataStreamCursor& operator<<(DataStreamCursor& out, const T& value) {
+inline DataStreamCursor& operator<<(DataStreamCursor& out, const T& value) {
     abi::write<T, EngineInfo::defaultVersion>(out.data(), value);
     return out;
 };
 
-DataStreamCursor& operator<<(DataStreamCursor& out, const ContextValue& value);;
+DataStreamCursor& operator<<(DataStreamCursor& out, const ContextValue& value);
 
 /// operator >>
 template<typename T>
-DataStreamCursor& operator>>(DataStreamCursor& in, const T& value) {
+inline DataStreamCursor& operator>>(DataStreamCursor& in, const T& value) {
     in.data() >> value;
     return in;
 }
 
 template<utils::NotGameEntity T>
-DataStreamCursor& operator>>(DataStreamCursor& in, T& value) {
+inline DataStreamCursor& operator>>(DataStreamCursor& in, T& value) {
     in.data() >> value;
     return in;
 };
 
 template<utils::GameEntity T>
-DataStreamCursor& operator>>(DataStreamCursor& in, T& value) {
+inline DataStreamCursor& operator>>(DataStreamCursor& in, T& value) {
     abi::read<T, EngineInfo::defaultVersion>(in.data(), value);
     return in;
 };

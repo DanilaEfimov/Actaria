@@ -1,4 +1,5 @@
 #include "Entities/Operators/conditionoperator.h"
+#include "conditionoperator.ser"
 
 
 /**
@@ -20,7 +21,10 @@ ConditionOperator::ConditionOperator(bool value, id_type trueEvent, id_type fals
  */
 Entity::hash_type ConditionOperator::hash() const
 {
-    return 42;
+    using entity_t = std::remove_cvref_t<decltype(*this)>;
+    constexpr auto version = EngineInfo::defaultVersion;
+
+    return utils::fnv1a_64(entity_traits<entity_t, version>::name);
 }
 
 /**

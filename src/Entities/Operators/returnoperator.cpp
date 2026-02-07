@@ -1,6 +1,7 @@
 #include "Entities/Operators/returnoperator.h"
 #include "Entities/event.h"
 #include "Entities/context.h"
+#include "returnoperator.ser"
 
 
 /**
@@ -17,7 +18,10 @@ ReturnOperator::ReturnOperator()
  */
 Entity::hash_type ReturnOperator::hash() const
 {
-    return 0;
+    using entity_t = std::remove_cvref_t<decltype(*this)>;
+    constexpr auto version = EngineInfo::defaultVersion;
+
+    return utils::fnv1a_64(entity_traits<entity_t, version>::name);
 }
 
 /**

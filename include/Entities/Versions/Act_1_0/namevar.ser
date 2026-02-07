@@ -3,6 +3,7 @@
  * @version Act_1_0
  */
 
+
 #ifndef NAMEVAR_SER
 #define NAMEVAR_SER
 
@@ -10,6 +11,8 @@
 #include "datastreamcursor.h"
 
 #include "Entities/namevar.h"
+#include "Logging/logcore.h"
+
 #include "contextvar.ser"
 
 
@@ -60,7 +63,7 @@ struct Reader<NameVar, abi::Version::Act_1_0> {
 
     static void read(StringListCursor& in, NameVar& n) {
         if(in.remaining() < entity_traits<NameVar, abi::Version::Act_1_0>::minimum_words){
-            qWarning() << "Reader<NameVar, Act_1_0>: not enought words in list";
+            qWarning(logCore) << "Reader<NameVar, Act_1_0>: not enought words in list";
             n.value = "unknown";
             return;
         }

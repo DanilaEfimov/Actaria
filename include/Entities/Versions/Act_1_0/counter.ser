@@ -3,10 +3,13 @@
  * @version Act_1_0
  */
 
+
 #ifndef COUNTER_SER
 #define COUNTER_SER
 
 #include "Entities/counter.h"
+#include "Logging/logcore.h"
+
 #include "stringlistcursor.h"
 #include "datastreamcursor.h"
 
@@ -60,7 +63,7 @@ struct Reader<Counter, abi::Version::Act_1_0> {
 
     static void read(StringListCursor& in, Counter& c) {
         if(in.remaining() < entity_traits<Counter, abi::Version::Act_1_0>::minimum_words){
-            qWarning() << "Reader<Counter, Act_1_0>: not enought words in list";
+            qWarning(logCore) << "Reader<Counter, Act_1_0>: not enought words in list";
             c.value = 0;
             return;
         }
@@ -71,7 +74,7 @@ struct Reader<Counter, abi::Version::Act_1_0> {
         c.value = static_cast<Counter::value_type>(in.peek().toLongLong(&ok));
 
         if(!ok){
-            qWarning() << "Reader<Counter, Act_1_0>: failed to parse value from: " << in.peek();
+            qWarning(logCore) << "Reader<Counter, Act_1_0>: failed to parse value from: " << in.peek();
         }
 
         in.skip();    // skipping this->value field

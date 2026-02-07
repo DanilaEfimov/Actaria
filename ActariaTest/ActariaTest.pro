@@ -10,6 +10,7 @@ DEFAULT_ENGINE_VERSION_PATH = $$ACTARIA_PATH/include/Entities/Versions/Act_1_0
 ALIASES = $$ACTARIA_PATH/include/Aliases
 
 INCLUDEPATH += $$ACTARIA_PATH/include/
+INCLUDEPATH += $$ACTARIA_PATH/include/Logging
 INCLUDEPATH += $$ACTARIA_PATH/include/Aliases
 INCLUDEPATH += $$ACTARIA_PATH/include/Entities
 INCLUDEPATH += $$ACTARIA_PATH/include/Compiler
@@ -25,7 +26,7 @@ SOURCES += $$files($$ACTARIA_PATH/src/Errors/*.cpp)
 SOURCES += $$files($$PWD/*.cpp)
 
 SOURCES += $$files($$ACTARIA_PATH/src/*.cpp)
-SOURCES -= $$ACTARIA_PATH/src/main.cpp
+SOURCES += $$files($$ACTARIA_PATH/src/Logging/*.cpp)
 
 DEFINES += ACTARIA_TEST
 

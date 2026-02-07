@@ -1,3 +1,9 @@
+/**
+ *  @file scene.ser
+ *  @version Act_1_0
+ */
+
+
 #ifndef SCENE_SER
 #define SCENE_SER
 

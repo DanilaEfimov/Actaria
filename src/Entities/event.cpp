@@ -1,5 +1,6 @@
 #include "Entities/event.h"
 #include "Entities/Operators/operator.h"
+#include "event.ser"
 
 
 /**
@@ -71,5 +72,8 @@ bool Event::exec(Context &context, Scene &scene)
  */
 Entity::hash_type Event::hash() const
 {
-    return 1;
+    using entity_t = std::remove_cvref_t<decltype(*this)>;
+    constexpr auto version = EngineInfo::defaultVersion;
+
+    return utils::fnv1a_64(entity_traits<entity_t, version>::name);
 }

@@ -3,6 +3,7 @@
 #include "readwrite.h"
 #include "contextvarfabric.h"
 #include "utils.h"
+#include "datastreamcursor.h"
 
 #include "entity.ser"
 
@@ -123,12 +124,12 @@ void EngineTest::namedvar_serializing()
         QByteArray buffer;
 
         {
-            QDataStream out(&buffer, QIODevice::WriteOnly);
+            DataStreamCursor out(&buffer, QIODevice::WriteOnly);
             abi::write<NameVar, EngineInfo::defaultVersion>(out, original);
         }
 
         {
-            QDataStream in(&buffer, QIODevice::ReadOnly);
+            DataStreamCursor in(&buffer, QIODevice::ReadOnly);
             abi::read<NameVar, EngineInfo::defaultVersion>(in, restored);
         }
 
@@ -176,12 +177,12 @@ void EngineTest::counter_serializing()
         QByteArray buffer;
 
         {
-            QDataStream out(&buffer, QIODevice::WriteOnly);
+            DataStreamCursor out(&buffer, QIODevice::WriteOnly);
             abi::write<Counter, EngineInfo::defaultVersion>(out, original);
         }
 
         {
-            QDataStream in(&buffer, QIODevice::ReadOnly);
+            DataStreamCursor in(&buffer, QIODevice::ReadOnly);
             abi::read<Counter, EngineInfo::defaultVersion>(in, restored);
         }
 
@@ -213,12 +214,12 @@ void EngineTest::trigger_serializing()
         QByteArray buffer;
 
         {
-            QDataStream out(&buffer, QIODevice::WriteOnly);
+            DataStreamCursor out(&buffer, QIODevice::WriteOnly);
             abi::write<Trigger, EngineInfo::defaultVersion>(out, original);
         }
 
         {
-            QDataStream in(&buffer, QIODevice::ReadOnly);
+            DataStreamCursor in(&buffer, QIODevice::ReadOnly);
             abi::read<Trigger, EngineInfo::defaultVersion>(in, restored);
         }
 
@@ -271,12 +272,12 @@ void EngineTest::context_serializing()
 
     QByteArray serialized;
     {
-        QDataStream out(&serialized, QIODevice::WriteOnly);
+        DataStreamCursor out(&serialized, QIODevice::WriteOnly);
         abi::write<Context, EngineInfo::defaultVersion>(out, context);
     }
 
     {
-        QDataStream in(&serialized, QIODevice::ReadOnly);
+        DataStreamCursor in(&serialized, QIODevice::ReadOnly);
         abi::read<Context, EngineInfo::defaultVersion>(in, copy);
     }
 
@@ -337,10 +338,10 @@ void EngineTest::jump_operator_serializing()
 
         QByteArray buffer;
 
-        QDataStream out(&buffer, QDataStream::WriteOnly);
+        DataStreamCursor out(&buffer, QIODevice::WriteOnly);
         abi::write<JumpOperator, EngineInfo::defaultVersion>(out, op);
 
-        QDataStream in(&buffer, QIODevice::ReadOnly);
+        DataStreamCursor in(&buffer, QIODevice::ReadOnly);
         abi::read<JumpOperator, EngineInfo::defaultVersion>(in, restored);
 
         QCOMPARE(op.id, restored.id);
@@ -378,10 +379,10 @@ void EngineTest::call_operator_serializing()
 
         QByteArray buffer;
 
-        QDataStream out(&buffer, QDataStream::WriteOnly);
+        DataStreamCursor out(&buffer, QIODevice::WriteOnly);
         abi::write<CallOperator, EngineInfo::defaultVersion>(out, op);
 
-        QDataStream in(&buffer, QIODevice::ReadOnly);
+        DataStreamCursor in(&buffer, QIODevice::ReadOnly);
         abi::read<CallOperator, EngineInfo::defaultVersion>(in, restored);
 
         QCOMPARE(op.id, restored.id);
@@ -419,10 +420,10 @@ void EngineTest::next_operator_serializing()
 
         QByteArray buffer;
 
-        QDataStream out(&buffer, QDataStream::WriteOnly);
+        DataStreamCursor out(&buffer, QIODevice::WriteOnly);
         abi::write<NextOperator, EngineInfo::defaultVersion>(out, op);
 
-        QDataStream in(&buffer, QIODevice::ReadOnly);
+        DataStreamCursor in(&buffer, QIODevice::ReadOnly);
         abi::read<NextOperator, EngineInfo::defaultVersion>(in, restored);
 
         QCOMPARE(op.id, restored.id);
@@ -455,14 +456,14 @@ void EngineTest::return_operator_serializing()
 
     QByteArray buffer;
 
-    QDataStream out(&buffer, QDataStream::WriteOnly);
+    DataStreamCursor out(&buffer, QIODevice::WriteOnly);
     abi::write<ReturnOperator, EngineInfo::defaultVersion>(out, op);
 
     DEBUG_ONLY(
         qDebug() << "\n\treturn operator dump:\n\t" << buffer.toHex(' ');
         );
 
-    QDataStream in(&buffer, QIODevice::ReadOnly);
+    DataStreamCursor in(&buffer, QIODevice::ReadOnly);
     abi::read<ReturnOperator, EngineInfo::defaultVersion>(in, restored);
 
     QVERIFY(op.id == restored.id);
@@ -497,10 +498,10 @@ void EngineTest::while_operator_serializing()
             WhileOperator restored(UNDEFINED_ID, UNDEFINED_ID);
 
             QByteArray buffer;
-            QDataStream out(&buffer, QDataStream::WriteOnly);
+            DataStreamCursor out(&buffer, QIODevice::WriteOnly);
             abi::write<WhileOperator, EngineInfo::defaultVersion>(out, op);
 
-            QDataStream in(&buffer, QIODevice::ReadOnly);
+            DataStreamCursor in(&buffer, QIODevice::ReadOnly);
             abi::read<WhileOperator, EngineInfo::defaultVersion>(in, restored);
 
             QCOMPARE(op.id, restored.id);
@@ -541,10 +542,10 @@ void EngineTest::condition_operator_serializing()
             ConditionOperator restored(value, UNDEFINED_ID, UNDEFINED_ID);
 
             QByteArray buffer;
-            QDataStream out(&buffer, QDataStream::WriteOnly);
+            DataStreamCursor out(&buffer, QIODevice::WriteOnly);
             abi::write<ConditionOperator, EngineInfo::defaultVersion>(out, op);
 
-            QDataStream in(&buffer, QIODevice::ReadOnly);
+            DataStreamCursor in(&buffer, QIODevice::ReadOnly);
             abi::read<ConditionOperator, EngineInfo::defaultVersion>(in, restored);
 
             QCOMPARE(op.id, restored.id);
@@ -587,10 +588,10 @@ void EngineTest::assignment_operator_serializing()
 
         QByteArray buffer;
 
-        QDataStream out(&buffer, QDataStream::WriteOnly);
+        DataStreamCursor out(&buffer, QIODevice::WriteOnly);
         abi::write<AssignmentOperator, EngineInfo::defaultVersion>(out, op);
 
-        QDataStream in(&buffer, QIODevice::ReadOnly);
+        DataStreamCursor in(&buffer, QIODevice::ReadOnly);
         abi::read<AssignmentOperator, EngineInfo::defaultVersion>(in, restored);
 
         QCOMPARE(op.lvalue, restored.lvalue);

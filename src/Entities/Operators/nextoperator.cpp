@@ -1,4 +1,5 @@
 #include "Entities/Operators/nextoperator.h"
+#include "nextoperator.ser"
 
 
 /**
@@ -16,7 +17,10 @@ NextOperator::NextOperator(id_type newScene)
  */
 Entity::hash_type NextOperator::hash() const
 {
-    return 0;
+    using entity_t = std::remove_cvref_t<decltype(*this)>;
+    constexpr auto version = EngineInfo::defaultVersion;
+
+    return utils::fnv1a_64(entity_traits<entity_t, version>::name);
 }
 
 /**

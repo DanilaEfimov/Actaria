@@ -29,6 +29,8 @@ public:
     virtual bool apply(Context& context, Scene& scene) = 0;
 
     virtual OperatorType type() const = 0;
+
+    hash_type hash() const override;
 };
 
 /**

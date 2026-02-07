@@ -7,6 +7,8 @@
 #define CONTEXTVAR_SER
 
 #include "Entities/contextvar.h"
+#include "Logging/logcore.h"
+
 #include "stringlistcursor.h"
 #include "datastreamcursor.h"
 
@@ -56,7 +58,7 @@ struct Reader<ContextVar, abi::Version::Act_1_0> {
 
     static void read(StringListCursor& in, ContextVar& c) {
         if(in.remaining() < entity_traits<ContextVar, abi::Version::Act_1_0>::minimum_words){
-            qWarning() << "Reader<ContextVar, Act_1_0>: not enought words in list";
+            qWarning(logCore) << "Reader<ContextVar, Act_1_0>: not enought words in list";
             c.name = "unknown";
             return;
         }
