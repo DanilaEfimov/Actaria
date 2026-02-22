@@ -1,32 +1,23 @@
-QT = core
-QT += testlib
-CONFIG += testcase
-CONFIG += c++20 cmdline
+QT = core testlib
+
+CONFIG += testcase c++20 cmdline
 
 ACTARIA_PATH = $$PWD/../
 
-DEFAULT_ENGINE_VERSION_PATH = $$ACTARIA_PATH/include/Entities/Versions/Act_1_0
+LIBS += -L$$ACTARIA_PATH/build/ -lactariacore
 
+DEFAULT_ENGINE_VERSION_PATH = $$ACTARIA_PATH/include/Entities/Versions/Act_1_0
 ALIASES = $$ACTARIA_PATH/include/Aliases
 
-INCLUDEPATH += $$ACTARIA_PATH/include/
-INCLUDEPATH += $$ACTARIA_PATH/include/Logging
-INCLUDEPATH += $$ACTARIA_PATH/include/Aliases
-INCLUDEPATH += $$ACTARIA_PATH/include/Entities
-INCLUDEPATH += $$ACTARIA_PATH/include/Compiler
-INCLUDEPATH += $$ACTARIA_PATH/include/GUI
-INCLUDEPATH += $$ACTARIA_PATH/include/VM
+INCLUDEPATH += $$ACTARIA_PATH/include
 INCLUDEPATH += $$DEFAULT_ENGINE_VERSION_PATH
+INCLUDEPATH += $$ALIASES
 
-SOURCES += $$files($$ACTARIA_PATH/src/Entities/*.cpp)
-SOURCES += $$files($$ACTARIA_PATH/src/Compiler/*.cpp)
-SOURCES += $$files($$ACTARIA_PATH/src/VM/*.cpp)
-SOURCES += $$files($$ACTARIA_PATH/src/Entities/Operators/*.cpp)
-SOURCES += $$files($$ACTARIA_PATH/src/Errors/*.cpp)
+HEADERS += globals.h \
+           enginetest.h \
+           testutils.h
+
 SOURCES += $$files($$PWD/*.cpp)
-
-SOURCES += $$files($$ACTARIA_PATH/src/*.cpp)
-SOURCES += $$files($$ACTARIA_PATH/src/Logging/*.cpp)
 
 DEFINES += ACTARIA_TEST
 
@@ -34,7 +25,10 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-HEADERS += \
-    enginetest.h \
-    globals.h \
-    testutils.h
+
+win32:LIBS += -L$$ACTARIA_PATH/build/debug -lactariacore
+unix:LIBS += -L$$ACTARIA_PATH/build/debug -lactariacore
+
+INCLUDEPATH += $$PWD/../build
+DEPENDPATH += $$PWD/../build
+

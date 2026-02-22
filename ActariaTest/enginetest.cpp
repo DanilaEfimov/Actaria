@@ -299,7 +299,17 @@ void EngineTest::context_serializing()
 
 void EngineTest::player_serializing()
 {
+    QByteArray serialized;
+    {
+        DataStreamCursor out(&serialized, QIODevice::WriteOnly);
+        abi::write<Player, EngineInfo::defaultVersion>(out, Player::instance());
+    }
 
+    QByteArray copy;
+    {
+        DataStreamCursor in(&serialized, QIODevice::ReadOnly);
+        abi::read<Player, EngineInfo::defaultVersion>(in, copy);
+    }
 }
 
 void EngineTest::character_serializing()

@@ -8,12 +8,14 @@ class ActariaTest : public QObject
     Q_OBJECT
 
 public:
-    ActariaTest();
+    ActariaTest()
+    {
+
+    }
 
 private slots:
     void test_entities();
     void test_compiler();
-    void test_
 };
 
 #endif // ACTARIATEST_H

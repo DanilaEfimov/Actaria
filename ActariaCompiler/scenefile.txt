@@ -1,0 +1,14 @@
+Scene File Representation
+
+A scene definition file may contain:
+Character or scene imports (to map the same entity using an ID).
+Character declarations (used for one-shot characters).
+Variable declarations for the local scene context.
+Event handler definitions.
+A scene definition (required).
+Comments.
+
+Scene Definition
+
+The scene definition describes the dialogue tree.
+It may also include definitions of built-in context variables such as background path, sound path, description, and other metadata.
