@@ -3,16 +3,21 @@
 
 #include <QString>
 
+
 enum class TokenCategory : uint8_t {
     Identifier,
     Keyword,
-    StringLiteral,
+    TextLiteral,
     NumberLiteral,
+    TriggerLiteral,
     SingleComment,
+    Arithmetic,
+    Separator,
     LBrace,
     RBrace,
     Eof
 };
+
 
 class Token {
     TokenCategory category;

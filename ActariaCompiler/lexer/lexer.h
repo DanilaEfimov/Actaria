@@ -1,6 +1,8 @@
 #ifndef LEXER_H
 #define LEXER_H
 
+#include "token.h"
+
 #include <QString>
 #include <QVector>
 
@@ -16,13 +18,17 @@ typedef QVector<QString> text_t;
 
 class Lexer
 {
-    const text_t source;
+    QVector<text_t> source;
     Position pos;
+
+    void increment() noexcept;
+
+    static TokenCategory checkCategory(const QString& value);
 
 public:
     Lexer(const text_t& source);
 
-    Token nextToken() const;
+    Token nextToken();
 
     Token peekToken(int n = 0) const;
 
