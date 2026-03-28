@@ -6,6 +6,7 @@
 class NumberLiteral : public Expression
 {
     int value;
+
 public:
     explicit NumberLiteral(int value);
 

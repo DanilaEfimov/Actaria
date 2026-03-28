@@ -6,10 +6,10 @@
 class KeyWords
 {
     static QSet<QString> typeNames;
+
     static QSet<QString> keywords;
 
 public:
-
     static bool contains(const QString& word);
 
     static bool isTypeName(const QString& word);

@@ -5,7 +5,6 @@
 
 class Literals
 {
-
     static constexpr const char* textLiteralOpening = "\"";
     static constexpr const char* textLiteralClosing = textLiteralOpening;
 
@@ -13,12 +12,11 @@ class Literals
     static constexpr const char* falseLiteral = "false";
 
 public:
-
-    static bool isTextLiteral(const QString& word);
-
     static bool isNumberLiteral(const QString& word);
 
     static bool isTriggerLiteral(const QString& word);
+
+    static bool isQuote(const QString& word);
 };
 
 #endif // LITERALS_H

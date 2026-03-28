@@ -4,7 +4,6 @@
 #include <stdexcept>
 #include <QString>
 
-
 class LexerError : public std::runtime_error {
 public:
     LexerError(const QString& msg, int line = -1, int col = -1)

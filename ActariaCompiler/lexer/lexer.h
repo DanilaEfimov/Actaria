@@ -3,30 +3,27 @@
 
 #include "token.h"
 
-#include <QString>
-#include <QVector>
-
-
-class Token;
+#include <QStringList>
 
 struct Position {
-    int line;
-    int column;
+    int line = 0;
+    int column = 0;
 };
-
-typedef QVector<QString> text_t;
 
 class Lexer
 {
-    QVector<text_t> source;
+    QStringList source;
+    QStringList currentWords;
     Position pos;
 
     void increment() noexcept;
-
+    void tokenizeCurrentLine();
     static TokenCategory checkCategory(const QString& value);
 
+    Token collectTextLiteral();
+
 public:
-    Lexer(const text_t& source);
+    explicit Lexer(const QStringList& sourceLines);
 
     Token nextToken();
 

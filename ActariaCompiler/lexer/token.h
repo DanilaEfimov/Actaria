@@ -15,7 +15,10 @@ enum class TokenCategory : uint8_t {
     Separator,
     LBrace,
     RBrace,
-    Eof
+    Quote,
+    Colon,
+    Eof,
+    Unknown
 };
 
 

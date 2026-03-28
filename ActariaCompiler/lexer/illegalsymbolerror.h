@@ -7,6 +7,7 @@ class IllegalSymbolError : public LexerError
 {
 public:
     IllegalSymbolError(int col, int line);
+    IllegalSymbolError(const char* msg);
 };
 
 #endif // ILLEGALSYMBOLERROR_H

@@ -1,3 +1,2 @@
-#include "statemate.h"
+#include "parser/nodes/statemate.h"
 
-Statemate::Statemate() {}

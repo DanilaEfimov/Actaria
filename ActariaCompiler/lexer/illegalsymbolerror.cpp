@@ -6,3 +6,7 @@ IllegalSymbolError::IllegalSymbolError(int col, int line)
                  + ", "
                  + QString::number(col + 1) + ")")
 {}
+
+IllegalSymbolError::IllegalSymbolError(const char *msg)
+    : LexerError(msg)
+{}

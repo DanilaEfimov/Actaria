@@ -29,7 +29,7 @@ QSet<QString> Pointing::arithmetic = QSet<QString>({
     ">",    // greater check operator
     "<",    // less check operator
     ">=",   // greater or equals check operator
-    "<=",   // less or equals checl operator
+    "<=",   // less or equals check operator
 });
 
 /**
@@ -38,6 +38,47 @@ QSet<QString> Pointing::arithmetic = QSet<QString>({
 QSet<QString> Pointing::separators = QSet<QString>({
     ";",    // operators separator
 });
+
+/**
+ * @brief Pointing::isColon
+ * @param word
+ * @return
+ */
+bool Pointing::isColon(const QString &word)
+{
+    return word.trimmed() == ":";
+}
+
+/**
+ * @brief Pointing::isIdentifierPart
+ * @param ch
+ * @return
+ */
+bool Pointing::isIdentifierPart(QChar ch)
+{
+    return ch.isLetterOrNumber() || ch == '_';
+}
+
+/**
+ * @brief Pointing::isIdentifier
+ * @param word
+ * @return
+ */
+bool Pointing::isIdentifier(const QString& word)
+{
+    if (word.isEmpty())
+        return false;
+
+    if (!(word[0].isLetter() || word[0] == '_'))
+        return false;
+
+    for (int i = 1; i < word.size(); ++i) {
+        if (!isIdentifierPart(word[i]))
+            return false;
+    }
+
+    return true;
+}
 
 /**
  * @brief Pointing::isBracket
@@ -82,7 +123,7 @@ QString Pointing::leftBracketFor(const QString &right)
             return it.key();
     }
 
-    throw IllegalSymbolError();
+    throw IllegalSymbolError("Pointing::leftBracketFor: given string is not a bracket");
 }
 
 /**
@@ -96,7 +137,7 @@ QString Pointing::rightBracketFor(const QString &left)
         return Pointing::brackets[left];
     }
 
-    throw IllegalSymbolError();
+    throw IllegalSymbolError("Pointing::rightBracketFor: given string is not a bracket");
 }
 
 /**

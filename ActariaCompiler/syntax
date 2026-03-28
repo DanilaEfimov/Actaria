@@ -1,0 +1,22 @@
+<scene_definition> ::= "Scene" <identifier> "{" <scene_body> "}"
+
+<scene_body> ::= { <scene_element> }
+
+<scene_element> ::= <variable_declaration>
+                  | <labeled_block>
+
+<variable_declaration> ::= <type_name> <identifier> "=" <expression> ";"
+
+<labeled_block> ::= <label> ":" <identifier> "{" <string_list> "}"
+
+<label> ::= <identifier>
+
+<type_name> ::= "Text" | "Trigger" | "Counter"
+
+<string_list> ::= <string_literal> { "," <string_literal> }
+
+<string_literal> ::= "\"" <string_characters> "\""
+
+<identifier> ::= <letter> { <letter> | <digit> | "_" }
+
+<expression> ::= ...

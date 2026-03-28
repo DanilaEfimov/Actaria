@@ -13,6 +13,11 @@ class Pointing
     static QSet<QString> separators;
 
 public:
+    static bool isColon(const QString& word);
+
+    static bool isIdentifierPart(QChar ch);
+
+    static bool isIdentifier(const QString& word);
 
     static bool isBracket(const QString& word);
 
